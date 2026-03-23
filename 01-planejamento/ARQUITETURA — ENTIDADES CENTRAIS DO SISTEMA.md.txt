@@ -1,0 +1,808 @@
+# ARQUITETURA — ENTIDADES CENTRAIS DO SISTEMA
+
+## 1. OBJETIVO DESTA FASE
+
+Esta fase tem como objetivo definir, de forma oficial, clara e sem ambiguidade, quais são as entidades centrais do LICITAIA V2 e qual é o papel de cada uma dentro do sistema.
+
+Nesta etapa, entidade não deve ser entendida como tabela, código, biblioteca ou detalhe técnico de implementação.  
+Entidade, aqui, significa peça real do domínio do sistema.
+
+Ou seja: cada entidade definida nesta fase representa um elemento estrutural necessário para que o LICITAIA consiga cumprir sua função principal como motor de conformidade administrativa preventiva.
+
+O LICITAIA não é um gerador livre de documentos.  
+Ele é um sistema que precisa:
+
+- estruturar a decisão administrativa
+- aplicar travas normativas
+- registrar eventos administrativos
+- preservar a linha lógica do processo
+- impedir salto indevido de etapa
+- manter rastreabilidade completa das decisões tomadas
+
+Por isso, as entidades da V2 não podem nascer como lista solta de nomes.  
+Elas precisam nascer como peças coerentes do domínio, amarradas ao fluxo central do sistema e à sua função jurídico-operacional.
+
+O objetivo desta fase não é expandir o sistema.  
+O objetivo desta fase é consolidar o núcleo.
+
+A lógica correta é:
+
+- definir poucas entidades
+- definir as entidades certas
+- garantir que cada uma tenha papel claro
+- evitar entidades decorativas
+- evitar entidades prematuras
+- evitar duplicidade de responsabilidade
+- preparar o sistema para evolução futura sem inflar a base agora
+
+Esta fase existe para garantir que a V2 nasça com um modelo de domínio limpo, compreensível, auditável, juridicamente coerente e seguro para implementação posterior.
+
+---
+
+## 2. CRITÉRIO OFICIAL PARA DEFINIR ENTIDADES
+
+Uma entidade central do LICITAIA V2 só deve existir se cumprir pelo menos uma função indispensável ao núcleo do sistema.
+
+Os critérios oficiais são os seguintes:
+
+### 2.1. critério de relevância de domínio
+A entidade deve representar algo real, necessário e recorrente dentro da lógica do processo administrativo de contratação.
+
+### 2.2. critério de impacto no fluxo
+A entidade deve sustentar ou influenciar o fluxo central obrigatório do sistema:
+
+DFD  
+ETP  
+TR  
+Pesquisa de preços  
+Encaminhamento do processo
+
+Se uma peça interfere de forma real nessa progressão, ela pode ser entidade.  
+Se não interfere, deve ser tratada com cautela.
+
+### 2.3. critério de conformidade
+A entidade deve servir para receber, suportar ou influenciar travas normativas, exigências legais, validações administrativas ou coerência documental.
+
+### 2.4. critério de rastreabilidade
+A entidade deve permitir ou exigir registro de eventos, validações, histórico, linha do tempo ou reconstrução posterior da decisão administrativa.
+
+### 2.5. critério de cobertura do núcleo
+A entidade deve ajudar o sistema a cobrir, sem ruptura arquitetural, as combinações centrais já assumidas pelo LICITAIA:
+
+- regime jurídico
+- tipo de objeto
+- estrutura do objeto
+- forma de execução
+
+### 2.6. critério de não expansão desnecessária
+Nenhuma entidade deve nascer nesta fase apenas porque pode ser útil no futuro.  
+Entidade sem necessidade atual do núcleo não deve entrar agora.
+
+### 2.7. critério de clareza estrutural
+A entidade deve ter papel facilmente compreensível para novos programadores e para a evolução segura do sistema.
+
+Se uma entidade não tiver função clara, ela não deve entrar.
+
+---
+
+## 3. ENTIDADE-MÃE DO DOMÍNIO
+
+## Processo Administrativo de Contratação
+
+A entidade central e dominante do LICITAIA V2 é o **Processo Administrativo de Contratação**.
+
+Esta é a entidade-mãe do domínio.
+
+Isso significa que o sistema não deve ser modelado como conjunto de documentos soltos.  
+Ele deve ser modelado como um processo administrativo estruturado, dentro do qual os demais elementos existem, se relacionam e evoluem.
+
+Tudo o que é relevante no LICITAIA deve nascer dentro de um processo.
+
+O processo é a unidade central de organização do domínio porque é nele que se concentram:
+
+- o enquadramento jurídico do caso
+- a definição do objeto
+- a estrutura do objeto
+- as etapas do fluxo
+- as justificativas
+- a memória de cálculo
+- a pesquisa de preços
+- os eventos administrativos
+- os registros de conformidade
+- a trilha de auditoria
+- o estado de progressão
+
+Sem esta centralidade, o sistema vira um conjunto de telas, formulários e artefatos desconectados.
+
+Portanto, fica definido como regra oficial da V2:
+
+**nenhuma entidade juridicamente ou operacionalmente relevante deve existir de forma solta fora do Processo Administrativo de Contratação.**
+
+---
+
+## 4. MAPA OFICIAL DAS ENTIDADES CENTRAIS
+
+As entidades centrais da V2 ficam organizadas em quatro grupos:
+
+- entidades nucleares
+- entidades operacionais
+- entidades de auditoria
+- entidades auxiliares
+
+Essa separação é obrigatória para preservar clareza, baixo acoplamento e comando correto do domínio.
+
+---
+
+## 5. ENTIDADES NUCLEARES
+
+Entidades nucleares são aquelas que formam o coração jurídico-operacional do LICITAIA.
+
+São elas que definem o caso concreto, sustentam o fluxo principal e recebem as travas essenciais do sistema.
+
+### 5.1. Processo Administrativo de Contratação
+É a entidade-mãe do domínio.
+
+Representa o caso administrativo concreto que está sendo estruturado no sistema.
+
+Tudo que for central deve estar contido nele ou vinculado a ele.
+
+### 5.2. Enquadramento do Processo
+É a entidade responsável por concentrar as escolhas estruturantes do caso.
+
+Ela deve representar, no mínimo, a combinação entre:
+
+- regime jurídico
+- tipo de objeto
+- estrutura do objeto
+- forma de execução
+
+Ela existe porque essa combinação define as exigências, travas, comportamentos e coerência do processo.
+
+O sistema não pode espalhar essa definição em pedaços desconectados.  
+O enquadramento precisa existir como peça central de comando lógico do processo.
+
+### 5.3. Estrutura do Objeto
+É a entidade que define como o objeto foi organizado administrativamente.
+
+Ela deve sustentar, no mínimo, as três possibilidades centrais:
+
+- item único
+- múltiplos itens
+- lote
+
+Ela merece entidade própria porque essa decisão impacta diretamente:
+
+- memória de cálculo
+- pesquisa de preços
+- justificativa técnica
+- consolidação do valor
+- lógica documental do processo
+
+### 5.4. Item do Processo
+É a entidade que representa a unidade concreta do objeto dentro da contratação.
+
+Mesmo quando o processo tiver item único, a modelagem da V2 deve tratar item como peça real do domínio, porque o sistema precisa nascer pronto para:
+
+- item único
+- múltiplos itens
+- lote
+
+Sem isso, a evolução futura do núcleo quebra ou fica artificial.
+
+### 5.5. DFD
+Representa o Documento de Formalização da Demanda como etapa nuclear do processo.
+
+No LICITAIA, o DFD não deve ser tratado como arquivo solto.  
+Ele é uma entidade do domínio porque representa a entrada estruturada da necessidade administrativa.
+
+### 5.6. ETP
+Representa o Estudo Técnico Preliminar como etapa central do fluxo.
+
+Ele existe como entidade porque não é apenas um texto.  
+Ele é parte da lógica de validação, fundamentação e amadurecimento da contratação.
+
+### 5.7. TR
+Representa o Termo de Referência como etapa nuclear de consolidação técnica e operacional da contratação.
+
+É entidade própria porque concentra definição do objeto, critérios, execução, exigências e coerência material da futura contratação.
+
+### 5.8. Memória de Cálculo
+É entidade nuclear do sistema.
+
+Não pode ser tratada como apêndice ou cálculo genérico.
+
+Ela existe porque a definição quantitativa do objeto precisa ser tecnicamente sustentada e juridicamente coerente.
+
+Além disso, o LICITAIA já assume que memória de cálculo precisa distinguir, no mínimo:
+
+- lógica de consumo
+- lógica de dimensionamento institucional
+
+Portanto, esta entidade pertence ao coração do domínio.
+
+### 5.9. Pesquisa de Preços
+Também é entidade nuclear.
+
+Ela existe para estruturar a fundamentação econômica da contratação de forma coerente com a estrutura do objeto e com a lógica normativa aplicável.
+
+Não pode ser tratada como bloco solto nem como simples saída documental.
+
+---
+
+## 6. ENTIDADES OPERACIONAIS
+
+Entidades operacionais são aquelas que não comandam o domínio, mas são indispensáveis para que o núcleo funcione corretamente.
+
+### 6.1. Referência de Preço
+É a entidade que representa cada fonte, coleta, parâmetro ou referência usada dentro da pesquisa de preços.
+
+Ela existe porque a Pesquisa de Preços precisa ser sustentada por elementos concretos e rastreáveis.
+
+### 6.2. Consolidação de Valor
+É a entidade que representa o fechamento econômico do processo, do item ou do lote, conforme a estrutura adotada.
+
+Ela existe porque o valor final não deve surgir como número solto.  
+Ele precisa resultar da lógica combinada entre estrutura do objeto, memória de cálculo e pesquisa de preços.
+
+### 6.3. Justificativa Administrativa
+É a entidade usada para registrar fundamentações específicas exigidas em pontos críticos do processo.
+
+Ela deve existir para suportar decisões como, por exemplo:
+
+- dispensa
+- inexigibilidade
+- agrupamento em lote
+- escolha metodológica relevante
+- justificativa de configuração do objeto
+- justificativa de escolha administrativa sensível
+
+Ela não substitui DFD, ETP ou TR.  
+Ela complementa o núcleo quando houver necessidade específica de fundamentação formal.
+
+---
+
+## 7. ENTIDADES DE AUDITORIA
+
+Entidades de auditoria são aquelas que garantem rastreabilidade, integridade da linha do tempo e reconstrução posterior da decisão administrativa.
+
+Elas são essenciais ao LICITAIA, mas não podem comandar o domínio.
+
+### 7.1. Evento Administrativo
+É entidade obrigatória.
+
+Representa cada ação, decisão, alteração, validação relevante ou marco do processo que precise compor a linha do tempo administrativa.
+
+Essa entidade é indispensável porque o LICITAIA deve registrar eventos administrativos de forma padronizada e rastreável.
+
+### 7.2. Registro de Conformidade
+É a entidade que representa o resultado de validações, travas, alertas, bloqueios ou verificações de conformidade aplicadas pelo sistema.
+
+Ela existe para registrar o comportamento normativo do LICITAIA sobre o processo.
+
+### 7.3. Etapa do Processo
+É a entidade responsável por representar o estado de progressão do processo dentro do fluxo oficial.
+
+Ela existe para impedir salto indevido, controlar o avanço e registrar a posição atual do processo na jornada obrigatória.
+
+Essa entidade não deve ser tratada como simples status visual de tela.  
+Ela é peça estrutural de controle do fluxo.
+
+---
+
+## 8. ENTIDADES AUXILIARES
+
+Entidades auxiliares ajudam o domínio, mas não podem dirigir o sistema.
+
+### 8.1. Base Normativa Aplicada
+É a entidade que representa o fundamento legal, normativo ou regulatório associado a uma decisão, validação, trava ou justificativa.
+
+Ela existe para reforçar coerência normativa e auditabilidade.
+
+### 8.2. Anexo ou Evidência Documental
+É a entidade que representa documentos de suporte, arquivos vinculados, evidências ou materiais de apoio associados ao processo ou a alguma etapa.
+
+Ela é importante, mas não comanda a lógica do sistema.
+
+### 8.3. Relatório de Conformidade
+É a entidade de saída estruturada do sistema.
+
+Ela existe para demonstrar, consolidar e apresentar o estado de conformidade do processo, mas não deve ser tratada como centro do domínio.
+
+---
+
+## 9. CLASSIFICAÇÃO OFICIAL DAS ENTIDADES
+
+### 9.1. entidades nucleares
+- Processo Administrativo de Contratação
+- Enquadramento do Processo
+- Estrutura do Objeto
+- Item do Processo
+- DFD
+- ETP
+- TR
+- Memória de Cálculo
+- Pesquisa de Preços
+
+### 9.2. entidades operacionais
+- Referência de Preço
+- Consolidação de Valor
+- Justificativa Administrativa
+
+### 9.3. entidades de auditoria
+- Evento Administrativo
+- Registro de Conformidade
+- Etapa do Processo
+
+### 9.4. entidades auxiliares
+- Base Normativa Aplicada
+- Anexo ou Evidência Documental
+- Relatório de Conformidade
+
+---
+
+## 10. ENTIDADES QUE COMANDAM O DOMÍNIO
+
+As entidades que comandam o domínio do LICITAIA V2 são:
+
+- Processo Administrativo de Contratação
+- Enquadramento do Processo
+- Estrutura do Objeto
+- Item do Processo
+- DFD
+- ETP
+- TR
+- Memória de Cálculo
+- Pesquisa de Preços
+
+Essas entidades formam o coração jurídico-operacional do sistema.
+
+São elas que definem:
+
+- o caso concreto
+- o comportamento do fluxo
+- a aplicação das travas
+- a exigência das justificativas
+- a coerência entre etapas
+- a consistência material do processo
+
+---
+
+## 11. ENTIDADES DERIVADAS QUE NÃO PODEM COMANDAR O DOMÍNIO
+
+As entidades abaixo são importantes, mas derivadas:
+
+- Evento Administrativo
+- Registro de Conformidade
+- Etapa do Processo
+- Relatório de Conformidade
+- Base Normativa Aplicada
+- Anexo ou Evidência Documental
+- Consolidação de Valor
+- Referência de Preço
+- Justificativa Administrativa
+
+Essas entidades não podem assumir o comando do domínio.
+
+Isso significa, por exemplo:
+
+- o processo não pode ser definido por relatório
+- a decisão não pode nascer do evento
+- a lógica do caso não pode ficar dependente de anexo
+- o fluxo não pode ser substituído por registro superficial de status
+- o sistema não pode tratar conformidade como camada separada do domínio central
+
+O domínio deve comandar.  
+A auditoria deve registrar.  
+A documentação deve refletir.  
+A saída deve derivar.
+
+Essa hierarquia é obrigatória.
+
+---
+
+## 12. RELAÇÕES OBRIGATÓRIAS ENTRE AS ENTIDADES
+
+A V2 deve adotar, desde já, as seguintes relações obrigatórias.
+
+### 12.1. tudo nasce dentro do processo
+Toda entidade relevante do núcleo deve estar vinculada ao Processo Administrativo de Contratação.
+
+Não deve existir DFD solto.  
+Não deve existir ETP solto.  
+Não deve existir TR solto.  
+Não deve existir memória de cálculo solta.  
+Não deve existir pesquisa de preços solta.
+
+### 12.2. o enquadramento influencia o restante do domínio
+O Enquadramento do Processo deve influenciar diretamente:
+
+- DFD
+- ETP
+- TR
+- memória de cálculo
+- pesquisa de preços
+- justificativas obrigatórias
+- validações de conformidade
+- travas do processo
+
+Isso é obrigatório porque a combinação entre regime jurídico, tipo de objeto, estrutura do objeto e forma de execução define o comportamento do sistema.
+
+### 12.3. a estrutura do objeto governa a composição do caso
+A Estrutura do Objeto deve comandar:
+
+- a existência de item único, múltiplos itens ou lote
+- a forma de distribuir cálculo
+- a forma de estruturar a pesquisa de preços
+- a forma de consolidar o valor
+- a necessidade de justificativas específicas
+
+### 12.4. item nunca existe de forma autônoma
+O Item do Processo sempre deve estar subordinado a:
+
+- um processo
+- uma estrutura do objeto
+
+Item é peça do domínio, mas nunca entidade autônoma solta.
+
+### 12.5. DFD, ETP e TR pertencem ao fluxo obrigatório
+As entidades DFD, ETP e TR devem existir como partes vinculadas ao processo e subordinadas à ordem lógica oficial.
+
+Elas não são peças aleatórias.  
+Elas compõem a progressão obrigatória do núcleo.
+
+### 12.6. memória de cálculo e pesquisa de preços devem se ligar ao objeto real
+Memória de Cálculo e Pesquisa de Preços devem estar vinculadas:
+
+- ao processo
+- à estrutura do objeto
+- ao item, quando aplicável
+
+Essa relação é obrigatória para impedir tratamento genérico e artificial desses blocos.
+
+### 12.7. referências de preço pertencem à pesquisa de preços
+A entidade Referência de Preço deve sempre estar subordinada à Pesquisa de Preços.
+
+Ela existe para sustentar a pesquisa, e não para existir isoladamente.
+
+### 12.8. consolidação de valor deriva do cálculo e da pesquisa
+A Consolidação de Valor deve sempre ser consequência lógica de:
+
+- estrutura do objeto
+- memória de cálculo
+- pesquisa de preços
+
+Ela não pode nascer como número manual sem lastro do domínio.
+
+### 12.9. justificativa administrativa sempre aponta para decisão concreta
+A Justificativa Administrativa deve estar associada a:
+
+- um processo
+- uma decisão específica
+- uma escolha sensível do domínio
+- uma hipótese que exija fundamentação
+
+Ela não pode ser entidade genérica sem causa definida.
+
+### 12.10. evento administrativo nasce de ação real do domínio
+Todo Evento Administrativo deve nascer de fato relevante ocorrido sobre alguma entidade do processo.
+
+Evento não pode ser log artificial.  
+Ele deve registrar ação real, rastreável e compreensível.
+
+### 12.11. registro de conformidade sempre deve apontar para algo verificável
+Todo Registro de Conformidade deve estar vinculado a:
+
+- processo
+- etapa
+- documento ou decisão concreta
+- trava aplicada, alerta ou bloqueio
+- fundamento normativo, quando couber
+
+### 12.12. etapa do processo deve controlar avanço real
+A entidade Etapa do Processo deve controlar a posição do processo dentro do fluxo obrigatório.
+
+Ela deve refletir avanço real, e não mero marcador visual de interface.
+
+### 12.13. relatório de conformidade deve ser sempre derivado
+Relatório de Conformidade deve ser consequência do que ocorreu no processo.
+
+Nunca deve ser tratado como fonte primária do domínio.
+
+---
+
+## 13. ENTIDADES QUE DEVEM NASCER DESDE JÁ
+
+As entidades abaixo são indispensáveis ao núcleo e devem nascer desde já na V2:
+
+- Processo Administrativo de Contratação
+- Enquadramento do Processo
+- Estrutura do Objeto
+- Item do Processo
+- DFD
+- ETP
+- TR
+- Memória de Cálculo
+- Pesquisa de Preços
+- Referência de Preço
+- Consolidação de Valor
+- Justificativa Administrativa
+- Evento Administrativo
+- Registro de Conformidade
+- Etapa do Processo
+- Base Normativa Aplicada
+- Anexo ou Evidência Documental
+- Relatório de Conformidade
+
+Essas entidades já são suficientes para estruturar o núcleo do LICITAIA V2 com coerência, auditabilidade e evolução controlada.
+
+---
+
+## 14. ENTIDADES QUE NÃO DEVEM EXISTIR AGORA
+
+Para evitar expansão desnecessária e preservar foco no núcleo, as entidades abaixo não devem nascer nesta fase:
+
+- Usuário
+- Perfil de acesso
+- Sessão
+- Credencial
+- Organização cliente
+- Prefeitura ou órgão em modelo multicliente completo
+- Unidade administrativa detalhada
+- Setor detalhado
+- Equipe
+- Permissão granular
+- Papel avançado de acesso
+- Notificação
+- Chat interno
+- Comentários paralelos como entidade central
+- Assinatura eletrônica
+- Workflow paralelo complexo
+- Esteira de publicação externa
+- Plano
+- Cobrança
+- Billing
+- Integração externa como entidade central
+- Agente de IA como entidade de domínio
+- Métrica analítica avançada como entidade nuclear
+- Dashboard como entidade de domínio
+- Versionamento complexo de documentos
+- Filas operacionais periféricas
+
+Essas frentes podem existir futuramente, mas não pertencem ao núcleo desta fase.
+
+Criá-las agora geraria:
+
+- complexidade prematura
+- dispersão do foco
+- aumento de acoplamento
+- dificuldade de manutenção
+- risco de inflação arquitetural
+
+A V2 deve crescer por necessidade comprovada, não por antecipação excessiva.
+
+---
+
+## 15. ENTIDADES QUE PRECISAM NASCER PREPARADAS PARA EVOLUÇÃO FUTURA
+
+Sem aprofundar fases futuras agora, algumas entidades já precisam nascer estruturalmente preparadas para suportar a evolução da V2.
+
+### 15.1. preparação para rastreabilidade
+As seguintes entidades precisam nascer preparadas para rastreabilidade:
+
+- Processo Administrativo de Contratação
+- DFD
+- ETP
+- TR
+- Memória de Cálculo
+- Pesquisa de Preços
+- Justificativa Administrativa
+- Etapa do Processo
+
+Essas entidades precisam admitir vinculação futura com:
+
+- evento administrativo
+- linha do tempo
+- histórico de alteração
+- posição no fluxo
+- responsável pela ação
+
+### 15.2. preparação para eventos administrativos
+As seguintes entidades devem nascer preparadas para gerar eventos:
+
+- Processo
+- DFD
+- ETP
+- TR
+- Memória de Cálculo
+- Pesquisa de Preços
+- Justificativa Administrativa
+- Etapa do Processo
+- Registro de Conformidade
+
+### 15.3. preparação para progressão de etapas
+As seguintes entidades precisam nascer preparadas para respeitar a ordem obrigatória do fluxo:
+
+- Processo
+- DFD
+- ETP
+- TR
+- Pesquisa de Preços
+- Etapa do Processo
+
+### 15.4. preparação para travas de conformidade
+As seguintes entidades precisam nascer aptas a receber ou influenciar travas normativas:
+
+- Enquadramento do Processo
+- Estrutura do Objeto
+- Item do Processo
+- DFD
+- ETP
+- TR
+- Memória de Cálculo
+- Pesquisa de Preços
+- Justificativa Administrativa
+
+### 15.5. preparação para autenticação futura
+Sem ainda modelar autenticação, as entidades centrais devem nascer preparadas para futura associação com:
+
+- responsável pela criação
+- responsável pela alteração
+- responsável pela validação
+- responsável pelo avanço de etapa
+
+Essa preparação é especialmente necessária para:
+
+- Processo
+- DFD
+- ETP
+- TR
+- Memória de Cálculo
+- Pesquisa de Preços
+- Evento Administrativo
+- Registro de Conformidade
+- Etapa do Processo
+
+### 15.6. preparação para multiusuário e multicliente futuro
+Sem aprofundar isso agora, as entidades centrais também precisam nascer sem impedir associação futura com:
+
+- organização
+- órgão
+- unidade administrativa
+- usuário responsável
+- perfil de atuação
+
+Essa preparação é especialmente importante para:
+
+- Processo
+- Evento Administrativo
+- Registro de Conformidade
+- Etapa do Processo
+- Relatório de Conformidade
+
+Importante: nesta fase, essa preparação é apenas estrutural de domínio.  
+Não significa iniciar agora a modelagem completa dessas frentes.
+
+---
+
+## 16. PRINCÍPIOS OBRIGATÓRIOS DA MODELAGEM DE ENTIDADES DA V2
+
+### 16.1. processo no centro
+Toda entidade central deve orbitar o Processo Administrativo de Contratação.
+
+### 16.2. domínio antes de documento
+O LICITAIA não deve ser modelado como repositório de documentos, mas como sistema de estruturação da decisão administrativa.
+
+### 16.3. enquadramento governa comportamento
+A combinação entre regime jurídico, tipo de objeto, estrutura do objeto e forma de execução deve influenciar o restante do sistema a partir do Enquadramento do Processo.
+
+### 16.4. itemização real
+A modelagem deve tratar item como peça real do domínio, e não como improviso para casos complexos.
+
+### 16.5. lote deve nascer corretamente
+A estrutura por lote não pode ser solução periférica ou remendo.  
+Ela precisa nascer corretamente amarrada à estrutura do objeto, ao cálculo, à pesquisa de preços e à consolidação do valor.
+
+### 16.6. cálculo e preço pertencem ao núcleo
+Memória de Cálculo e Pesquisa de Preços são entidades centrais e não podem ser tratadas como apêndices.
+
+### 16.7. progressão obrigatória
+As entidades devem respeitar o fluxo oficial do sistema e impedir salto indevido de etapa.
+
+### 16.8. auditoria nasce do domínio
+Evento, conformidade e relatório devem derivar do domínio e não comandá-lo.
+
+### 16.9. clareza para evolução
+A modelagem deve ser facilmente compreensível para quem entrar no projeto depois.
+
+### 16.10. baixo acoplamento
+Cada entidade deve ter função clara e responsabilidade bem delimitada.
+
+### 16.11. sem perfumaria arquitetural
+Não criar entidade apenas para parecer sistema mais sofisticado.
+
+### 16.12. regressão zero
+Nenhuma entidade desta fase pode enfraquecer:
+
+- a lógica do fluxo
+- a coerência jurídica
+- a auditabilidade
+- a rastreabilidade
+- a simplicidade de manutenção
+
+---
+
+## 17. RISCOS ARQUITETURAIS QUE DEVEM SER EVITADOS
+
+A modelagem de entidades da V2 deve evitar, obrigatoriamente, os seguintes erros:
+
+### 17.1. processo fraco ou descentralizado
+Se o processo não for a entidade central, o sistema se fragmenta.
+
+### 17.2. enquadramento espalhado
+Se regime, tipo de objeto, estrutura e forma de execução ficarem espalhados sem entidade organizadora, as travas ficam difusas e o sistema perde coerência.
+
+### 17.3. item tratado como detalhe secundário
+Se item não nascer corretamente, múltiplos itens e lote se tornam improviso posterior.
+
+### 17.4. memória de cálculo tratada como acessório
+Isso compromete a solidez material do processo.
+
+### 17.5. pesquisa de preços tratada como bloco genérico
+Isso enfraquece aderência normativa e rompe coerência com a estrutura do objeto.
+
+### 17.6. evento administrativo solto
+Evento sem origem clara vira log artificial e perde valor de auditoria.
+
+### 17.7. etapa tratada como simples status visual
+Isso enfraquece a progressão obrigatória e o bloqueio real do fluxo.
+
+### 17.8. relatório comandando o domínio
+Relatório deve refletir o processo, nunca governá-lo.
+
+### 17.9. explosão prematura de entidades periféricas
+Isso dificulta implementação, leitura do sistema e manutenção futura.
+
+### 17.10. antecipação indevida de autenticação e multicliente
+Esses temas devem ser preparados, mas não dominarem a Fase 5.
+
+---
+
+## 18. DEFINIÇÃO OFICIAL RESUMIDA DA FASE 5
+
+Fica definido que a Fase 5 do LICITAIA V2 estabelece o modelo central de domínio do sistema a partir de uma entidade-mãe chamada **Processo Administrativo de Contratação**, cercada por entidades nucleares, operacionais, de auditoria e auxiliares.
+
+As entidades nucleares formam o coração jurídico-operacional do sistema e sustentam:
+
+- o enquadramento do caso
+- a estrutura do objeto
+- a itemização
+- o fluxo obrigatório
+- a memória de cálculo
+- a pesquisa de preços
+
+As entidades operacionais sustentam a execução concreta do núcleo.  
+As entidades de auditoria garantem rastreabilidade, eventos, validações e progressão.  
+As entidades auxiliares apoiam documentação, fundamento normativo e saídas estruturadas.
+
+Também fica definido que:
+
+- o domínio deve comandar o sistema
+- a auditoria deve registrar o domínio
+- as saídas documentais devem derivar do domínio
+- entidades periféricas não devem nascer agora
+- a modelagem já deve estar preparada, sem aprofundamento prematuro, para rastreabilidade, autenticação futura e modelo multiusuário/multicliente futuro
+
+Com isso, a V2 fica oficialmente preparada para avançar à próxima fase sem improviso, sem expansão indevida e com preservação integral da coerência estrutural do LICITAIA.
+
+---
+
+## 19. DIRETRIZ FINAL DA FASE
+
+A modelagem de entidades da V2 deve obedecer a uma regra simples e inegociável:
+
+**o LICITAIA não deve ser organizado em torno de telas, relatórios ou documentos isolados.  
+Ele deve ser organizado em torno do processo administrativo, da estrutura da decisão e da conformidade preventiva.**
+
+Essa é a base oficial da Fase 5.
+
+Regressão zero.

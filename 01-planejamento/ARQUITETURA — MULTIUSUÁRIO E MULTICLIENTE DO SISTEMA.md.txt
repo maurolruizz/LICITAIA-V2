@@ -1,0 +1,382 @@
+ARQUITETURA — MODELO MULTIUSUÁRIO E MULTICLIENTE DO SISTEMA
+1. Visão geral da fase
+
+A Fase 7 da reconstrução do LICITAIA V2 tem como objetivo definir, de forma estrutural e oficial, o modelo de operação multiusuário e multicliente do sistema.
+
+Esta fase estabelece como o LICITAIA funcionará quando houver múltiplos operadores humanos atuando simultaneamente dentro da plataforma e quando múltiplos órgãos públicos utilizarem o sistema ao mesmo tempo, preservando isolamento institucional completo entre eles.
+
+O LICITAIA deve nascer preparado para operar como uma plataforma institucional compartilhada, capaz de atender diversos órgãos públicos sem mistura de dados, sem mistura de processos e sem mistura de trilhas de auditoria.
+
+A fase não trata de implementação técnica, escolha de tecnologia ou modelagem física do banco de dados. O objetivo é definir a arquitetura conceitual que permitirá que o sistema cresça com segurança, escalabilidade e manutenção simples.
+
+Esta definição é indispensável porque o LICITAIA não é apenas um sistema de registro documental. Ele estrutura decisões administrativas, registra eventos relevantes, aplica travas normativas e preserva rastreabilidade completa do processo administrativo.
+
+Em um sistema com essas características, a separação correta entre usuários, clientes institucionais e contextos de operação é requisito estrutural.
+
+2. Por que multiusuário e multicliente entram agora
+
+A definição do modelo multiusuário e multicliente ocorre neste momento porque as fases anteriores já estabeleceram os fundamentos necessários para isso.
+
+Até aqui foram definidos:
+
+arquitetura geral do sistema
+
+estrutura de repositórios
+
+camadas do sistema
+
+arquitetura do banco de dados
+
+entidades centrais
+
+arquitetura de autenticação e segurança
+
+A autenticação definiu quem pode acessar o sistema e como a identidade do operador é reconhecida. Agora é necessário definir como múltiplos operadores coexistirão dentro do mesmo ambiente institucional e como múltiplos clientes institucionais coexistirão dentro do mesmo produto.
+
+Se esta definição fosse feita antes da autenticação, a modelagem ficaria abstrata demais. Se fosse feita depois da definição completa dos módulos e fluxos, o sistema correria o risco de nascer sem separação institucional adequada.
+
+Portanto, a Fase 7 estabelece o modelo de ocupação institucional do sistema após a definição da porta de entrada e antes da implementação do motor operacional.
+
+3. Definição de multiusuário no LICITAIA
+
+No contexto do LICITAIA, multiusuário significa que um mesmo cliente institucional pode ter vários operadores humanos utilizando o sistema simultaneamente.
+
+Dentro de um mesmo órgão público podem existir diferentes papéis operacionais envolvidos na condução de um processo administrativo.
+
+Exemplos de operadores institucionais incluem:
+
+administrador do sistema
+
+responsável pela demanda
+
+comprador ou agente de contratação
+
+assessor jurídico
+
+controlador interno
+
+gestor autorizador
+
+fiscal de contrato
+
+Todos esses operadores pertencem ao mesmo cliente institucional, mas podem exercer funções diferentes dentro do sistema.
+
+O modelo multiusuário do LICITAIA exige que cada operador possua identidade individual, trilha de ações própria e responsabilidade operacional vinculada às atividades que executa.
+
+Portanto, multiusuário no LICITAIA não significa apenas múltiplos logins. Significa coexistência de múltiplos operadores sobre os mesmos processos institucionais, com rastreabilidade individual completa das ações realizadas.
+
+4. Definição de multicliente no LICITAIA
+
+No LICITAIA, multicliente significa que órgãos públicos distintos utilizarão o mesmo produto, porém com isolamento institucional completo.
+
+Cada cliente institucional utilizará o sistema como se estivesse em seu próprio ambiente operacional.
+
+Exemplos de clientes distintos incluem:
+
+Prefeitura Municipal A
+
+Prefeitura Municipal B
+
+Câmara Municipal C
+
+Fundação Pública D
+
+Autarquia E
+
+Cada cliente institucional terá:
+
+seus próprios usuários
+
+seus próprios processos administrativos
+
+seus próprios documentos
+
+suas próprias trilhas de auditoria
+
+suas próprias configurações institucionais
+
+Embora todos utilizem o mesmo produto, os dados e processos de um cliente jamais poderão interferir ou se misturar com os de outro cliente.
+
+O LICITAIA será um produto único, mas cada cliente operará em um ambiente logicamente isolado dentro da plataforma.
+
+5. Decisão arquitetural sobre isolamento entre clientes
+
+Uma decisão arquitetural fundamental desta fase é a estratégia de isolamento entre clientes institucionais.
+
+Existem três modelos possíveis em sistemas SaaS:
+
+banco de dados separado por cliente
+
+schema separado por cliente
+
+banco compartilhado com isolamento lógico por cliente
+
+Após análise dos objetivos do projeto, a decisão oficial para o LICITAIA V2 é:
+
+produto único com banco compartilhado e isolamento lógico rigoroso por cliente institucional.
+
+Neste modelo:
+
+o sistema utiliza uma única estrutura de banco de dados
+
+as tabelas são compartilhadas
+
+cada registro pertence obrigatoriamente a um cliente institucional
+
+todas as operações de leitura e escrita respeitam esse vínculo institucional
+
+Isso significa que cada dado armazenado no sistema possui um identificador explícito de cliente institucional.
+
+Esse identificador deve ser obrigatório em todas as entidades operacionais do sistema.
+
+Nenhum processo, documento, evento administrativo ou registro relevante pode existir sem vínculo explícito com um cliente.
+
+Justificativa da decisão
+
+Este modelo foi escolhido porque oferece o melhor equilíbrio entre:
+
+simplicidade operacional
+
+custo de infraestrutura
+
+facilidade de manutenção
+
+velocidade de evolução da V2
+
+escalabilidade futura
+
+baixo acoplamento arquitetural
+
+Por que não banco separado por cliente neste momento
+
+A separação física de banco por cliente aumenta significativamente a complexidade operacional:
+
+provisionamento de bancos
+
+manutenção
+
+monitoramento
+
+backups
+
+atualização de versão
+
+migrações
+
+Esse modelo só se justifica em cenários de escala muito maior ou em exigências institucionais extremamente específicas.
+
+Por que não schema separado por cliente
+
+A separação por schema também aumenta a complexidade operacional sem trazer benefícios relevantes nesta fase da reconstrução.
+
+Conclusão arquitetural
+
+O LICITAIA V2 adotará o modelo:
+
+produto único + banco compartilhado + isolamento lógico obrigatório por cliente institucional.
+
+6. Diferença entre usuário, responsável operacional, organização, cliente e contexto
+
+Para que o modelo funcione corretamente, é necessário distinguir claramente alguns conceitos.
+
+Usuário é a pessoa autenticada que acessa o sistema.
+
+Responsável operacional é o usuário que, em determinado momento do processo, assume responsabilidade direta por uma ação relevante.
+
+Organização é a entidade institucional à qual o usuário pertence, como uma prefeitura, câmara ou fundação.
+
+Cliente é a organização tratada como unidade isolada dentro do sistema. No contexto do produto, cliente representa a unidade institucional contratante do LICITAIA.
+
+Contexto de operação é o ambiente institucional ativo no qual o usuário está operando naquele momento.
+
+Toda ação dentro do sistema deve ocorrer dentro de um contexto institucional definido.
+
+Isso significa que qualquer operação deve saber:
+
+qual usuário executou a ação
+
+em nome de qual cliente institucional
+
+em qual processo administrativo
+
+em qual etapa do fluxo
+
+7. Princípios estruturais obrigatórios
+
+A Fase 7 estabelece princípios obrigatórios que devem orientar toda a arquitetura do sistema.
+
+Todo dado pertence a um cliente institucional.
+
+O identificador do cliente institucional deve ser obrigatório em todas as entidades operacionais do sistema e nunca pode ser implícito ou opcional.
+
+Todo usuário opera dentro de um contexto institucional definido.
+
+Nenhum usuário pode operar no sistema sem estar associado a um cliente institucional.
+
+Toda ação relevante precisa registrar autoria individual.
+
+Mesmo em ambiente compartilhado, o rastro de ações deve ser pessoal e auditável.
+
+A separação entre clientes é obrigatória.
+
+Essa separação não pode depender apenas da interface do usuário. Ela deve ser imposta pela arquitetura do backend e pelo modelo de dados.
+
+A lógica de negócio deve ser centralizada.
+
+O frontend não pode decidir sozinho o que um usuário pode ver ou acessar entre clientes institucionais.
+
+A auditoria deve registrar tanto a autoria individual quanto o vínculo institucional da ação.
+
+O sistema deve registrar:
+
+usuário
+
+cliente
+
+processo
+
+etapa
+
+momento da ação
+
+tipo de ação executada
+
+8. Separação de dados e processos
+
+A separação entre clientes deve ocorrer em quatro níveis principais.
+
+Separação de usuários
+Usuários de um cliente não podem acessar usuários de outro cliente.
+
+Separação de processos
+Cada processo administrativo pertence a um único cliente institucional.
+
+Separação de documentos
+DFD, ETP, TR, pesquisas de preços, memórias de cálculo e eventos administrativos devem sempre estar vinculados ao cliente dono do processo.
+
+Separação de trilha de auditoria
+Cada evento administrativo precisa registrar:
+
+usuário
+
+cliente
+
+processo
+
+etapa
+
+data e hora
+
+ação executada
+
+Nenhum dado sensível pode ser salvo sem vínculo ao cliente institucional.
+
+9. O que deve existir agora
+
+Nesta fase devem existir apenas as definições estruturais.
+
+Devem existir:
+
+definição oficial de multiusuário
+
+definição oficial de multicliente
+
+decisão arquitetural de isolamento lógico por cliente
+
+definição da relação entre usuário, cliente e processo
+
+princípios obrigatórios de separação de dados
+
+princípios obrigatórios de trilha de auditoria institucional
+
+Blocos estruturais mínimos desta fase:
+
+cliente institucional
+
+usuário
+
+perfil ou papel do usuário
+
+vínculo do usuário com cliente
+
+processo vinculado ao cliente
+
+eventos administrativos vinculados a cliente e usuário
+
+contexto institucional de operação
+
+10. O que não deve existir agora
+
+Nesta fase não deve existir:
+
+modelagem física de banco
+
+criação de tabelas SQL
+
+escolha de tecnologia específica
+
+detalhamento de permissões por tela
+
+implementação de interface
+
+controle detalhado de UI
+
+arquitetura de microserviços
+
+separação física de bancos
+
+sistemas avançados de IAM
+
+Também não deve existir tentativa de resolver todos os cenários institucionais possíveis nesta etapa.
+
+A Fase 7 é estrutural, não operacional detalhada.
+
+11. Preparação para a fase seguinte
+
+A Fase 7 prepara o sistema para as próximas etapas da reconstrução.
+
+Após esta definição, o LICITAIA passa a saber:
+
+quem são os operadores
+
+qual é o cliente institucional ativo
+
+como os dados são isolados
+
+como os processos pertencem a um cliente
+
+como a auditoria se vincula ao cliente e ao usuário
+
+Essas definições são fundamentais para a construção do motor de fluxo do processo administrativo.
+
+12. Riscos arquiteturais
+
+Os principais riscos que devem ser evitados são:
+
+Mistura de dados entre clientes institucionais.
+
+Usuários operando sem contexto institucional definido.
+
+Trilhas de auditoria sem vínculo claro entre usuário e cliente.
+
+Confusão entre identidade do usuário e papel operacional.
+
+Complexidade excessiva na fase inicial da V2.
+
+Dependência do frontend para impor isolamento entre clientes.
+
+Multiusuário sem responsabilidade individual clara.
+
+13. Definição oficial resumida da Fase 7
+
+O LICITAIA V2 adotará modelo multiusuário e multicliente com isolamento lógico obrigatório por cliente institucional.
+
+O sistema será um produto único, capaz de atender múltiplos órgãos públicos simultaneamente.
+
+Cada cliente institucional operará em ambiente logicamente isolado dentro do sistema.
+
+O banco de dados será compartilhado, mas todo registro possuirá vínculo obrigatório com o cliente institucional ao qual pertence.
+
+Toda ação relevante registrará autoria individual e vínculo institucional.
+
+A separação entre clientes será garantida pela arquitetura do backend e pelo modelo de dados, não apenas pela interface do sistema.

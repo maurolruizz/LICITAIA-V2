@@ -1,0 +1,521 @@
+ARQUITETURA — BANCO DE DADOS DO SISTEMA
+
+LICITAIA V2 — Fase 4
+
+Este documento define a arquitetura oficial do banco de dados do sistema LICITAIA V2.
+
+O objetivo desta fase é estabelecer os princípios estruturais de persistência do sistema, sem ainda entrar na definição detalhada de entidades, campos ou modelagem técnica.
+
+Esta definição deve preservar integralmente:
+
+o núcleo de conformidade administrativa do LICITAIA
+
+a rastreabilidade completa do processo
+
+a integridade do fluxo administrativo
+
+a separação correta entre camadas do sistema
+
+a arquitetura definida nas fases anteriores da reconstrução da V2
+
+Esta fase não trata ainda de entidades detalhadas, não trata de autenticação e não inicia implementação técnica.
+
+O foco aqui é definir como o sistema armazena e organiza seus dados de forma segura, auditável e coerente com o domínio jurídico-administrativo.
+
+1 — Papel do banco de dados dentro do LICITAIA
+
+O banco de dados do LICITAIA não é apenas um mecanismo de armazenamento.
+
+Ele é responsável por preservar:
+
+a estrutura do processo administrativo
+
+o progresso entre etapas
+
+as decisões tomadas
+
+os dados produzidos em cada fase
+
+os registros de auditoria
+
+os vínculos entre os diferentes elementos do processo
+
+O banco funciona como espinha dorsal estrutural do sistema.
+
+Sem um modelo de dados sólido e auditável, o LICITAIA perderia sua principal característica:
+
+ser um motor de conformidade administrativa preventiva.
+
+2 — Modelo de banco adotado
+
+O LICITAIA V2 adota como núcleo oficial de persistência:
+
+BANCO DE DADOS RELACIONAL TRANSACIONAL
+
+O banco relacional será responsável por armazenar:
+
+estrutura do processo
+
+dados operacionais
+
+vínculos entre entidades
+
+eventos administrativos
+
+trilha de auditoria
+
+Campos semiestruturados podem existir como apoio controlado, mas nunca como base do domínio.
+
+3 — Justificativa da escolha do modelo relacional
+
+O LICITAIA trabalha com um domínio altamente estruturado e dependente de integridade lógica.
+
+O sistema possui:
+
+fluxo obrigatório entre etapas
+
+dependência entre registros
+
+regras de progressão do processo
+
+travas de conformidade
+
+necessidade de reconstrução cronológica
+
+rastreabilidade administrativa
+
+relações fortes entre elementos do processo
+
+Essas características exigem:
+
+integridade referencial
+
+consistência transacional
+
+capacidade de auditoria
+
+estrutura de relações claras entre registros
+
+Por essas razões, o modelo relacional é o mais adequado para sustentar o núcleo do sistema.
+
+4 — Capacidades obrigatórias do banco de dados
+
+O banco do LICITAIA V2 deve obrigatoriamente suportar os seguintes elementos estruturais.
+
+4.1 Persistência do processo administrativo
+
+O sistema deve manter registro persistente de cada processo em construção.
+
+Esse registro deve preservar:
+
+estado atual do processo
+
+etapa atual
+
+histórico de avanço
+
+vínculos com usuários responsáveis
+
+registros gerados ao longo das fases
+
+O banco deve permitir reconstruir o estado completo do processo a qualquer momento.
+
+4.2 Integridade entre decisões e contexto
+
+Cada decisão administrativa registrada no sistema precisa estar vinculada a:
+
+um processo específico
+
+uma etapa específica
+
+um responsável identificado
+
+um momento temporal definido
+
+Essa integridade é essencial para garantir rastreabilidade jurídica.
+
+4.3 Trilha de auditoria completa
+
+O banco precisa permitir reconstrução da linha do tempo administrativa.
+
+Devem ser registrados eventos como:
+
+criação de processo
+
+alteração de dados relevantes
+
+avanço de etapa
+
+bloqueios de conformidade
+
+desbloqueios autorizados
+
+validações
+
+geração de relatórios
+
+intervenções assistidas
+
+Cada evento deve possuir:
+
+identificação do usuário
+
+timestamp
+
+referência ao elemento afetado
+
+tipo de ação realizada
+
+4.4 Versionamento operacional
+
+O sistema deve suportar revisões e ajustes dentro do processo administrativo.
+
+O banco deve permitir:
+
+atualização de dados
+
+preservação de registros relevantes
+
+rastreamento de alterações significativas
+
+Isso é essencial para segurança administrativa e jurídica.
+
+4.5 Suporte às variações estruturais do domínio
+
+O sistema precisa suportar as variações estruturais que influenciam o comportamento do processo.
+
+Entre elas:
+
+regime jurídico
+
+tipo de objeto
+
+estrutura do objeto
+
+forma de execução
+
+Esses elementos alteram exigências do sistema e devem existir como dados estruturados.
+
+4.6 Separação entre núcleo do sistema e apoio de IA
+
+O sistema possui um backend específico para inteligência artificial.
+
+A IA pode gerar:
+
+sugestões
+
+textos assistidos
+
+consolidações
+
+classificações auxiliares
+
+Porém, o banco do domínio não pode depender da IA para existir.
+
+A IA apoia o processo, mas não define o dado estrutural oficial.
+
+5 — O que deve ser armazenado no banco
+
+Devem ser persistidos todos os dados que possuem relevância estrutural, operacional ou jurídica.
+
+Entre eles:
+
+5.1 Estrutura central do processo
+
+Devem ser registrados:
+
+processo administrativo em construção
+
+fase atual
+
+status do processo
+
+vínculo com o responsável
+
+5.2 Escolhas estruturantes do processo
+
+Devem ser persistidas escolhas que alteram o comportamento do sistema.
+
+Entre elas:
+
+regime jurídico
+
+tipo de objeto
+
+estrutura do objeto
+
+forma de execução
+
+Essas escolhas influenciam travas e exigências do fluxo.
+
+5.3 Dados produzidos nas etapas
+
+Devem ser armazenados os dados gerados nas fases do processo.
+
+Entre eles:
+
+informações do DFD
+
+informações do ETP
+
+informações do TR
+
+dados da pesquisa de preços
+
+dados de memória de cálculo
+
+justificativas administrativas
+
+observações de conformidade
+
+5.4 Eventos administrativos
+
+Devem ser registrados eventos relevantes dentro do processo.
+
+Entre eles:
+
+criação
+
+edição relevante
+
+avanço de etapa
+
+bloqueios
+
+validações
+
+geração de relatórios
+
+5.5 Logs de auditoria
+
+Devem ser armazenados logs capazes de reconstruir decisões administrativas.
+
+Esses logs devem incluir:
+
+usuário
+
+ação executada
+
+momento da ação
+
+elemento afetado
+
+5.6 Resultados de conformidade
+
+Devem ser persistidos resultados operacionais relevantes do sistema.
+
+Exemplos:
+
+bloqueios de conformidade
+
+pendências detectadas
+
+alertas relevantes
+
+relatórios gerados
+
+6 — O que não deve ser armazenado no banco como núcleo
+
+Para preservar a arquitetura do sistema, alguns elementos não devem ser persistidos como base do domínio.
+
+6.1 Regra jurídica textual solta
+
+Regras jurídicas não devem ser armazenadas de forma arbitrária dentro dos registros.
+
+A lógica normativa deve viver na camada de domínio do sistema.
+
+6.2 Lógica de cálculo
+
+O banco deve armazenar:
+
+entradas
+
+resultados
+
+rastros relevantes
+
+Mas não deve armazenar a lógica matemática do sistema.
+
+Essa lógica pertence às camadas de serviço e domínio.
+
+6.3 Estados temporários de interface
+
+Elementos puramente visuais ou temporários da interface não devem ser persistidos.
+
+Exemplos:
+
+abas abertas
+
+estado visual de telas
+
+interações momentâneas
+
+6.4 Respostas brutas de IA como verdade do sistema
+
+Saídas de IA podem ser armazenadas como:
+
+sugestões
+
+rascunhos
+
+snapshots assistidos
+
+Mas não devem substituir os dados oficiais do processo.
+
+6.5 Duplicação desnecessária de dados
+
+O sistema deve evitar replicar dados sem finalidade clara.
+
+Duplicações só devem ocorrer quando necessárias para:
+
+auditoria
+
+versionamento
+
+performance
+
+7 — Tipos de persistência dentro do sistema
+
+Para manter organização e clareza, o LICITAIA separa quatro tipos de persistência.
+
+7.1 Persistência estrutural
+
+Define a identidade e estrutura do processo.
+
+Inclui elementos como:
+
+processo
+
+fase
+
+regime jurídico
+
+tipo de objeto
+
+estrutura do objeto
+
+forma de execução
+
+Essa camada constitui a espinha dorsal do sistema.
+
+7.2 Persistência operacional
+
+Representa o trabalho executado dentro do processo.
+
+Inclui:
+
+dados preenchidos nas etapas
+
+justificativas
+
+cálculos
+
+pesquisa de preços
+
+consolidações operacionais
+
+7.3 Trilha de auditoria
+
+Registra a linha do tempo administrativa.
+
+Inclui:
+
+eventos
+
+ações realizadas
+
+responsáveis
+
+timestamps
+
+referências aos elementos afetados
+
+Essa trilha permite reconstruir o processo administrativo.
+
+7.4 Dados assistidos por IA
+
+Incluem dados gerados por mecanismos de inteligência artificial.
+
+Exemplos:
+
+sugestões de texto
+
+resumos
+
+classificações
+
+explicações
+
+Esses dados são apoio ao processo, não substituem o dado oficial.
+
+8 — Arquitetura geral de persistência da V2
+
+A arquitetura de persistência do LICITAIA V2 segue três pilares.
+
+8.1 Banco relacional como núcleo
+
+O banco relacional guarda:
+
+estrutura do processo
+
+dados operacionais
+
+trilha de auditoria
+
+8.2 Campos semiestruturados como apoio
+
+Campos flexíveis podem existir para:
+
+snapshots
+
+payloads auxiliares
+
+metadados
+
+dados assistidos por IA
+
+Eles não substituem a modelagem estrutural.
+
+8.3 Artefatos documentais vinculados
+
+Documentos e arquivos devem ser tratados como artefatos vinculados ao processo.
+
+Eles não substituem a estrutura relacional.
+
+9 — Princípios obrigatórios de persistência da V2
+
+O banco de dados do LICITAIA deve obedecer aos seguintes princípios.
+
+Princípio 1 — o banco preserva a lógica do processo
+
+A estrutura do banco deve refletir o fluxo administrativo.
+
+Princípio 2 — regras não vivem no banco
+
+Regras jurídicas e cálculos pertencem às camadas de domínio e serviço.
+
+Princípio 3 — toda decisão relevante precisa ser rastreável
+
+Cada ação importante deve possuir registro auditável.
+
+Princípio 4 — IA nunca substitui o dado estrutural
+
+A IA é um mecanismo de apoio.
+
+Princípio 5 — flexibilidade controlada
+
+Campos flexíveis são permitidos apenas quando necessários.
+
+Princípio 6 — prioridade para robustez estrutural
+
+O banco deve priorizar:
+
+integridade
+
+rastreabilidade
+
+clareza estrutural
+
+manutenção simples
+
+regressão zero

@@ -1,0 +1,167 @@
+LICITAIA V2
+ARQUITETURA DO SISTEMA
+
+VISÃO GERAL
+
+O LICITAIA é um motor de conformidade administrativa preventiva voltado à fase preparatória das contratações públicas conforme a Lei 14.133.
+
+O sistema não é apenas um gerador de documentos. Ele atua como um motor de validação, controle de fluxo e rastreabilidade das decisões administrativas.
+
+ARQUITETURA GERAL
+
+O sistema será dividido em quatro blocos principais:
+
+1. FRONTEND
+Responsável pela interface do usuário.
+
+Funções:
+- login
+- navegação
+- formulários
+- visualização das etapas
+- exibição de alertas e travas
+
+Tecnologias:
+Next.js
+React
+TypeScript
+
+2. BACKEND PRINCIPAL
+
+Responsável pelo núcleo operacional do sistema.
+
+Funções:
+- regras jurídicas
+- regras matemáticas
+- fluxo do processo
+- validações
+- travas de conformidade
+- registro de eventos administrativos
+- comunicação com banco de dados
+
+Tecnologia:
+Python
+FastAPI
+
+3. SERVIÇO DE IA
+
+Responsável por apoio assistido ao usuário.
+
+Funções:
+- auxílio redacional
+- sugestões de texto
+- apoio ao preenchimento
+
+A IA não controla decisões jurídicas nem o fluxo administrativo.
+
+Tecnologia:
+Python
+FastAPI
+
+4. BANCO DE DADOS
+
+Responsável pela persistência das informações do sistema.
+
+Tecnologia:
+PostgreSQL
+
+Serão armazenados:
+
+- usuários
+- órgãos públicos
+- processos administrativos
+- etapas
+- decisões
+- documentos
+- pesquisas de preço
+- memória de cálculo
+- logs
+- auditoria
+
+MÓDULOS CENTRAIS DA V2
+
+O LICITAIA V2 será estruturado com os seguintes módulos centrais:
+
+1. Autenticação e acesso
+2. Cadastro institucional
+3. Abertura do processo
+4. DFD
+5. ETP
+6. TR
+7. Estrutura do objeto
+8. Memória de cálculo
+9. Pesquisa de preços
+10. Consolidação do valor
+11. Travas de conformidade
+12. Fluxo do processo
+13. Eventos administrativos
+14. Auditoria e rastreabilidade
+15. Geração assistida por IA
+
+LÓGICA ESTRUTURAL
+
+O sistema será organizado em cinco grandes camadas funcionais:
+
+1. Camada de entrada
+- autenticação
+- cadastro institucional
+- abertura do processo
+
+2. Camada de estruturação do processo
+- DFD
+- ETP
+- TR
+
+3. Camada de estrutura técnica do objeto
+- estrutura do objeto
+- memória de cálculo
+- pesquisa de preços
+- consolidação do valor
+
+4. Camada de controle e segurança
+- travas de conformidade
+- fluxo do processo
+- eventos administrativos
+- auditoria e rastreabilidade
+
+5. Camada assistiva
+- IA de apoio redacional
+
+REGRAS ARQUITETURAIS INEGOCIÁVEIS DA V2
+
+1. Não programar antes de definir a estrutura.
+2. Não criar telas antes de definir fluxo.
+3. Não criar banco antes de definir entidades e relacionamentos.
+4. Não deixar lógica jurídica espalhada.
+5. Não deixar lógica matemática espalhada.
+6. Não misturar backend, regra de negócio e dados.
+7. Não quebrar a arquitetura modular.
+8. Não permitir salto indevido de etapa no fluxo do processo.
+9. Não enfraquecer o registro de eventos administrativos.
+10. Não expandir o sistema sem necessidade real do núcleo.
+
+PRINCÍPIOS DA V2
+
+- segurança jurídica
+- coerência normativa
+- rastreabilidade
+- auditabilidade
+- robustez funcional
+- clareza técnica
+- clareza administrativa
+- baixo acoplamento
+- manutenção simples
+- preservação da arquitetura
+- prevenção de erro humano
+- fidelidade à lógica real do processo administrativo
+
+ERROS QUE NÃO DEVEM SER REPETIDOS
+
+- improvisar arquitetura
+- começar por telas
+- espalhar regras pelo sistema
+- duplicar responsabilidades
+- criar lógica sem documentação prévia
+- tratar memória de cálculo de forma genérica
+- tratar pesquisa de preços sem respeitar a estrutura do objeto
+- crescer em funcionalidades sem consolidar o núcleo

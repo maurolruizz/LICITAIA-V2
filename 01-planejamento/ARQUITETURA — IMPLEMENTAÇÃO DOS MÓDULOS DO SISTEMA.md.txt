@@ -1,0 +1,407 @@
+ARQUITETURA — IMPLEMENTAÇÃO DOS MÓDULOS DO SISTEMA
+FASE 10 — ARQUITETURA DE IMPLEMENTAÇÃO DOS MÓDULOS DO LICITAIA V2
+1. VISÃO GERAL DA FASE
+
+A Fase 10 estabelece como os módulos centrais do LICITAIA V2 existirão dentro da arquitetura real do sistema.
+
+Nas fases anteriores foram definidos:
+
+arquitetura macro do sistema
+
+camadas
+
+banco de dados
+
+entidades centrais
+
+autenticação
+
+modelo multiusuário
+
+fluxo do processo administrativo
+
+motor do processo
+
+módulos conceituais do motor de conformidade
+
+Essas definições estruturaram o que o sistema é.
+
+A Fase 10 define como esses módulos passam a existir dentro da implementação real da V2.
+
+Esta fase não cria novos módulos, não altera a arquitetura, não inicia código e não redefine conceitos anteriores.
+
+O objetivo é transformar a arquitetura conceitual da Fase 9 em uma arquitetura implementável, garantindo:
+
+baixo acoplamento
+
+alta manutenibilidade
+
+previsibilidade arquitetural
+
+preservação da lógica central do sistema
+
+regressão zero
+
+2. POR QUE A FASE 10 VEM DEPOIS DA FASE 9
+
+A Fase 9 definiu quais são os módulos centrais do motor de conformidade do LICITAIA.
+
+Esses módulos representam responsabilidades fundamentais do sistema.
+
+Entretanto, definir módulos conceitualmente não define como eles serão implementados no sistema real.
+
+Sem essa definição intermediária, a implementação poderia gerar:
+
+lógica espalhada em telas
+
+duplicação de regras
+
+dependências indevidas entre módulos
+
+perda de rastreabilidade
+
+mistura entre fluxo, interface e regra de negócio
+
+A Fase 10 evita esse cenário.
+
+Ela estabelece as regras estruturais de implementação modular da V2.
+
+3. CONCEITO DE IMPLEMENTAÇÃO MODULAR NO LICITAIA
+
+No LICITAIA, um módulo não é apenas um conjunto de funções.
+
+Um módulo é uma unidade arquitetural de responsabilidade clara dentro do motor de conformidade.
+
+Cada módulo possui:
+
+responsabilidade específica
+
+entrada bem definida
+
+processamento interno controlado
+
+saída estruturada
+
+isolamento interno
+
+interface pública estável
+
+Isso permite que:
+
+regras do sistema não fiquem espalhadas
+
+lógica administrativa permaneça centralizada
+
+módulos possam evoluir sem quebrar o sistema
+
+novos programadores compreendam rapidamente a arquitetura
+
+A implementação modular garante que o LICITAIA permaneça um motor de conformidade, e não um conjunto desorganizado de formulários.
+
+4. ARQUITETURA GERAL DOS MÓDULOS NO SISTEMA
+
+Na arquitetura oficial da V2:
+
+os módulos centrais vivem no núcleo modular do frontend
+
+o fluxo do processo administrativo aciona os módulos
+
+as telas não executam regras de conformidade
+
+o backend atua como apoio especializado
+
+o banco não contém lógica do sistema
+
+Fluxo arquitetural correto:
+
+Interface → Fluxo do Processo → Módulos → Resultado → Persistência / API → Interface
+
+Isso garante que:
+
+o fluxo administrativo continue sendo o eixo do sistema
+
+os módulos concentrem as regras
+
+as telas sejam apenas interface
+
+5. ESTRUTURA CONCEITUAL DO NÚCLEO modules
+
+O núcleo modules representa o coração funcional do frontend da V2.
+
+Ele contém os módulos responsáveis por executar:
+
+validações estruturais
+
+regras administrativas
+
+travas normativas
+
+cálculos
+
+verificações de coerência
+
+geração de eventos administrativos
+
+decisões automatizadas de conformidade
+
+O núcleo modules não é uma pasta utilitária.
+
+Ele é o motor lógico do sistema no frontend.
+
+Regras fundamentais:
+
+módulos não devem ser organizados por tela
+
+módulos devem ser organizados por responsabilidade
+
+cada módulo deve possuir fronteira clara
+
+nenhuma regra central deve ficar fora desse núcleo
+
+6. ORGANIZAÇÃO INTERNA DE UM MÓDULO
+
+Cada módulo do sistema deve possuir estrutura lógica interna clara.
+
+A estrutura conceitual mínima de um módulo inclui:
+
+Interface pública
+
+Funções que podem ser chamadas por outros módulos ou pelo fluxo.
+
+Contratos de entrada
+
+Definição clara de quais dados o módulo recebe.
+
+Normalização de entrada
+
+Preparação e validação inicial dos dados recebidos.
+
+Núcleo de regras
+
+Local onde a lógica principal do módulo é executada.
+
+Validações internas
+
+Verificações de coerência normativa e estrutural.
+
+Geração de resultado
+
+O módulo deve retornar um resultado estruturado.
+
+Nunca deve retornar valores indefinidos ou implícitos.
+
+Registro de eventos administrativos
+
+Quando aplicável, o módulo deve produzir eventos rastreáveis.
+
+Metadados de decisão
+
+Quando houver decisões relevantes, devem ser registrados:
+
+regra aplicada
+
+motivo
+
+contexto
+
+etapa do processo
+
+Isso garante rastreabilidade completa.
+
+7. COMUNICAÇÃO ENTRE MÓDULOS
+
+Módulos devem comunicar-se apenas por interfaces públicas.
+
+Um módulo não pode acessar a estrutura interna de outro módulo.
+
+Comunicação correta:
+
+um módulo chama a função pública de outro módulo
+
+recebe resultado estruturado
+
+decide como utilizar esse resultado
+
+Comunicação incorreta:
+
+acessar variáveis internas de outro módulo
+
+manipular estado interno de outro módulo
+
+depender de comportamento implícito
+
+Essa regra é essencial para preservar:
+
+isolamento
+
+previsibilidade
+
+manutenção simples
+
+8. COMO MÓDULOS SÃO ACIONADOS PELO FLUXO
+
+No LICITAIA, o fluxo do processo administrativo é o orquestrador do sistema.
+
+As telas não chamam módulos diretamente para executar lógica central.
+
+O fluxo executa o seguinte padrão:
+
+o usuário executa uma ação
+
+o fluxo identifica a etapa administrativa
+
+o fluxo aciona o módulo correspondente
+
+o módulo executa suas regras
+
+o módulo retorna resultado estruturado
+
+o fluxo decide o próximo passo
+
+Possíveis decisões:
+
+permitir avanço
+
+bloquear etapa
+
+exigir complemento
+
+registrar evento
+
+gerar alerta
+
+9. INTERAÇÃO DOS MÓDULOS COM O BACKEND
+
+Módulos podem interagir com o backend quando necessário.
+
+Entretanto, o backend não é o núcleo do motor de conformidade.
+
+Regra fundamental:
+
+O backend atua como apoio especializado, especialmente em:
+
+geração assistida por IA
+
+processamento intensivo
+
+serviços externos
+
+A decisão administrativa central sempre permanece no fluxo + módulos.
+
+10. PRESERVAÇÃO DE BAIXO ACOPLAMENTO
+
+Para garantir baixo acoplamento, as seguintes regras são obrigatórias:
+
+módulos não acessam detalhes internos de outros módulos
+
+regras administrativas não ficam em telas
+
+lógica normativa não pode ser duplicada
+
+integrações externas não ficam em componentes visuais
+
+fluxo permanece como orquestrador central
+
+Cada responsabilidade central deve possuir um único módulo dominante.
+
+11. PREVENÇÃO DE DEPENDÊNCIA CIRCULAR
+
+Dependência circular ocorre quando:
+
+módulo A depende de módulo B
+
+módulo B depende de módulo A
+
+Isso deve ser evitado.
+
+Regra arquitetural:
+
+Dependências devem seguir hierarquia clara.
+
+Módulos que geram decisões não devem depender de módulos que apenas apresentam resultados dessas decisões.
+
+Quando duas responsabilidades parecem depender uma da outra, a arquitetura deve ser revista.
+
+12. BOAS PRÁTICAS OBRIGATÓRIAS
+
+A implementação modular da V2 deve seguir obrigatoriamente:
+
+regras centrais vivem em módulos
+
+telas não executam lógica normativa
+
+módulos possuem responsabilidade única
+
+entradas e saídas devem ser explícitas
+
+decisões devem ser rastreáveis
+
+módulos devem ser testáveis isoladamente
+
+integrações externas ficam desacopladas
+
+duplicação de regra é proibida
+
+arquitetura modular deve ser preservada
+
+evolução futura deve respeitar essas fronteiras
+
+13. RISCOS ARQUITETURAIS A EVITAR
+
+Os principais riscos nesta fase são:
+
+transformar modules em uma pasta genérica
+
+espalhar regras em telas
+
+duplicar validações
+
+criar dependência circular
+
+misturar fluxo com interface
+
+esconder lógica no backend
+
+criar módulos gigantes
+
+fragmentar excessivamente o sistema
+
+Esses erros enfraquecem o motor de conformidade.
+
+14. DEFINIÇÃO OFICIAL DA FASE 10
+
+A Fase 10 define oficialmente a arquitetura de implementação dos módulos centrais do LICITAIA V2.
+
+Essa arquitetura estabelece que:
+
+módulos vivem no núcleo modular do frontend
+
+o fluxo administrativo orquestra a execução dos módulos
+
+módulos comunicam-se por interfaces públicas
+
+backend atua apenas como apoio especializado
+
+regras administrativas permanecem isoladas nos módulos
+
+dependências circulares são proibidas
+
+baixo acoplamento é obrigatório
+
+15. RESULTADO ESPERADO DA FASE
+
+Após a Fase 10, o projeto possui definição clara de:
+
+onde os módulos vivem
+
+como são organizados
+
+como são acionados
+
+como se comunicam
+
+como integram com backend
+
+como preservar isolamento e manutenção
+
+Com essa definição, o sistema está pronto para iniciar a fase de implementação real da arquitetura modular da V2, mantendo coerência estrutural e regressão zero.

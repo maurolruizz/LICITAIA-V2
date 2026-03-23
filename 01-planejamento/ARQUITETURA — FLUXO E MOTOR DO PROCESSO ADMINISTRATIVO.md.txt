@@ -1,0 +1,559 @@
+ARQUITETURA — FLUXO E MOTOR DO PROCESSO ADMINISTRATIVO
+conceito de motor de processo administrativo
+
+O motor de processo administrativo do LICITAIA é a estrutura lógica que governa o comportamento do processo preparatório dentro do sistema.
+
+Ele não é uma tela.
+Ele não é um formulário.
+Ele não é uma lista de páginas.
+
+Ele é a camada de orquestração que define:
+
+em que estado o processo está
+
+quais ações são permitidas naquele estado
+
+quais dados mínimos são exigidos
+
+quais validações devem ocorrer
+
+quais decisões precisam ser registradas
+
+quais eventos administrativos precisam ser gerados
+
+quando o processo pode avançar
+
+quando o processo deve ser bloqueado
+
+Em termos arquiteturais, o motor de processo é o responsável por transformar o LICITAIA em um sistema de condução administrativa estruturada. Ele materializa a diretriz do projeto de orientar, validar, travar, estruturar, documentar e registrar, sempre preservando a possibilidade de reconstrução posterior da linha do tempo do processo.
+
+Definição objetiva:
+o motor de processo administrativo do LICITAIA é a lógica central que controla o ciclo de vida do processo administrativo de contratação, desde sua abertura até sua conclusão preparatória, aplicando ordem obrigatória, bloqueios de conformidade, registro de decisões e geração de eventos auditáveis.
+
+entidade central que governa o fluxo
+
+A entidade central que governa o fluxo é o Processo Administrativo de Contratação, já definido anteriormente como entidade-mãe do sistema.
+
+Na Fase 8, essa entidade deixa de ser vista apenas como registro central e passa a ser entendida também como âncora operacional do fluxo.
+
+Tudo acontece em torno dela:
+
+o processo nasce como uma instância administrativa identificável
+
+cada etapa é vinculada a esse processo
+
+cada decisão pertence a esse processo
+
+cada evento pertence a esse processo
+
+cada bloqueio é avaliado no contexto desse processo
+
+cada progressão de fase ocorre dentro desse processo
+
+Portanto, o motor não governa módulos isolados. Ele governa a trajetória administrativa de uma entidade-mãe única.
+
+Definição estrutural:
+o Processo Administrativo de Contratação é a unidade de continuidade do fluxo. Ele concentra identidade, contexto, regime, objeto, estrutura, etapas, decisões, eventos, pendências e histórico.
+
+Sem essa centralização, o sistema viraria conjunto de documentos soltos. Com essa centralização, o sistema preserva coerência processual.
+
+nascimento do processo administrativo no sistema
+
+O processo administrativo nasce no sistema no momento em que o usuário autorizado inicia formalmente uma nova contratação dentro de um cliente institucional específico.
+
+Esse nascimento não deve ser tratado como simples abertura de formulário. Ele é a criação de uma instância administrativa controlada.
+
+O nascimento do processo deve conter, no mínimo, os seguintes pilares estruturais:
+
+1. vínculo institucional
+o processo já nasce vinculado a um cliente institucional específico.
+Isso impede mistura de contexto entre entes distintos.
+
+2. vínculo de responsabilidade
+o processo já nasce associado ao usuário que o abriu, como responsável inicial pelo evento de criação.
+
+3. identidade única do processo
+o sistema deve atribuir identidade única para o processo, que será a referência-mãe de toda a trilha posterior.
+
+4. estado inicial controlado
+o processo nasce em estado inicial formal, nunca em estado “avançado”.
+A primeira etapa válida do fluxo é a etapa inicial definida pelo motor.
+
+5. contexto mínimo de enquadramento
+o processo precisa nascer já com os metadados estruturais mínimos que condicionam o restante do fluxo:
+
+regime jurídico inicial
+
+tipo de objeto
+
+estrutura do objeto
+
+forma de execução, quando aplicável
+
+classificação preliminar necessária para definir travas futuras
+
+6. evento administrativo de abertura
+o nascimento do processo deve gerar imediatamente evento administrativo de criação.
+
+7. registro decisório inicial
+quando houver escolha inicial relevante, como definição de regime ou natureza do objeto, isso não deve existir apenas como dado salvo; deve existir também como decisão registrada.
+
+Regra arquitetural:
+nenhum processo pode nascer “vazio de contexto” a ponto de inviabilizar a aplicação das travas posteriores.
+Ele pode nascer incompleto, mas não pode nascer sem identidade estrutural mínima.
+
+etapas estruturais obrigatórias
+
+As etapas estruturais obrigatórias do processo, dentro do escopo atual do LICITAIA, são as seguintes:
+
+1. abertura do processo
+etapa de criação da instância administrativa e fixação do enquadramento inicial.
+
+2. DFD
+formalização da demanda administrativa.
+Aqui o processo registra a origem da necessidade pública e sua formulação inicial.
+
+3. ETP
+análise estruturada da solução, necessidade, alternativa, adequação e justificativa técnica preliminar.
+
+4. TR
+consolidação técnica do objeto a ser contratado, com detalhamento suficiente para sustentação da contratação.
+
+5. pesquisa de preços / preparação para contratação
+fase de composição referencial, análise econômica compatível com a estrutura do objeto e preparação para decisão de encaminhamento.
+
+6. encaminhamento para fase posterior
+encerramento da fase preparatória no escopo do LICITAIA e preparação do processo para a etapa externa ou subsequente.
+
+7. conclusão preparatória
+estado de fechamento da atuação nuclear do LICITAIA naquele processo.
+
+Esse encadeamento está alinhado ao fluxo oficial já consolidado no projeto: DFD, ETP, TR, pesquisa de preços e encaminhamento, sempre com progressão obrigatória e vedação a salto indevido.
+
+Observação arquitetural importante:
+essas são as etapas estruturais-mãe.
+Dentro delas podem existir subetapas, pendências, revisões e estados intermediários, mas isso não altera a espinha dorsal oficial do fluxo.
+
+controle de progressão entre etapas
+
+O controle de progressão entre etapas é o núcleo operacional do motor.
+
+A progressão não pode depender apenas de navegação de tela.
+Ela deve depender de regra formal de elegibilidade de avanço.
+
+Cada transição entre etapas deve ser governada por quatro camadas de controle:
+
+1. pré-condições estruturais
+a etapa anterior precisa existir formalmente e estar em estado compatível para avanço.
+
+Exemplo:
+não existe entrada válida em ETP sem existência formal de DFD no processo.
+
+2. completude mínima obrigatória
+a etapa anterior precisa atingir um nível mínimo de preenchimento, consistência e validação.
+
+Não é necessário exigir perfeição total para tudo, mas é obrigatório exigir suficiência mínima para avançar.
+
+3. conformidade contextual
+as escolhas feitas no processo precisam ser coerentes com:
+
+regime jurídico
+
+tipo de objeto
+
+estrutura do objeto
+
+forma de execução
+
+Se houver incoerência material, o avanço deve ser bloqueado.
+
+4. registro formal de fechamento ou aptidão
+o avanço entre etapas deve ocorrer por meio de um ato sistêmico formal:
+“etapa apta para progressão”, “etapa concluída”, ou equivalente conceitual.
+
+Arquiteturalmente, isso significa:
+a etapa não avança porque o usuário clicou em “próximo”.
+A etapa avança porque o motor reconheceu elegibilidade administrativa para progressão.
+
+Regra obrigatória:
+a progressão deve ser sempre validada pelo motor e sempre produzir registro rastreável.
+
+mecanismos de bloqueio de salto de fase
+
+O LICITAIA deve impedir salto de fase por arquitetura, não por mera convenção visual. O próprio projeto já estabelece que nunca deve permitir execução fora da ordem e nunca deve permitir salto de etapa.
+
+Os mecanismos obrigatórios de bloqueio são:
+
+1. bloqueio por ordem estrutural
+se a etapa anterior obrigatória não existir ou não estiver apta, a próxima etapa não é liberada.
+
+2. bloqueio por dependência lógica
+se a etapa seguinte depende materialmente de dados ou decisões da anterior, o avanço é recusado.
+
+Exemplo:
+TR não pode ser tratado como etapa independente de um ETP inexistente quando a lógica do processo exigir essa conexão.
+
+3. bloqueio por insuficiência documental mínima
+se faltarem elementos obrigatórios para sustentar a decisão administrativa, a etapa não progride.
+
+4. bloqueio por incoerência normativa
+se o processo estiver enquadrado como dispensa, inexigibilidade ou licitação, as travas específicas do regime precisam ser satisfeitas antes do avanço.
+
+5. bloqueio por inconsistência do objeto
+se a estrutura do objeto exigir lógica específica, como lote, múltiplos itens, obra, serviço contínuo ou locação, o sistema não pode aceitar progressão com modelagem incompatível.
+
+6. bloqueio por pendência decisória
+se existir decisão obrigatória não tomada, o processo não avança.
+
+7. bloqueio por integridade do fluxo
+qualquer tentativa de acessar, concluir ou consolidar etapa futura sem cadeia de antecedentes válidos deve ser barrada.
+
+Princípio:
+o sistema não bloqueia para dificultar.
+Ele bloqueia para impedir produção administrativa juridicamente frágil, incoerente ou não auditável.
+
+registro de decisões administrativas
+
+No LICITAIA, decisão administrativa não pode ser apenas “valor armazenado em campo”.
+
+Decisão administrativa é um ato lógico relevante do processo que precisa de registro próprio.
+
+Devem ser registradas como decisões, no mínimo, as escolhas que alteram interpretação, exigência, caminho ou justificativa do processo, como:
+
+escolha do regime jurídico
+
+definição do tipo de objeto
+
+definição da estrutura do objeto
+
+enquadramento em dispensa
+
+enquadramento em inexigibilidade
+
+definição de lote
+
+escolha da lógica de memória de cálculo
+
+confirmação de justificativas obrigatórias
+
+aprovação de avanço de etapa
+
+retorno de etapa para revisão
+
+encerramento preparatório
+
+Cada decisão administrativa registrada deve conter, como estrutura mínima:
+
+processo ao qual pertence
+
+etapa em que ocorreu
+
+tipo da decisão
+
+conteúdo objetivo da decisão
+
+fundamento administrativo ou normativo associado, quando aplicável
+
+usuário responsável
+
+cliente institucional
+
+data e hora
+
+versão ou contexto em que foi tomada
+
+efeito produzido no fluxo
+
+Regra central:
+decisão altera o estado administrativo do processo.
+Por isso, precisa de rastreabilidade própria.
+
+geração de eventos administrativos
+
+Eventos administrativos são o mecanismo de linha do tempo do LICITAIA. As regras do projeto já tratam esse ponto como essencial para rastreabilidade, auditoria e reconstrução posterior da história do processo.
+
+Diferença conceitual importante:
+
+decisão administrativa = ato lógico deliberativo que altera enquadramento, interpretação, validação ou progressão
+
+evento administrativo = ocorrência formal registrada na linha do tempo do processo
+
+Nem todo evento é uma decisão.
+Mas decisões relevantes devem gerar eventos.
+
+Exemplos de eventos:
+
+processo criado
+
+etapa iniciada
+
+etapa salva
+
+etapa validada
+
+etapa bloqueada
+
+pendência detectada
+
+justificativa exigida
+
+decisão registrada
+
+etapa concluída
+
+etapa reaberta
+
+processo encaminhado
+
+processo concluído no escopo preparatório
+
+Cada evento deve conter, no mínimo:
+
+identificador do processo
+
+tipo do evento
+
+etapa vinculada
+
+usuário responsável
+
+cliente institucional
+
+timestamp
+
+descrição objetiva
+
+referência à decisão associada, se houver
+
+referência ao motivo do bloqueio ou liberação, se houver
+
+Princípio obrigatório:
+o sistema deve permitir reconstrução cronológica integral da vida administrativa do processo.
+
+vínculo entre ação, usuário e cliente
+
+Toda ação relevante no LICITAIA deve ser amarrada a uma cadeia de responsabilidade clara.
+
+Essa cadeia precisa sempre conectar:
+
+ação executada
+
+usuário que executou
+
+cliente institucional em cujo ambiente a ação ocorreu
+
+processo afetado
+
+etapa afetada
+
+momento da ação
+
+Estruturalmente, isso significa que não pode existir:
+
+decisão sem autor
+
+evento sem processo
+
+evento sem etapa
+
+registro sem contexto institucional
+
+avanço de fase sem responsável
+
+A cadeia oficial de vínculo deve ser:
+
+cliente institucional → processo administrativo → etapa → ação/decisão/evento → usuário responsável
+
+Esse encadeamento é o que transforma o sistema em ferramenta auditável e compatível com responsabilidade operacional real.
+
+adaptação do fluxo para diferentes regimes
+
+O fluxo estrutural do LICITAIA continua sendo um só, mas seu comportamento interno muda conforme o enquadramento do processo. Isso está alinhado ao princípio de cobertura do projeto: a arquitetura central deve permanecer estável, enquanto as combinações entre regime jurídico, tipo de objeto, estrutura do objeto e forma de execução definem exigências e travas.
+
+1. licitação
+
+Na licitação, o fluxo tende a seguir a espinha dorsal completa com maior densidade concorrencial e documental.
+
+Características:
+
+necessidade de coerência plena entre DFD, ETP, TR e pesquisa
+
+exigência de preparação comparativa compatível
+
+maior expectativa de detalhamento do objeto e critérios
+
+Arquiteturalmente:
+o motor mantém o fluxo-base integral e aplica validações de coerência concorrencial.
+
+2. dispensa
+
+Na dispensa, o fluxo continua existindo, mas com travas próprias de enquadramento.
+
+Características:
+
+necessidade de justificativa legal específica
+
+verificação de hipótese admitida
+
+travas automáticas de coerência do enquadramento
+
+controle de justificativa e, quando aplicável, limite legal
+
+Arquiteturalmente:
+não se cria outro sistema.
+Mantém-se o mesmo motor, com ramificações de regra.
+
+3. inexigibilidade
+
+Na inexigibilidade, o fluxo também permanece dentro da espinha dorsal, mas exige prova de inviabilidade de competição e sustentação técnica própria.
+
+Características:
+
+justificativa técnica reforçada
+
+comprovação compatível com a hipótese
+
+vedação de tratamento como licitação comum
+
+Arquiteturalmente:
+o motor precisa trocar o conjunto de exigências, não a entidade-mãe do processo.
+
+4. bens
+
+Para bens, o fluxo adapta campos, justificativas e critérios conforme se trate de consumo ou permanência.
+
+Consequências no motor:
+
+escolha correta da memória de cálculo
+
+coerência com unidade de consumo ou dimensionamento institucional
+
+compatibilidade com aquisição de item, múltiplos itens ou lote
+
+5. serviços
+
+Para serviços, o fluxo exige tratamento de escopo, metodologia, forma de execução e continuidade, quando aplicável.
+
+Consequências no motor:
+
+reforço do conteúdo técnico no ETP e no TR
+
+exigência de clareza sobre execução
+
+comportamento distinto para serviço comum, contínuo ou técnico especializado
+
+6. obras e engenharia
+
+Para obras e engenharia, o fluxo exige maior rigor técnico de estruturação e detalhamento.
+
+Consequências no motor:
+
+reforço de coerência técnica do objeto
+
+vedação de simplificações incompatíveis com a complexidade
+
+maior peso da consistência entre justificativa, escopo e forma de execução
+
+7. item único
+
+Fluxo simplificado na estrutura do objeto, sem simplificar indevidamente a lógica jurídica.
+A pesquisa e a consolidação tendem a ser diretas.
+
+8. múltiplos itens
+
+O motor deve tratar cada item de forma analítica quando a estrutura assim exigir.
+
+9. lote
+
+O lote é um ponto crítico já reconhecido no projeto e precisa ser restaurado integralmente.
+
+Arquiteturalmente, o motor deve:
+
+reconhecer que lote não é item único
+
+exigir coerência técnica e econômica do agrupamento
+
+manter detalhamento por item quando necessário
+
+consolidar valor final de forma compatível com a estrutura agrupada
+
+Regra síntese:
+o fluxo não muda de identidade.
+O que muda é o conjunto de regras, exigências, travas e evidências requerido em cada combinação.
+
+princípios estruturais obrigatórios
+
+o processo administrativo é a entidade operacional central do fluxo.
+
+a progressão entre etapas depende de elegibilidade validada pelo motor, não de simples navegação.
+
+toda etapa possui pré-condições mínimas de entrada, permanência e saída.
+
+nenhuma etapa futura pode ser concluída sem cadeia válida de etapas antecedentes.
+
+toda decisão relevante deve ter registro próprio.
+
+todo evento relevante deve integrar a linha do tempo administrativa.
+
+toda ação relevante deve ser vinculada a usuário, cliente institucional, processo e etapa.
+
+o fluxo-base é único, mas adaptável por regra conforme regime, objeto, estrutura e forma de execução.
+
+bloqueios de conformidade são parte do núcleo do sistema, não adendos opcionais.
+
+a arquitetura do fluxo deve preservar baixo acoplamento, auditabilidade, clareza para novos programadores e fidelidade ao processo administrativo real. Esses princípios estão alinhados às diretrizes do projeto, às regras de desenvolvimento e ao checklist de auditoria.
+
+riscos arquiteturais a evitar
+
+1. tratar fluxo como sequência de telas
+isso enfraquece a lógica central e abre espaço para inconsistência.
+
+2. permitir avanço por clique e não por validação
+isso destrói o conceito de motor administrativo.
+
+3. armazenar decisão apenas como campo
+isso elimina rastreabilidade real.
+
+4. não diferenciar decisão de evento
+isso empobrece auditoria e dificulta reconstrução da linha do tempo.
+
+5. espalhar regra de progressão em vários pontos
+isso aumenta acoplamento e cria risco de regressão.
+
+6. criar fluxos paralelos independentes para licitação, dispensa e inexigibilidade
+isso fragmenta arquitetura.
+O correto é um fluxo-base com comportamento parametrizado por regra.
+
+7. permitir lote como se fosse item único
+isso repete fragilidade já identificada no projeto.
+
+8. permitir que o sistema aceite etapas “formalmente concluídas” sem suficiência mínima
+isso cria falsa conformidade.
+
+9. perder vínculo entre ação e responsável
+isso destrói auditabilidade.
+
+10. inflar a fase com módulos novos
+isso contraria a diretriz central de consolidação, não expansão.
+
+definição oficial resumida da Fase 8
+
+A Fase 8 define oficialmente que o LICITAIA V2 operará sobre um motor de processo administrativo centrado na entidade Processo Administrativo de Contratação, responsável por controlar o nascimento, os estados, a progressão, os bloqueios, as decisões e os eventos do fluxo preparatório da contratação pública.
+
+Esse motor deverá:
+
+governar a trajetória do processo do início ao encerramento preparatório
+
+impor etapas estruturais obrigatórias
+
+impedir salto de fase
+
+registrar decisões administrativas com rastreabilidade
+
+gerar eventos administrativos auditáveis
+
+vincular cada ação a usuário, cliente, processo e etapa
+
+adaptar o comportamento do fluxo conforme regime jurídico, tipo de objeto, estrutura do objeto e forma de execução
+
+preservar coerência normativa, robustez operacional e baixo acoplamento

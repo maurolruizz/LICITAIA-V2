@@ -1,0 +1,470 @@
+ESTRUTURA REAL DO PROJETO — LICITAIA V2
+1. Objetivo deste documento
+
+Este documento registra a estrutura física real do repositório do LICITAIA V2, conforme implementado no ambiente de desenvolvimento.
+
+Sua função é servir como fonte oficial de verdade ("as-built") da organização do projeto, garantindo que todas as fases de implementação e manutenção futura utilizem os caminhos reais do repositório, evitando divergências entre arquitetura conceitual e estrutura física.
+
+Este documento é obrigatório para:
+
+preservar regressão zero
+
+evitar criação de estruturas paralelas
+
+garantir continuidade técnica entre chats
+
+permitir que novos desenvolvedores compreendam rapidamente o projeto
+
+alinhar prompts de implementação com o estado real do código
+
+Este documento não substitui os documentos de arquitetura.
+
+Ele registra como o projeto está fisicamente organizado no repositório.
+
+2. Pasta raiz do projeto
+
+O projeto LICITAIA V2 está estruturado na seguinte pasta raiz:
+
+C:\LICITAIA-V2
+
+Dentro desta pasta existem 7 diretórios principais oficialmente definidos na arquitetura do sistema.
+
+3. Estrutura da pasta raiz
+
+A estrutura atual da pasta raiz do projeto é:
+
+LICITAIA-V2
+│
+├── 01-planejamento
+│   └── governanca
+│       ├── MASTER-CONTEXT-LICITAIA.md
+│       ├── REGRAS-DE-DESENVOLVIMENTO-LICITAIA.md
+│       ├── CHECKLIST-DE-AUDITORIA-LICITAIA.md
+│       ├── PROMPT-PADRAO-CURSOR.md
+│       └── MATRIZ-DE-FECHAMENTO-DECYON-V2.md
+├── 02-frontend
+│   └── licitaia-v2-web
+├── 03-backend-api
+│   └── licitaia-v2-api
+├── 04-backend-ai
+│   └── licitaia-v2-ai-core
+├── 05-banco-de-dados
+├── 06-documentacao
+└── 07-prompts-cursor
+
+A subpasta 01-planejamento/governanca concentra o pacote normativo oficial (Master Context, regras de desenvolvimento, checklist de auditoria, prompt padrão do Cursor e matriz de fechamento DECYON V2), referenciado pelo PLANO-MESTRE-DECYON-V2.md.
+
+4. Estrutura real do frontend
+
+O frontend do LICITAIA V2 está localizado em:
+
+C:\LICITAIA-V2\02-frontend\licitaia-v2-web
+
+Este diretório contém o código principal da aplicação web.
+
+5. Observação arquitetural importante
+
+O frontend do LICITAIA V2 não utiliza a pasta src como raiz de código.
+
+A estrutura do projeto foi organizada com as pastas principais diretamente na raiz do repositório frontend.
+
+Portanto:
+
+todos os caminhos de implementação devem respeitar essa estrutura
+
+nenhum prompt deve criar src/ sem decisão arquitetural explícita
+
+Essa regra evita duplicação de estrutura e quebra de imports.
+
+6. Estrutura atual do frontend
+
+A estrutura atual do diretório licitaia-v2-web é:
+
+licitaia-v2-web
+│
+├── app
+├── components
+├── constants
+├── docs-internos
+├── features
+├── hooks
+├── lib
+├── modules
+├── public
+├── services
+├── stores
+├── styles
+├── tests
+├── types
+└── validators
+
+Cada diretório possui função específica dentro da arquitetura do frontend.
+
+7. Papel da pasta modules
+
+A pasta modules é reservada para a implementação do núcleo modular do motor de conformidade do LICITAIA V2.
+
+Ela será responsável por abrigar:
+
+módulos de execução administrativa
+
+validações estruturadas
+
+eventos administrativos
+
+metadados de decisão
+
+orquestração do fluxo do processo
+
+regras de conformidade
+
+A implementação completa desta estrutura começa na FASE 11 do plano de reconstrução do sistema.
+
+8. Regra estrutural oficial para o núcleo modular
+
+A implementação do núcleo modular do LICITAIA V2 deve ocorrer dentro da pasta já existente modules, localizada em:
+
+02-frontend/licitaia-v2-web/modules
+
+Portanto:
+
+não deve ser criada uma pasta src/modules
+
+não deve ser criada estrutura modular paralela
+
+Toda a infraestrutura modular deve ser implementada dentro da pasta existente.
+
+9. Estrutura alvo da pasta modules
+
+A partir da Fase 11, a pasta modules deverá evoluir para a seguinte estrutura:
+
+modules
+│
+├── core
+├── orchestrator
+├── shared
+├── domain
+└── registry
+
+Essas pastas abrigarão:
+
+contratos estruturais
+
+tipos
+
+factories
+
+enums
+
+validações
+
+módulos administrativos
+
+registro de módulos
+
+base do motor de fluxo
+
+10. Regras obrigatórias de preservação estrutural
+
+A evolução do projeto deve respeitar as seguintes regras:
+
+não criar estrutura paralela
+
+não duplicar pastas existentes
+
+não mover diretórios sem decisão arquitetural
+
+não criar src sem decisão oficial
+
+não alterar caminhos usados pelo projeto atual
+
+Qualquer mudança estrutural deve ser registrada neste documento.
+
+11. Uso deste documento nas próximas fases
+
+Antes de qualquer nova fase de implementação:
+
+o desenvolvedor deve consultar este documento
+
+verificar a estrutura real do repositório
+
+confirmar o caminho físico da implementação
+
+ajustar prompts de implementação conforme necessário
+
+Isso garante que o desenvolvimento siga a estrutura real do projeto.
+
+12. Atualização do documento
+
+Sempre que houver alteração relevante na estrutura do projeto, este documento deve ser atualizado.
+
+Exemplos de alterações que exigem atualização:
+
+criação de novos diretórios estruturais
+
+mudança de organização de pastas
+
+adoção de src
+
+reorganização do núcleo modular
+
+mudança de localização de camadas do sistema
+
+13. Status atual do projeto
+
+Status atual registrado:
+
+estrutura base do projeto criada
+
+repositórios organizados
+
+arquitetura do sistema definida
+
+documentos de arquitetura produzidos
+
+frontend inicial estruturado
+
+pasta modules criada
+
+O projeto encontra-se no início da FASE 11, que marca o começo da implementação da infraestrutura modular do sistema.
+
+14. Diretriz de regressão zero
+
+Toda implementação futura deve respeitar simultaneamente:
+
+documentos de arquitetura
+
+regras de desenvolvimento do projeto
+
+checklist de auditoria
+
+estrutura real registrada neste documento
+
+Nenhuma fase de implementação deve violar essas diretrizes.
+
+Regressão estrutural não é permitida.
+
+15. Atualização oficial após a Fase 11
+
+A Fase 11 do LICITAIA V2 foi executada e marcou o início da implementação real da infraestrutura do núcleo modular do sistema.
+
+A implementação foi realizada no repositório frontend localizado em:
+
+C:\LICITAIA-V2\02-frontend\licitaia-v2-web
+
+e respeitou a estrutura real do projeto, sem uso de src.
+
+Toda a implementação da fase ocorreu exclusivamente dentro da pasta existente:
+
+modules
+
+localizada em:
+
+C:\LICITAIA-V2\02-frontend\licitaia-v2-web\modules
+
+Nenhuma estrutura paralela src/modules foi criada.
+
+16. Estado real da pasta modules após a Fase 11
+
+Após a execução da Fase 11, a pasta modules passou a conter oficialmente a nova infraestrutura do núcleo modular do LICITAIA V2.
+
+A estrutura modular implementada nesta fase é a seguinte:
+
+modules
+│
+├── core
+│   ├── contracts
+│   ├── types
+│   ├── enums
+│   ├── constants
+│   ├── factories
+│   └── utils
+│
+├── orchestrator
+│
+├── shared
+│   ├── validators
+│   ├── event-builders
+│   └── metadata
+│
+├── domain
+│   ├── dfd
+│   ├── etp
+│   ├── tr
+│   └── pricing
+│
+├── registry
+│
+└── index.ts
+
+Essa estrutura passou a representar a base oficial do novo motor modular da V2.
+
+17. Componentes implementados na Fase 11
+
+A Fase 11 implementou os seguintes blocos estruturais do núcleo modular:
+
+17.1 Core
+
+Implementação dos elementos centrais do motor modular, incluindo:
+
+contratos estruturais de entrada e saída de módulos
+
+contratos de validação
+
+contratos de eventos administrativos
+
+contratos de metadados de decisão
+
+contratos do orquestrador
+
+tipos centrais do motor
+
+enums estruturais
+
+factories padronizadas
+
+utilitários básicos do núcleo
+
+17.2 Orchestrator
+
+Implementação da base do orquestrador de fluxo, incluindo:
+
+registro de módulos
+
+despacho de execução
+
+execução inicial de fluxo
+
+agregação de resultados
+
+interrupção de fluxo em caso de bloqueio estrutural
+
+17.3 Shared
+
+Implementação dos componentes compartilhados do núcleo modular, incluindo:
+
+validadores compartilhados
+
+builders de eventos
+
+composição de metadados
+
+17.4 Domain
+
+Implementação de módulos placeholder para os domínios centrais:
+
+DFD
+
+ETP
+
+TR
+
+Pricing
+
+Esses módulos foram criados apenas como base estrutural de execução, ainda sem implementação completa das regras finais de negócio.
+
+17.5 Registry
+
+Implementação do registro central de módulos disponíveis no núcleo modular.
+
+18. Regra oficial de convivência entre estrutura anterior e nova infraestrutura modular
+
+Antes da Fase 11, a pasta modules já continha estruturas anteriores do projeto.
+
+Essas estruturas preexistentes foram preservadas.
+
+A Fase 11 adicionou uma nova infraestrutura modular oficial sem apagar o conteúdo anterior.
+
+Portanto, a partir deste ponto, fica estabelecido que:
+
+a infraestrutura oficial do novo núcleo modular do LICITAIA V2 passa a ser composta por:
+
+modules/core
+
+modules/orchestrator
+
+modules/shared
+
+modules/domain
+
+modules/registry
+
+modules/index.ts
+
+As demais pastas preexistentes dentro de modules devem ser tratadas, até decisão posterior, como:
+
+estrutura anterior ao núcleo modular oficial da V2
+
+legado temporário
+
+conteúdo sujeito a futura auditoria técnica, migração controlada ou incorporação planejada
+
+Nenhuma remoção ou reorganização dessas estruturas antigas deve ocorrer sem decisão arquitetural explícita.
+
+19. Situação arquitetural após a Fase 11
+
+Com a conclusão da Fase 11, o LICITAIA V2 passou a possuir uma infraestrutura real para o motor modular do sistema.
+
+Isso significa que o projeto agora possui:
+
+contratos oficiais de módulo
+
+tipagem estrutural central
+
+sistema padronizado de resultados
+
+sistema de validações estruturadas
+
+sistema de eventos administrativos
+
+sistema de metadados de decisão
+
+base do orquestrador de fluxo
+
+registro central de módulos
+
+módulos placeholder para os domínios centrais do processo administrativo
+
+A partir deste ponto, as próximas fases devem evoluir essa infraestrutura sem quebrar a arquitetura já definida.
+
+20. Regra obrigatória para fases futuras
+
+A partir da conclusão da Fase 11, toda fase futura que altere a pasta modules deve obrigatoriamente:
+
+consultar este documento antes da implementação
+
+respeitar a estrutura oficial do núcleo modular já criada
+
+não criar estruturas paralelas
+
+não duplicar contratos ou orquestradores fora da base oficial
+
+registrar neste documento qualquer alteração estrutural relevante
+
+A continuidade técnica do LICITAIA V2 depende da preservação rigorosa desta base.
+
+21. Status oficial do projeto após a Fase 11
+
+Status atualizado do projeto:
+
+arquitetura macro definida
+
+camadas definidas
+
+banco de dados definido
+
+entidades centrais definidas
+
+autenticação e segurança definidas
+
+modelo multiusuário definido
+
+fluxo administrativo definido
+
+módulos conceituais definidos
+
+arquitetura de implementação dos módulos definida
+
+infraestrutura real do núcleo modular implementada
+
+O projeto encontra-se agora com a Fase 11 tecnicamente executada e documentalmente registrada.

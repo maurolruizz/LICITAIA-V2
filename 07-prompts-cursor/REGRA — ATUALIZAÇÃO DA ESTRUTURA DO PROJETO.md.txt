@@ -1,0 +1,57 @@
+REGRA OBRIGATÓRIA — ATUALIZAÇÃO DA ESTRUTURA DO PROJETO
+
+Toda fase de implementação do LICITAIA V2 deve seguir obrigatoriamente o seguinte procedimento.
+
+Antes de iniciar qualquer implementação técnica ou execução de código, o assistente deve:
+
+verificar o documento
+ESTRUTURA REAL DO PROJETO — LICITAIA V2.md.txt
+
+confirmar que os caminhos físicos utilizados na fase correspondem à estrutura real do repositório
+
+consultar o pacote normativo em 01-planejamento/governanca/ e o PLANO-MESTRE-DECYON-V2.md quando a fase exigir aderência institucional além da estrutura física
+
+declarar explicitamente no início da fase:
+
+VERIFICAÇÃO DE ESTRUTURA REAL: OK
+
+Após qualquer fase que:
+
+crie novas pastas
+
+crie novos diretórios estruturais
+
+reorganize caminhos
+
+mova arquivos estruturais
+
+altere a organização do frontend ou backend
+
+o assistente deve obrigatoriamente:
+
+solicitar atualização do documento
+ESTRUTURA REAL DO PROJETO — LICITAIA V2.md.txt
+
+fornecer o bloco de atualização necessário
+
+registrar no final da fase:
+
+ESTRUTURA DO PROJETO ATUALIZADA
+
+Nenhuma fase pode ser considerada concluída sem essa verificação.
+
+Esta regra existe para preservar:
+
+regressão zero
+
+coerência estrutural
+
+continuidade entre chats
+
+precisão dos prompts usados no Cursor
+
+Isso cria uma trava processual.
+
+Ou seja:
+
+toda fase futura terá que verificar a estrutura real antes de executar.

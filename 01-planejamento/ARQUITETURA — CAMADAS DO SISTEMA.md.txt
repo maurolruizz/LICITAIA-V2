@@ -1,0 +1,366 @@
+LICITAIA V2
+ARQUITETURA — CAMADAS DO SISTEMA
+
+Este documento define oficialmente as camadas arquiteturais do LICITAIA V2.
+
+Objetivo:
+organizar responsabilidades internas do sistema e impedir mistura entre apresentação, regras administrativas, persistência e inteligência artificial.
+
+Este documento segue as diretrizes definidas em:
+
+MASTER CONTEXT — LICITAIA (01-planejamento/governanca/MASTER-CONTEXT-LICITAIA.md)
+
+REGRAS DE DESENVOLVIMENTO — LICITAIA (01-planejamento/governanca/REGRAS-DE-DESENVOLVIMENTO-LICITAIA.md)
+
+CHECKLIST DE AUDITORIA — LICITAIA (01-planejamento/governanca/CHECKLIST-DE-AUDITORIA-LICITAIA.md)
+
+PLANO MESTRE — DECYON V2 (01-planejamento/PLANO-MESTRE-DECYON-V2.md)
+
+1. PRINCÍPIO CENTRAL DA ARQUITETURA
+
+O LICITAIA é um motor de conformidade administrativa preventiva, não um gerador de documentos.
+
+Por esse motivo:
+
+regras jurídicas não podem ficar em componentes visuais
+
+cálculos administrativos não podem ficar espalhados
+
+IA não pode decidir juridicamente
+
+persistência não pode conter lógica de negócio
+
+cada bloco do sistema tem responsabilidade definida
+
+2. BLOCOS PRINCIPAIS DO SISTEMA
+
+O sistema é dividido em três blocos estruturais:
+
+FRONTEND
+
+Responsável por:
+
+interface do usuário
+
+condução do fluxo operacional
+
+validações de interface
+
+aplicação da lógica modular de conformidade no lado da aplicação
+
+BACKEND API
+
+Responsável por:
+
+execução segura de serviços
+
+regras centrais do servidor
+
+integridade do sistema
+
+persistência de dados
+
+integração entre serviços
+
+BACKEND AI
+
+Responsável por:
+
+geração assistida de conteúdo
+
+processamento textual inteligente
+
+apoio à produção documental
+
+estruturação de respostas assistidas
+
+A IA não decide juridicamente e não governa o fluxo do sistema.
+
+3. CAMADAS DO FRONTEND
+
+O frontend possui seis camadas arquiteturais.
+
+3.1 Camada de Apresentação
+
+Função:
+exibir o sistema ao usuário.
+
+Inclui:
+
+páginas
+
+componentes visuais
+
+formulários
+
+tabelas
+
+botões
+
+modais
+
+alertas
+
+dashboards
+
+Não inclui:
+
+regra jurídica
+
+cálculo administrativo
+
+decisão de conformidade
+
+integração direta com banco de dados
+
+3.2 Camada de Orquestração de Fluxo
+
+Função:
+controlar a progressão do processo administrativo dentro da interface.
+
+Inclui:
+
+controle de etapas
+
+navegação entre fases
+
+bloqueio de avanço indevido
+
+sincronização de etapas do processo
+
+Não inclui:
+
+persistência
+
+cálculo central
+
+lógica de IA
+
+3.3 Camada de Estado da Aplicação
+
+Função:
+controlar dados temporários da interface.
+
+Inclui:
+
+estado de formulários
+
+dados temporários
+
+filtros
+
+carregamento
+
+estado de telas
+
+Não inclui:
+
+regras jurídicas
+
+persistência oficial
+
+3.4 Camada de Validação de Interface
+
+Função:
+evitar erros operacionais simples.
+
+Inclui:
+
+validação de campos obrigatórios
+
+formatos de dados
+
+bloqueios básicos de ação
+
+Não inclui:
+
+validação jurídica profunda
+
+travas administrativas centrais
+
+3.5 Núcleo Modular de Conformidade
+
+Função:
+aplicar a lógica estrutural do LICITAIA no frontend.
+
+Inclui os módulos:
+
+regime
+
+compliance
+
+workflow
+
+audit
+
+pricing
+
+calculation-memory
+
+object-structure
+
+administrative-events
+
+legal-rules
+
+reporting
+
+dashboard
+
+process
+
+Esse núcleo sustenta a lógica operacional do sistema.
+
+3.6 Camada de Integração Externa
+
+Função:
+conectar o frontend aos serviços do sistema.
+
+Inclui:
+
+chamadas para Backend API
+
+chamadas para Backend AI
+
+envio de payloads
+
+tratamento de respostas
+
+4. CAMADAS DO BACKEND API
+
+O backend API possui cinco camadas.
+
+4.1 Camada de Entrada da API
+
+Função:
+receber requisições externas.
+
+Inclui:
+
+rotas
+
+controllers
+
+validação inicial de requisição
+
+padronização de resposta
+
+4.2 Camada de Aplicação (Casos de Uso)
+
+Função:
+executar operações do sistema.
+
+Inclui:
+
+criação de processo
+
+avanço de etapa
+
+execução de serviços
+
+coordenação entre módulos
+
+4.3 Camada de Regras de Negócio
+
+Função:
+garantir integridade do sistema.
+
+Inclui:
+
+travas administrativas
+
+validações centrais
+
+coerência de estados
+
+proteção contra ações inválidas
+
+4.4 Camada de Persistência
+
+Função:
+acessar armazenamento de dados.
+
+Inclui:
+
+repositórios
+
+leitura
+
+gravação
+
+atualização de dados
+
+Não inclui:
+
+lógica de negócio
+
+4.5 Camada de Integrações
+
+Função:
+conectar serviços externos.
+
+Inclui:
+
+comunicação com Backend AI
+
+logs
+
+integrações futuras
+
+5. CAMADAS DO BACKEND AI
+
+O backend AI possui quatro camadas.
+
+5.1 Entrada do Serviço de IA
+
+Função:
+receber solicitações de processamento inteligente.
+
+5.2 Orquestração de Tarefas de IA
+
+Função:
+decidir qual rotina de IA executar.
+
+5.3 Processamento Assistido
+
+Função:
+executar geração ou transformação textual.
+
+Inclui:
+
+geração de conteúdo
+
+estruturação textual
+
+refinamento de respostas
+
+5.4 Adaptadores de Saída
+
+Função:
+garantir que a resposta da IA retorne de forma estruturada e segura.
+
+6. PROIBIÇÕES ARQUITETURAIS
+
+São proibidos no LICITAIA V2:
+
+regra jurídica em componente visual
+
+cálculo administrativo espalhado
+
+IA decidindo enquadramento jurídico
+
+controllers contendo regra pesada
+
+persistência contendo lógica de negócio
+
+duplicação de regra em múltiplas camadas
+
+mistura entre apresentação, lógica e infraestrutura
+
+Essas proibições existem para preservar a robustez do núcleo do sistema.
+
+7. STATUS DA FASE
+
+Fase 3 da reconstrução do LICITAIA V2:
+
+DEFINIÇÃO DAS CAMADAS DO SISTEMA — CONCLUÍDA

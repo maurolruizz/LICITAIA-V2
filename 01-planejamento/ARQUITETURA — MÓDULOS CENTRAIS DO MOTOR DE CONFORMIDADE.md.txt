@@ -1,0 +1,1016 @@
+VISÃO GERAL DA FASE
+
+A Fase 9 tem como objetivo transformar o núcleo funcional do LICITAIA V2 em uma arquitetura oficial de módulos centrais, com responsabilidades explícitas, fronteiras rígidas e dependências controladas.
+
+Até a Fase 8, o sistema já definiu o fluxo oficial do processo administrativo, a lógica de progressão entre etapas, os bloqueios de salto, o registro de decisões, a geração de eventos administrativos e a adaptação do fluxo conforme regime, objeto, estrutura e execução. A partir disso, a Fase 9 existe para responder uma pergunta central: quais são os módulos internos que sustentam esse motor de processo sem espalhar regra de negócio, sem duplicação de lógica e sem mistura indevida de responsabilidades.
+
+Esta fase não trata de interface, não trata de banco em detalhe, não trata de tecnologia nova e não trata de implementação em código. Trata exclusivamente da arquitetura funcional dos módulos centrais que compõem o núcleo operacional do LICITAIA V2.
+
+O resultado esperado desta fase é deixar oficialmente definido:
+
+quais módulos existem no núcleo;
+
+por que cada um existe;
+
+o que cada um faz;
+
+o que cada um não pode fazer;
+
+como eles se relacionam;
+
+quais acoplamentos são permitidos;
+
+quais acoplamentos são proibidos;
+
+como isso sustenta o motor de conformidade do sistema.
+
+CONCEITO DE MÓDULOS CENTRAIS DO LICITAIA
+
+Os módulos centrais do LICITAIA são os blocos internos de responsabilidade do núcleo operacional do sistema.
+
+Eles existem para impedir que o sistema cresça como um conjunto de telas, formulários e validações soltas. No LICITAIA, cada comportamento relevante do processo administrativo deve nascer de um módulo responsável, claramente definido, auditável e reutilizável.
+
+Como o próprio contexto oficial do projeto já estabelece, o LICITAIA não é um gerador livre de documentos. Ele é um motor de estruturação da decisão administrativa, que deve orientar, validar, travar quando necessário, estruturar, documentar e registrar. Isso exige módulos centrais que controlem exatamente essas funções, sem dispersão da lógica pelo sistema.
+
+Em termos arquiteturais, módulo central é uma unidade funcional do núcleo que:
+
+possui responsabilidade única e nítida;
+
+recebe entradas conceituais bem definidas;
+
+produz saídas conceituais previsíveis;
+
+não invade a responsabilidade de outros módulos;
+
+pode ser mantido e evoluído sem romper o restante do sistema.
+
+No LICITAIA V2, os módulos centrais não são uma conveniência organizacional. Eles são uma exigência arquitetural da reconstrução. O plano oficial da V2 determina que a nova versão deve nascer com módulos centrais previamente definidos e com lógica jurídica e matemática não espalhada.
+
+POR QUE A FASE 9 VEM DEPOIS DA FASE 8
+
+A Fase 9 só pode vir depois da Fase 8 porque módulo sem fluxo definido vira abstração solta.
+
+Primeiro era necessário fechar:
+
+qual é o processo administrativo oficial do sistema;
+
+quais são suas etapas;
+
+como nasce o processo;
+
+como se dá a progressão;
+
+quando há bloqueio;
+
+como decisões e eventos são registrados;
+
+como o fluxo se adapta ao regime jurídico, ao tipo de objeto, à estrutura do objeto e à forma de execução.
+
+Somente depois disso é possível definir os módulos com precisão, porque os módulos centrais não existem no vazio: eles existem para sustentar o comportamento do processo já definido. O fluxo é a lógica macro. Os módulos são os responsáveis internos por executar essa lógica com separação correta de responsabilidades.
+
+Em termos práticos:
+
+a Fase 8 definiu o que o sistema deve fazer ao longo do processo;
+
+a Fase 9 define quem, dentro do núcleo, é responsável por fazer cada parte disso.
+
+Sem a Fase 8, a Fase 9 correria o risco de criar módulos genéricos, artificiais ou redundantes. Com a Fase 8 fechada, a definição dos módulos pode ser objetiva, enxuta e diretamente conectada à operação real do LICITAIA.
+
+LISTA OFICIAL DOS MÓDULOS CENTRAIS
+
+A arquitetura oficial do núcleo operacional do LICITAIA V2 passa a reconhecer os seguintes módulos centrais obrigatórios:
+
+Módulo de Contexto Normativo
+
+Módulo de Enquadramento do Processo
+
+Módulo de Orquestração do Processo
+
+Módulo de Controle de Etapas
+
+Módulo de Validação de Conformidade
+
+Módulo de Bloqueios Preventivos
+
+Módulo de Decisões Administrativas
+
+Módulo de Eventos Administrativos
+
+Módulo de Trilha de Auditoria
+
+Módulo de Estruturação do Objeto
+
+Módulo de Memória de Cálculo
+
+Módulo de Pesquisa de Preços
+
+Módulo de Consolidação de Conformidade
+
+Módulo de Métricas e Indicadores
+
+Esta lista está aderente ao núcleo modular já indicado no contexto oficial do projeto, que menciona centralização de constantes legais, validações administrativas e jurídicas, eventos padronizados, registro de decisões, controle de etapas, reconstrução de trilha de auditoria, bloqueios preventivos, orquestração de fluxo, relatórios de conformidade, score de compliance e métricas. A Fase 9 apenas converte esse núcleo já apontado em arquitetura oficial e formalizada.
+
+RESPONSABILIDADE OFICIAL DE CADA MÓDULO
+1. Módulo de Contexto Normativo
+
+Responsabilidade oficial: centralizar as regras normativas, parâmetros jurídicos, constantes legais, critérios de conformidade e fundamentos estruturais que alimentam os demais módulos do núcleo.
+
+Este módulo existe para impedir que base legal, limites normativos, critérios de enquadramento e exigências obrigatórias fiquem espalhados pelo sistema.
+
+Pode fazer:
+
+fornecer parâmetros normativos a outros módulos;
+
+centralizar constantes legais;
+
+mapear exigências por regime jurídico;
+
+mapear exigências por tipo e estrutura do objeto;
+
+servir como fonte única de referência para travas e validações.
+
+Não pode fazer:
+
+decidir sozinho o andamento do processo;
+
+registrar eventos;
+
+registrar decisões;
+
+controlar etapa;
+
+calcular score;
+
+gerar trilha de auditoria.
+
+Entrada conceitual:
+
+regime jurídico;
+
+tipo de objeto;
+
+estrutura do objeto;
+
+forma de execução;
+
+hipótese administrativa em análise.
+
+Saída conceitual:
+
+conjunto de regras aplicáveis;
+
+exigências obrigatórias;
+
+parâmetros de bloqueio;
+
+fundamentos normativos de validação.
+
+2. Módulo de Enquadramento do Processo
+
+Responsabilidade oficial: traduzir a configuração concreta do processo em um perfil operacional válido para o restante do núcleo.
+
+Este módulo é o ponto em que o sistema interpreta o processo a partir da combinação entre regime jurídico, objeto, estrutura e execução, porque o contexto oficial do projeto estabelece que é essa combinação que define travas, exigências e comportamento do sistema.
+
+Pode fazer:
+
+classificar o processo em termos operacionais;
+
+determinar qual matriz de exigências será aplicada;
+
+informar quais obrigações documentais e de validação passam a valer;
+
+identificar cenários especiais.
+
+Não pode fazer:
+
+controlar fluxo por si só;
+
+executar bloqueio diretamente;
+
+registrar evento;
+
+gerar relatório final.
+
+Entrada conceitual:
+
+dados estruturantes do processo.
+
+Saída conceitual:
+
+perfil de enquadramento do processo;
+
+matriz de exigências aplicáveis;
+
+sinalização de cenários especiais.
+
+3. Módulo de Orquestração do Processo
+
+Responsabilidade oficial: coordenar o comportamento do núcleo ao longo do processo administrativo.
+
+Este é o módulo coordenador. Ele não substitui outros módulos, mas organiza quando e em que ordem cada um deve ser acionado, sempre respeitando a progressão oficial do processo. O próprio projeto já define que o frontend controla fluxo, etapas, validações básicas e lógica de conformidade.
+
+Pode fazer:
+
+acionar os módulos corretos conforme a etapa;
+
+coordenar fluxos de entrada, validação, bloqueio e progressão;
+
+garantir coerência entre estado do processo e comportamento do sistema;
+
+receber respostas dos módulos especializados e decidir o encaminhamento operacional.
+
+Não pode fazer:
+
+concentrar regras jurídicas internamente;
+
+duplicar validações;
+
+armazenar decisão administrativa como responsabilidade primária;
+
+produzir score por conta própria;
+
+substituir o módulo de controle de etapas.
+
+Entrada conceitual:
+
+estado atual do processo;
+
+etapa atual;
+
+ações do usuário;
+
+retorno dos módulos especializados.
+
+Saída conceitual:
+
+próxima ação operacional permitida;
+
+acionamento de validações;
+
+acionamento de bloqueios;
+
+autorização ou impedimento de progressão.
+
+4. Módulo de Controle de Etapas
+
+Responsabilidade oficial: governar a progressão formal do processo entre DFD, ETP, TR, pesquisa de preços e encaminhamento posterior.
+
+Pode fazer:
+
+definir etapa atual;
+
+verificar pré-condições de conclusão de etapa;
+
+impedir salto indevido;
+
+autorizar avanço, permanência ou retorno controlado;
+
+informar pendências de etapa.
+
+Não pode fazer:
+
+decidir enquadramento jurídico;
+
+registrar decisão administrativa de mérito;
+
+gerar eventos diretamente sem acionar o módulo responsável;
+
+consolidar score.
+
+Entrada conceitual:
+
+processo;
+
+etapa atual;
+
+estado de completude;
+
+resultado das validações.
+
+Saída conceitual:
+
+status da etapa;
+
+possibilidade de avanço;
+
+pendências impeditivas;
+
+transição autorizada ou bloqueada.
+
+5. Módulo de Validação de Conformidade
+
+Responsabilidade oficial: verificar se dados, decisões, justificativas e estruturas do processo estão em conformidade com as regras aplicáveis.
+
+Pode fazer:
+
+validar regime jurídico;
+
+validar coerência entre hipótese e enquadramento;
+
+validar exigências obrigatórias;
+
+validar estrutura do objeto;
+
+validar documentação mínima;
+
+validar coerência material entre etapas;
+
+validar combinações vedadas.
+
+Não pode fazer:
+
+bloquear por conta própria sem repassar o resultado ao módulo de bloqueios;
+
+registrar decisão administrativa;
+
+controlar etapa;
+
+produzir eventos como responsabilidade principal.
+
+Entrada conceitual:
+
+dados do processo;
+
+exigências aplicáveis;
+
+informações das etapas;
+
+parâmetros normativos.
+
+Saída conceitual:
+
+validação aprovada;
+
+validação com ressalva;
+
+inconformidade;
+
+lista de pendências;
+
+fundamentos da inconformidade.
+
+6. Módulo de Bloqueios Preventivos
+
+Responsabilidade oficial: transformar inconformidades relevantes em impedimentos operacionais reais.
+
+Este módulo existe porque o LICITAIA deve tratar regras jurídicas como travas do sistema e bloquear ações quando regras forem violadas.
+
+Pode fazer:
+
+impedir avanço de etapa;
+
+impedir conclusão de ação;
+
+impedir fechamento de documento;
+
+exigir correção prévia;
+
+categorizar bloqueio por gravidade e natureza.
+
+Não pode fazer:
+
+reinterpretar a norma sozinho;
+
+registrar decisão em nome do usuário;
+
+controlar auditoria completa;
+
+substituir a validação de conformidade.
+
+Entrada conceitual:
+
+resultado de validação;
+
+critérios de bloqueio;
+
+contexto operacional.
+
+Saída conceitual:
+
+bloqueio ativo;
+
+tipo de bloqueio;
+
+motivo do bloqueio;
+
+condição de desbloqueio.
+
+7. Módulo de Decisões Administrativas
+
+Responsabilidade oficial: registrar e estruturar decisões administrativas tomadas no processo, com motivação, contexto e vínculo com etapa e responsável.
+
+Pode fazer:
+
+formalizar decisão do usuário responsável;
+
+associar justificativa e fundamento;
+
+vincular decisão à etapa e ao processo;
+
+preservar materialidade da decisão.
+
+Não pode fazer:
+
+gerar evento sozinho sem o módulo de eventos;
+
+controlar fluxo;
+
+validar juridicamente por si só;
+
+calcular métricas.
+
+Entrada conceitual:
+
+ação deliberativa do usuário;
+
+contexto da etapa;
+
+fundamento apresentado;
+
+identificador do responsável.
+
+Saída conceitual:
+
+decisão administrativa estruturada;
+
+justificativa vinculada;
+
+vínculo com processo, etapa e usuário.
+
+8. Módulo de Eventos Administrativos
+
+Responsabilidade oficial: transformar ações relevantes do sistema e do usuário em eventos administrativos padronizados.
+
+Pode fazer:
+
+registrar abertura de processo;
+
+registrar mudança de etapa;
+
+registrar decisão;
+
+registrar bloqueio;
+
+registrar desbloqueio;
+
+registrar conclusão de etapa;
+
+padronizar tipo, origem, tempo e contexto do evento.
+
+Não pode fazer:
+
+decidir mérito jurídico;
+
+controlar progressão;
+
+substituir a trilha de auditoria;
+
+concentrar todas as informações históricas do sistema em modelo monolítico.
+
+Entrada conceitual:
+
+ocorrência relevante;
+
+metadados operacionais;
+
+vínculo com processo, etapa, usuário e cliente.
+
+Saída conceitual:
+
+evento administrativo padronizado.
+
+9. Módulo de Trilha de Auditoria
+
+Responsabilidade oficial: reconstruir a linha do tempo administrativa do processo a partir de decisões, eventos, alterações relevantes e bloqueios.
+
+Pode fazer:
+
+organizar historicamente os registros;
+
+permitir reconstrução posterior do processo;
+
+consolidar cadeia de responsabilização;
+
+servir de base para auditoria, revisão e inspeção.
+
+Não pode fazer:
+
+substituir o módulo de eventos;
+
+substituir o módulo de decisões;
+
+validar conformidade por conta própria;
+
+controlar etapa.
+
+Entrada conceitual:
+
+eventos administrativos;
+
+decisões administrativas;
+
+transições de etapa;
+
+registros de bloqueio.
+
+Saída conceitual:
+
+trilha cronológica auditável;
+
+visão histórica do processo;
+
+reconstrução da linha lógica administrativa.
+
+10. Módulo de Estruturação do Objeto
+
+Responsabilidade oficial: governar a lógica estrutural do objeto contratado, incluindo item único, múltiplos itens e lote.
+
+Este módulo é obrigatório porque o contexto do projeto determina que a estrutura do objeto impacta diretamente memória de cálculo, pesquisa de preços, justificativa técnica e consolidação final do valor.
+
+Pode fazer:
+
+definir e validar a estrutura do objeto;
+
+tratar coerência técnica de agrupamento em lote;
+
+informar a outros módulos como o objeto está estruturado;
+
+impedir tratamento genérico indevido do objeto.
+
+Não pode fazer:
+
+executar pesquisa de preços;
+
+calcular memória de cálculo completa;
+
+decidir fluxo global.
+
+Entrada conceitual:
+
+tipo de objeto;
+
+composição do objeto;
+
+forma de agrupamento.
+
+Saída conceitual:
+
+estrutura válida do objeto;
+
+classificação estrutural;
+
+parâmetros para cálculo e pesquisa.
+
+11. Módulo de Memória de Cálculo
+
+Responsabilidade oficial: estruturar, validar e consolidar a lógica quantitativa que justifica a demanda administrativa.
+
+Este módulo é central porque a memória de cálculo não pode ser genérica e deve operar, no mínimo, com separação entre consumo e dimensionamento institucional.
+
+Pode fazer:
+
+aplicar modelo de consumo;
+
+aplicar modelo de dimensionamento institucional;
+
+impedir lógica incompatível com o objeto;
+
+consolidar justificativa quantitativa da necessidade;
+
+fornecer base para etapas posteriores.
+
+Não pode fazer:
+
+definir preço de referência;
+
+substituir a pesquisa de preços;
+
+decidir enquadramento jurídico.
+
+Entrada conceitual:
+
+tipo de objeto;
+
+estrutura do objeto;
+
+dados quantitativos da demanda.
+
+Saída conceitual:
+
+memória de cálculo estruturada;
+
+consistência quantitativa;
+
+base justificadora da demanda.
+
+12. Módulo de Pesquisa de Preços
+
+Responsabilidade oficial: governar a estruturação da pesquisa de preços conforme a lógica do objeto e da contratação.
+
+O contexto oficial determina que a pesquisa de preços deve seguir a estrutura do objeto e não pode ser tratada como bloco genérico único quando a estrutura exigir detalhamento.
+
+Pode fazer:
+
+tratar pesquisa simples para item único;
+
+tratar pesquisa por item para múltiplos itens;
+
+tratar pesquisa por item com consolidação final para lote;
+
+consolidar base de referência de preço conforme estrutura válida.
+
+Não pode fazer:
+
+substituir memória de cálculo;
+
+definir sozinho o enquadramento do processo;
+
+ignorar a estrutura do objeto;
+
+operar desacoplado da lógica normativa aplicável.
+
+Entrada conceitual:
+
+estrutura do objeto;
+
+parâmetros da contratação;
+
+dados de referência de preço.
+
+Saída conceitual:
+
+pesquisa estruturada;
+
+consolidação de preços;
+
+elementos para instrução da contratação.
+
+13. Módulo de Consolidação de Conformidade
+
+Responsabilidade oficial: sintetizar o estado global de conformidade do processo e produzir a visão consolidada necessária para encerramento de etapa, emissão de relatório e score.
+
+Pode fazer:
+
+agregar resultados de validação;
+
+agregar bloqueios, pendências, decisões e eventos;
+
+informar se o processo está apto a avançar;
+
+produzir base estruturada para relatório de conformidade;
+
+alimentar score de compliance.
+
+Não pode fazer:
+
+substituir validações especializadas;
+
+criar novos fatos administrativos;
+
+controlar etapa sozinho.
+
+Entrada conceitual:
+
+resultados de validação;
+
+bloqueios;
+
+pendências;
+
+trilha resumida;
+
+estado do processo.
+
+Saída conceitual:
+
+estado consolidado de conformidade;
+
+resumo de pendências;
+
+aptidão ou não para progressão;
+
+insumo para relatório e score.
+
+14. Módulo de Métricas e Indicadores
+
+Responsabilidade oficial: agregar indicadores operacionais e de conformidade do sistema, sem interferir na lógica transacional do processo.
+
+Pode fazer:
+
+calcular score de compliance;
+
+gerar métricas para dashboard;
+
+produzir indicadores de pendências, bloqueios, conclusão e qualidade processual;
+
+servir à gestão e monitoramento.
+
+Não pode fazer:
+
+decidir fluxo;
+
+bloquear processo;
+
+registrar decisão administrativa;
+
+alterar o estado do processo.
+
+Entrada conceitual:
+
+estado consolidado de conformidade;
+
+eventos;
+
+bloqueios;
+
+conclusões de etapa.
+
+Saída conceitual:
+
+score;
+
+métricas;
+
+indicadores agregados.
+
+FRONTEIRAS OBRIGATÓRIAS ENTRE MÓDULOS
+
+As fronteiras obrigatórias da Fase 9 são as seguintes:
+
+O módulo de contexto normativo fornece regra, mas não decide fluxo.
+
+O módulo de enquadramento interpreta o tipo de processo, mas não bloqueia.
+
+O módulo de orquestração coordena o núcleo, mas não concentra regra jurídica nem histórico.
+
+O módulo de controle de etapas governa progressão, mas não faz validação jurídica profunda.
+
+O módulo de validação identifica conformidade ou inconformidade, mas não impõe sozinho o bloqueio.
+
+O módulo de bloqueios executa a trava operacional, mas não produz fundamento isoladamente.
+
+O módulo de decisões registra deliberação administrativa, mas não substitui evento.
+
+O módulo de eventos padroniza ocorrências, mas não substitui decisão nem trilha.
+
+O módulo de trilha de auditoria reconstrói a história, mas não cria a história.
+
+O módulo de estruturação do objeto governa a forma do objeto, mas não executa preço nem cálculo global.
+
+O módulo de memória de cálculo justifica quantidade, mas não define preço.
+
+O módulo de pesquisa de preços justifica referência econômica, mas não justifica quantitativo.
+
+O módulo de consolidação de conformidade sintetiza o estado do processo, mas não cria regras novas.
+
+O módulo de métricas mede o sistema, mas não governa o processo.
+
+Essas fronteiras são obrigatórias para impedir:
+
+duplicação de lógica;
+
+confusão entre causa e efeito;
+
+módulos “gigantes”;
+
+manutenção difícil;
+
+regressão estrutural.
+
+DEPENDÊNCIAS PERMITIDAS
+
+As dependências permitidas na arquitetura oficial são:
+
+Orquestração do Processo pode depender de:
+
+Enquadramento do Processo
+
+Controle de Etapas
+
+Validação de Conformidade
+
+Bloqueios Preventivos
+
+Decisões Administrativas
+
+Eventos Administrativos
+
+Consolidação de Conformidade
+
+Controle de Etapas pode depender de:
+
+Validação de Conformidade
+
+Consolidação de Conformidade
+
+Eventos Administrativos
+
+Validação de Conformidade pode depender de:
+
+Contexto Normativo
+
+Enquadramento do Processo
+
+Estruturação do Objeto
+
+Memória de Cálculo
+
+Pesquisa de Preços
+
+Bloqueios Preventivos pode depender de:
+
+Validação de Conformidade
+
+Contexto Normativo
+
+Eventos Administrativos
+
+Decisões Administrativas pode depender de:
+
+Enquadramento do Processo
+
+Controle de Etapas
+
+Eventos Administrativos
+
+Eventos Administrativos pode depender apenas de:
+
+contexto operacional recebido;
+
+identificadores necessários para padronização do evento.
+
+Trilha de Auditoria pode depender de:
+
+Eventos Administrativos
+
+Decisões Administrativas
+
+Controle de Etapas
+
+Bloqueios Preventivos
+
+Estruturação do Objeto pode depender de:
+
+Enquadramento do Processo
+
+Contexto Normativo
+
+Memória de Cálculo pode depender de:
+
+Estruturação do Objeto
+
+Enquadramento do Processo
+
+Contexto Normativo
+
+Pesquisa de Preços pode depender de:
+
+Estruturação do Objeto
+
+Enquadramento do Processo
+
+Contexto Normativo
+
+Consolidação de Conformidade pode depender de:
+
+Validação de Conformidade
+
+Bloqueios Preventivos
+
+Controle de Etapas
+
+Trilha de Auditoria
+
+Métricas e Indicadores pode depender de:
+
+Consolidação de Conformidade
+
+Eventos Administrativos
+
+Trilha de Auditoria
+
+Regra estrutural: dependência permitida não significa liberdade de acoplamento direto irrestrito. Significa apenas que aquele módulo pode consumir a saída conceitual do outro dentro do desenho oficial do núcleo.
+
+DEPENDÊNCIAS PROIBIDAS
+
+Ficam oficialmente proibidas as seguintes dependências:
+
+O módulo de Contexto Normativo depender de módulos operacionais.
+
+O módulo de Eventos Administrativos depender de módulos de Métricas, Score ou Dashboard.
+
+O módulo de Trilha de Auditoria depender de interface, tela ou componente visual.
+
+O módulo de Validação de Conformidade depender diretamente de componentes de UI.
+
+O módulo de Bloqueios Preventivos depender de lógica de apresentação.
+
+O módulo de Memória de Cálculo depender de Pesquisa de Preços para existir.
+
+O módulo de Pesquisa de Preços depender de Memória de Cálculo para validar preço.
+
+O módulo de Métricas e Indicadores interferir no comportamento transacional do processo.
+
+O módulo de Decisões Administrativas reimplementar regra normativa já pertencente ao módulo de Contexto Normativo ou à Validação de Conformidade.
+
+O módulo de Orquestração do Processo concentrar toda a lógica de validação, bloqueio, auditoria, cálculo e eventos em si mesmo.
+
+O módulo de Controle de Etapas assumir função de “supermódulo” e passar a decidir tudo.
+
+O módulo de qualquer etapa duplicar lógica já existente em outro módulo.
+
+Estas proibições derivam diretamente dos princípios oficiais do projeto: preservar arquitetura, nunca misturar responsabilidades, nunca criar lógica duplicada, não deixar lógica jurídica espalhada, não deixar lógica matemática espalhada e evitar complexidade desnecessária.
+
+COMO OS MÓDULOS SUSTENTAM O MOTOR DO PROCESSO
+
+O motor do processo definido na Fase 8 passa a ser sustentado da seguinte forma:
+
+Quando um processo nasce, o módulo de Enquadramento do Processo interpreta sua configuração estrutural. A partir disso, o módulo de Contexto Normativo informa quais regras passam a valer.
+
+O módulo de Orquestração do Processo coordena o comportamento do sistema conforme a etapa atual. Ao longo de DFD, ETP, TR e Pesquisa de Preços, o módulo de Controle de Etapas governa a progressão e verifica se os pré-requisitos de cada fase foram atendidos.
+
+Quando o processo envolve definição de objeto, o módulo de Estruturação do Objeto governa a lógica de item único, múltiplos itens ou lote. Quando envolve justificativa quantitativa, o módulo de Memória de Cálculo aplica o modelo compatível. Quando envolve referência econômica, o módulo de Pesquisa de Preços estrutura a pesquisa conforme a natureza do objeto. Isso é especialmente importante porque o projeto já identificou como prioridades restaurar compras em lote, separar corretamente a memória de cálculo e garantir coerência automática entre regime jurídico e travas aplicáveis.
+
+Em seguida, o módulo de Validação de Conformidade verifica se tudo está coerente com o enquadramento, com a etapa e com as regras aplicáveis. Se houver inconformidade relevante, o módulo de Bloqueios Preventivos transforma essa inconformidade em trava real do sistema, impedindo avanço indevido, exatamente como a filosofia do LICITAIA exige.
+
+Sempre que houver deliberação relevante, o módulo de Decisões Administrativas registra a decisão. Sempre que houver ocorrência relevante, o módulo de Eventos Administrativos registra o evento padronizado. A partir disso, o módulo de Trilha de Auditoria permite reconstruir toda a linha do tempo administrativa do processo, atendendo à exigência de rastreabilidade e auditabilidade do projeto.
+
+No fechamento de cada etapa e na visão global do processo, o módulo de Consolidação de Conformidade sintetiza o estado do caso. Finalmente, o módulo de Métricas e Indicadores calcula score e agrega métricas para uso gerencial, sem interferir na lógica transacional do processo.
+
+PRINCÍPIOS ESTRUTURAIS OBRIGATÓRIOS
+
+A Fase 9 fixa os seguintes princípios estruturais obrigatórios:
+
+Princípio 1 — responsabilidade única por módulo.
+Cada módulo central deve ter função nuclear específica. Módulo com função difusa é regressão arquitetural.
+
+Princípio 2 — regra normativa centralizada.
+Nenhuma regra jurídica relevante deve ficar espalhada em múltiplos pontos do sistema.
+
+Princípio 3 — lógica matemática centralizada.
+Memória de cálculo e lógica quantitativa devem permanecer em módulo próprio, sem espalhamento.
+
+Princípio 4 — eventos e decisões são ativos estruturais.
+Eventos e decisões não são logs acessórios. São parte do núcleo do sistema.
+
+Princípio 5 — bloqueio é efeito operacional de inconformidade.
+Validação aponta o problema; bloqueio impõe a trava.
+
+Princípio 6 — auditoria é reconstrução, não improviso.
+A trilha de auditoria deve nascer da arquitetura, não de remendos posteriores.
+
+Princípio 7 — progressão de etapa é governada, não presumida.
+O sistema nunca deve permitir salto indevido de fase.
+
+Princípio 8 — módulos de medição não governam processo.
+Score, métricas e dashboard são consequência do núcleo, não seu controlador.
+
+Princípio 9 — baixo acoplamento é regra do núcleo.
+Módulos devem se relacionar por contrato funcional claro, não por dependência difusa ou circular.
+
+Princípio 10 — nada de expansão artificial.
+Só permanecem módulos que sustentam diretamente o núcleo da proposta do LICITAIA.
+
+RISCOS ARQUITETURAIS A EVITAR
+
+Os principais riscos arquiteturais que a Fase 9 deve neutralizar são:
+
+Centralizar tudo no módulo de orquestração.
+Isso transformaria a orquestração em um “deus do sistema”, difícil de manter e propenso a regressões.
+
+Espalhar regras jurídicas em telas, fluxos e formulários.
+Isso viola diretamente a reconstrução da V2 e compromete consistência normativa.
+
+Misturar validação com bloqueio.
+Validação identifica; bloqueio impede. Misturar os dois enfraquece clareza e manutenção.
+
+Misturar decisão administrativa com evento administrativo.
+Decisão é deliberação de mérito; evento é registro padronizado de ocorrência.
+
+Misturar trilha de auditoria com logging genérico.
+A trilha deve reconstruir a linha lógica administrativa, não apenas acumular mensagens técnicas.
+
+Permitir circularidade entre módulos.
+Exemplo: cálculo dependendo de preço e preço dependendo de cálculo de forma estruturalmente circular.
+
+Criar módulos por perfumaria.
+Todo módulo da Fase 9 deve responder a uma necessidade central do núcleo. O projeto não está em fase de expansão funcional.
+
+Duplicar lógica entre módulos.
+Isso contraria frontalmente as regras de desenvolvimento já fixadas.
+
+Permitir que métricas interfiram no comportamento transacional.
+Dashboard e score não podem mandar no processo.
+
+Acoplar módulo central a tela específica.
+Os módulos centrais precisam sustentar o sistema, não uma interface particular.
+
+DEFINIÇÃO OFICIAL RESUMIDA DA FASE 9
+
+A Fase 9 define oficialmente que o núcleo operacional do LICITAIA V2 será sustentado por uma arquitetura modular centrada em contexto normativo, enquadramento do processo, orquestração, controle de etapas, validação de conformidade, bloqueios preventivos, decisões administrativas, eventos administrativos, trilha de auditoria, estruturação do objeto, memória de cálculo, pesquisa de preços, consolidação de conformidade e métricas.
+
+Cada módulo possui responsabilidade específica, fronteira rígida e dependências controladas.
+
+Nenhum módulo poderá invadir responsabilidade de outro, duplicar regra já existente ou concentrar lógica excessiva.
+
+O objetivo arquitetural desta fase é garantir que o motor do processo definido na Fase 8 opere com robustez, rastreabilidade, auditabilidade, coerência normativa, manutenção simples e baixo acoplamento, preservando a filosofia do LICITAIA como motor preventivo de conformidade administrativa.

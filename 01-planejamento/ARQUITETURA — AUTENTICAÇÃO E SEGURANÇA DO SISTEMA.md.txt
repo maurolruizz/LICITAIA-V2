@@ -1,0 +1,178 @@
+ARQUITETURA — AUTENTICAÇÃO E SEGURANÇA DO SISTEMA
+1. visão geral da fase
+
+A Fase 6 da reconstrução do LICITAIA V2 define a arquitetura oficial de autenticação e segurança do sistema como parte estrutural do produto. Esta fase não existe para tratar apenas de login, tela de acesso ou conveniência operacional. Ela existe para estabelecer como o sistema reconhecerá quem está operando, como vinculará ações relevantes a um responsável identificado, como protegerá a integridade do fluxo administrativo e como sustentará auditoria, rastreabilidade e evolução segura do núcleo do produto. Essa definição está em linha direta com a identidade central do LICITAIA como motor de conformidade administrativa preventiva, orientado a estruturar decisões, aplicar travas normativas, registrar eventos administrativos e permitir reconstrução posterior da linha do tempo do processo.
+
+O LICITAIA não é um gerador livre de documentos. Ele conduz o usuário por decisões estruturadas, valida regras obrigatórias, bloqueia comportamentos indevidos quando necessário e registra cada ação relevante dentro da lógica do processo administrativo. Por isso, autenticação e segurança não podem ser tratadas como camada periférica. Elas precisam nascer integradas ao núcleo da plataforma, sustentando identificação do responsável, proteção do fluxo, coerência operacional e capacidade real de auditoria.
+
+Esta fase entra exatamente no momento correto do plano da V2: depois da definição da arquitetura geral, da estrutura do projeto, das camadas, do banco e das entidades centrais, e antes da definição do modelo multiusuário e multicliente. Essa ordem existe para evitar improviso, retrabalho e expansão desnecessária, preservando uma base arquitetural correta antes do início da implementação.
+
+2. por que autenticação entra agora
+
+Autenticação e segurança entram agora porque a reconstrução já definiu os elementos que precisavam existir antes: a arquitetura macro, as fronteiras entre os blocos do sistema, a estrutura dos repositórios, as camadas oficiais, a lógica do banco de dados e as entidades centrais do domínio. Sem essa base, qualquer discussão de autenticação ficaria solta, genérica e desconectada do funcionamento real do LICITAIA. Com essa base já consolidada, agora é possível definir identidade, responsabilidade e proteção operacional de forma coerente com o restante da arquitetura.
+
+A autenticação precisa entrar neste ponto porque o LICITAIA já foi concebido para registrar ações relevantes do usuário, produzir eventos administrativos padronizados, aplicar travas normativas e manter trilha de auditoria. Um sistema com esse nível de responsabilidade não pode evoluir sem deixar claro quem está operando, quais ações dependem de identidade válida e como essa identidade se conecta à auditoria e à progressão obrigatória do fluxo. O próprio contexto-mestre do projeto estabelece que cada ação relevante deve poder gerar timestamp, identificação do responsável e posição daquela decisão dentro do fluxo processual.
+
+Além disso, a auditoria do projeto já identifica o fluxo de autenticação como um ponto crítico conhecido, o que reforça que essa fase não é acessória. Ela é estrutural para a robustez do núcleo, para a segurança dos dados do processo e para a evolução controlada da V2.
+
+3. papel da autenticação no LICITAIA V2
+
+No LICITAIA V2, a autenticação tem o papel de confirmar a identidade do operador e transformar essa identidade em base confiável para o funcionamento do sistema. Em termos práticos, ela existe para que o LICITAIA saiba quem está usando a plataforma, a qual responsável determinada ação pertence e se uma operação sensível pode ou não ser executada naquele contexto.
+
+A autenticação sustenta cinco funções centrais do produto.
+
+A primeira é a identificação do operador. O sistema precisa reconhecer quem iniciou sessão e quem está praticando atos dentro do processo administrativo digital.
+
+A segunda é a vinculação entre ação e responsabilidade. Como o LICITAIA registra decisões, justificativas, alterações, travas, eventos e avanços de etapa, essas ações não podem existir sem autor identificado.
+
+A terceira é a proteção do processo. O sistema precisa impedir que atos relevantes ocorram sem identidade confirmada ou por meio de acessos indevidos.
+
+A quarta é a sustentação da trilha de auditoria. Não basta registrar que algo aconteceu. É necessário registrar quem fez, quando fez, em qual processo e em qual ponto do fluxo aquela ação ocorreu. Isso é coerente com a diretriz de preservar eventos administrativos, auditoria e reconstrução posterior da linha do tempo do processo.
+
+A quinta é a preparação para crescimento futuro. Mesmo sem aprofundar agora o modelo multiusuário e multicliente, a autenticação precisa nascer de forma estruturada para permitir evolução posterior sem reescrever o núcleo do sistema.
+
+Em síntese, no LICITAIA, autenticação não é detalhe de acesso. É base de segurança, responsabilidade operacional, rastreabilidade e governança do processo administrativo.
+
+4. diferença entre autenticação, autorização, responsabilidade operacional e rastreabilidade
+
+Autenticação é o mecanismo pelo qual o sistema confirma quem é a pessoa que está acessando e operando a plataforma. A pergunta que a autenticação responde é: quem é este operador?
+
+Autorização é o mecanismo pelo qual o sistema define o que essa pessoa autenticada pode ou não pode fazer. A pergunta que a autorização responde é: esta pessoa pode executar esta ação, neste contexto e neste momento?
+
+Responsabilidade operacional é o vínculo formal entre uma ação praticada no sistema e o responsável que a praticou. A pergunta que ela responde é: quem responde por este ato registrado dentro do LICITAIA? Essa responsabilidade é essencial porque o sistema foi concebido para registrar a linha lógica do processo, não apenas para armazenar dados.
+
+Rastreabilidade é a capacidade de reconstruir depois a sequência de acontecimentos do processo. A pergunta que ela responde é: o que aconteceu, quem fez, quando fez, em qual processo fez, em qual etapa fez e qual foi o efeito daquela ação? O checklist de auditoria trata expressamente como eixo central a integridade da linha do tempo, a qualidade dos logs e a capacidade de reconstrução posterior das decisões.
+
+Esses quatro conceitos se conectam, mas não se confundem. Autenticação resolve identidade. Autorização resolve permissão. Responsabilidade operacional resolve imputação do ato. Rastreabilidade resolve reconstrução histórica e auditável do processo.
+
+5. princípios obrigatórios de segurança da V2
+
+A V2 deve nascer com princípios de segurança claros, simples e obrigatórios.
+
+O primeiro princípio é identidade confiável desde o início. Nenhuma ação relevante do processo pode depender de identidade vaga, genérica ou improvisada.
+
+O segundo princípio é mínimo acesso necessário. O sistema não deve partir da lógica de que todo usuário autenticado pode fazer tudo. Mesmo sem detalhar ainda perfis complexos, a arquitetura já precisa nascer compatível com limitação de acesso por contexto.
+
+O terceiro princípio é proteção do fluxo do processo. O LICITAIA possui progressão obrigatória entre DFD, ETP, TR, pesquisa de preços e encaminhamento posterior. A segurança do sistema precisa impedir saltos indevidos, execuções fora de ordem e manipulações sem identidade válida. Essa preservação do fluxo é regra obrigatória de desenvolvimento.
+
+O quarto princípio é responsabilidade explícita por ação relevante. Toda operação sensível deve poder ser vinculada a um responsável identificado.
+
+O quinto princípio é integridade da trilha de auditoria. Os registros não podem ser meramente decorativos. Eles precisam ser confiáveis, úteis e consistentes com o histórico do processo.
+
+O sexto princípio é segurança por arquitetura, não por improviso. As regras de proteção não podem ficar espalhadas em telas, componentes ou verificações casuais. Elas devem nascer da estrutura do sistema e respeitar o princípio de preservação da arquitetura modular.
+
+O sétimo princípio é baixo acoplamento. Segurança, autenticação, auditoria e fluxo precisam se relacionar sem misturar responsabilidades entre módulos.
+
+O oitavo princípio é falha segura. Quando houver dúvida sobre identidade, sessão ou permissão, a ação sensível deve ser bloqueada, não liberada.
+
+O nono princípio é preparação para evolução futura. A arquitetura precisa ser forte o suficiente para crescer depois, sem quebrar o que já estiver consolidado.
+
+Esses princípios são coerentes com os princípios inegociáveis do projeto: segurança jurídica, rastreabilidade, auditabilidade, baixo acoplamento, manutenção simples, prevenção de erro humano e preservação da arquitetura.
+
+6. o que o sistema precisa registrar sobre identidade e ação
+
+O LICITAIA V2 precisa nascer preparado para registrar, em toda ação relevante, um conjunto mínimo e obrigatório de informações ligadas à identidade e ao ato praticado.
+
+O sistema deve conseguir registrar quem executou a ação, quando a ação foi executada, qual ação foi executada, sobre qual entidade ou elemento a ação incidiu, em qual processo administrativo a ação ocorreu, em qual etapa do fluxo essa ação aconteceu e qual foi o resultado da operação. Também deve ser possível registrar, quando aplicável, se houve bloqueio, validação, rejeição, inconsistência ou disparo de trava normativa.
+
+Em linguagem prática, o LICITAIA precisa conseguir responder, para qualquer ato relevante: quem fez, o que fez, quando fez, em qual processo fez, em qual etapa fez e qual foi o efeito da ação.
+
+Essa exigência decorre diretamente da definição central do projeto de que cada ação relevante deve poder gerar evento administrativo padronizado, base legal associada, timestamp, identificação do responsável e posição da decisão dentro do fluxo.
+
+Importante: nesta fase, o sistema não precisa inflar o registro com excesso de dados pessoais, cadastros complexos ou metadados periféricos. O foco é registrar o necessário para responsabilidade operacional, segurança séria, auditabilidade real e evolução controlada.
+
+7. relação entre autenticação, auditoria, conformidade e progressão de etapas
+
+A autenticação deve se relacionar de forma direta com quatro pilares do LICITAIA: eventos administrativos, registros de conformidade, trilha de auditoria e progressão de etapas.
+
+Em relação aos eventos administrativos, a regra estrutural é clara: todo evento humano relevante deve nascer vinculado a uma identidade autenticada. Se o evento foi gerado automaticamente pelo sistema, isso deve ficar distinguido de forma explícita. Ações humanas e ações automáticas não podem se misturar no histórico.
+
+Em relação aos registros de conformidade, autenticação é o que permite saber quem tentou executar determinada ação, quem gerou determinada justificativa, quem provocou determinada trava ou quem tentou avançar em desacordo com o fluxo. Isso reforça a linha de decisão administrativa e aumenta a utilidade real dos registros de conformidade.
+
+Em relação à trilha de auditoria, a autenticação é parte da base de confiança do histórico. A auditoria do LICITAIA não pode registrar apenas que houve alteração; ela precisa registrar por quem, quando, em qual contexto e com qual impacto a alteração ocorreu. O sistema já tem como eixo obrigatório a preservação de eventos administrativos e a reconstrução da linha do tempo.
+
+Em relação à progressão de etapas, a autenticação protege atos críticos como avanço, retorno controlado, edição sensível e tentativa de operação fora de ordem. Como o projeto proíbe salto indevido de fase, a identidade do operador precisa estar vinculada a toda ação que interfira no fluxo.
+
+A síntese estrutural é esta: a autenticação fornece identidade; a identidade sustenta responsabilidade operacional; essa responsabilidade fortalece a auditoria e a conformidade; e tudo isso protege a progressão obrigatória do fluxo administrativo.
+
+8. o que deve existir agora
+
+Na Fase 6, deve existir oficialmente a definição de que autenticação é camada estrutural do produto, e não detalhe de interface.
+
+Deve existir a definição de que o operador autenticado é um conceito transversal do sistema, com reflexo em eventos administrativos, auditoria, conformidade e progressão de etapas.
+
+Deve existir a regra oficial de que toda ação relevante do processo deve poder apontar para um responsável identificado.
+
+Deve existir a distinção formal entre eventos provocados por usuários e eventos automáticos do sistema.
+
+Deve existir a noção estrutural de que há áreas públicas, áreas autenticadas e ações sensíveis dependentes de identidade válida, sem detalhar ainda tecnologia específica de proteção.
+
+Deve existir a base conceitual mínima de autorização, deixando claro que autenticar não significa ter permissão irrestrita.
+
+Deve existir a definição de que trilha de auditoria, logs relevantes e registros de conformidade consumirão informação de identidade do operador autenticado.
+
+Deve existir a preparação da arquitetura para crescimento posterior, permitindo que essa identidade venha futuramente a se relacionar com perfis, organizações, clientes e contextos operacionais sem exigir refatoração radical do núcleo.
+
+9. o que não deve existir agora
+
+Na Fase 6, ainda não deve existir aprofundamento de multiusuário.
+
+Ainda não deve existir aprofundamento de multicliente.
+
+Ainda não deve existir matriz extensa de perfis, papéis e permissões finas.
+
+Ainda não deve existir detalhamento por órgão, secretaria, setor, unidade administrativa ou hierarquias internas complexas.
+
+Ainda não deve existir fluxo inflado de administração de contas, governança avançada de acessos, delegação entre usuários ou catálogo sofisticado de políticas organizacionais.
+
+Ainda não deve existir escolha definitiva de biblioteca, provider, SDK, framework ou solução técnica específica de autenticação.
+
+Ainda não deve existir desenho de telas administrativas periféricas que não sejam indispensáveis ao núcleo desta fase.
+
+Ainda não deve existir expansão de produto disfarçada de segurança.
+
+O motivo é simples: o plano de reconstrução separa claramente a Fase 6 da Fase 7. A Fase 6 define a base de autenticação e segurança. A Fase 7 aprofunda multiusuário e multicliente. Misturar as duas agora geraria confusão, inflaria a arquitetura e aumentaria o risco de regressão.
+
+10. preparação estrutural para a futura Fase 7
+
+A Fase 6 deve preparar corretamente o sistema para a Fase 7 em cinco sentidos.
+
+Primeiro, a identidade do operador precisa nascer desacoplada do restante do domínio. Os módulos do LICITAIA devem consumir uma identidade já resolvida, e não reinventar mecanismos próprios para descobrir quem é o usuário.
+
+Segundo, a referência ao responsável autenticado precisa ser reutilizável por eventos, auditoria, conformidade e progressão de etapas.
+
+Terceiro, autenticação e autorização já devem ficar conceitualmente separadas. Isso será indispensável para que a Fase 7 possa introduzir perfis, permissões e segregação de contexto sem reescrever toda a lógica de acesso.
+
+Quarto, a arquitetura não deve pressupor que o operador existe isoladamente, sem contexto institucional. Mesmo sem aprofundar multicliente agora, a V2 já deve nascer aberta para futura vinculação com organização, cliente ou ambiente de operação.
+
+Quinto, a trilha de auditoria deve nascer suficientemente bem estruturada para aceitar, no futuro, mais contexto sem comprometer a coerência do histórico anterior.
+
+Em resumo, a Fase 6 não constrói ainda o modelo multiusuário e multicliente. Ela apenas garante que a fundação da identidade esteja correta para a próxima fase.
+
+11. riscos arquiteturais que devem ser evitados
+
+O primeiro risco é tratar autenticação como mero login de interface. Isso reduziria um tema estrutural a um detalhe superficial e enfraqueceria responsabilidade operacional, auditoria e proteção do fluxo.
+
+O segundo risco é espalhar segurança em telas, páginas e componentes. Isso gera comportamento inconsistente, manutenção ruim e alto risco de falhas.
+
+O terceiro risco é confundir autenticação com autorização. Estar autenticado não significa estar autorizado a tudo.
+
+O quarto risco é permitir que eventos relevantes existam sem responsável identificável. Isso destrói a confiabilidade da trilha de auditoria.
+
+O quinto risco é permitir avanço de etapa sem identidade válida ou sem vínculo com o operador responsável. Isso contraria a lógica central do LICITAIA e enfraquece a governança do processo.
+
+O sexto risco é registrar informação demais sem critério. Excesso de ruído também prejudica auditoria e manutenção.
+
+O sétimo risco é acoplar cedo demais a arquitetura de segurança a uma tecnologia específica. Nesta fase, o foco é definição estrutural, não implementação detalhada.
+
+O oitavo risco é misturar a Fase 6 com a Fase 7 e começar a discutir hierarquias, clientes, setores e permissões refinadas antes de consolidar a base.
+
+O nono risco é não distinguir ações humanas de ações automáticas do sistema, embaralhando a leitura posterior da linha do tempo administrativa.
+
+O décimo risco é deixar o sistema operar com identidade genérica, ambígua ou informal. Isso enfraquece segurança, rastreabilidade, conformidade e responsabilidade ao mesmo tempo.
+
+12. definição oficial resumida da Fase 6
+
+A Fase 6 da reconstrução do LICITAIA V2 define a arquitetura oficial de autenticação e segurança do sistema como parte estrutural do produto, estabelecendo que a identidade do operador autenticado deve sustentar responsabilidade operacional, trilha de auditoria, registros de conformidade, proteção do fluxo e progressão segura das etapas do processo administrativo.
+
+Esta fase não aprofunda ainda o modelo multiusuário e multicliente, nem entra em implementação técnica específica. Seu objetivo é consolidar a base de identidade e proteção operacional necessária para que o LICITAIA permaneça coerente com sua natureza de motor de conformidade administrativa preventiva, preserve rastreabilidade integral e evolua sem retrabalho estrutural. Essa definição é coerente com a diretriz da V2 de pensar sempre em escalabilidade, rastreabilidade e segurança, sem pular etapas e sem inflar o sistema além do seu escopo central.
