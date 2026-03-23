@@ -15,6 +15,7 @@ import { saveExecution } from '../modules/process-execution/process-execution.se
 import { logger } from '../middleware/logger';
 import { withInstitutionalMeta } from '../lib/response-meta';
 import { applyAiAssistiveLayer } from '../modules/ai-assistive/ai-assistive.service';
+import { COVERAGE_DIMENSIONS } from '../phase35/coverage-matrix';
 
 const { runAdministrativeProcess } = require(
   '../../../../02-frontend/licitaia-v2-web/modules-dist'
@@ -102,5 +103,71 @@ export async function runProcessController(req: Request, res: Response): Promise
     const responseBody: ProcessRunResponseBody = buildInternalErrorResponse(error);
     res.status(500).json(withInstitutionalMeta(res, responseBody));
   }
+}
+
+export async function preflightProcessController(req: Request, res: Response): Promise<void> {
+  const requestId = (res.locals['requestId'] as string | undefined) ?? '';
+  const rid = requestId ? `[rid:${requestId}] ` : '';
+  try {
+    const body = req.body;
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      const responseBody: ProcessRunResponseBody = buildValidationErrorResponse({
+        message: 'Request body must be a JSON object.',
+        details: [{ field: 'body', reason: 'Request body must be a JSON object.' }],
+      });
+      res.status(400).json(withInstitutionalMeta(res, responseBody));
+      return;
+    }
+    if (!('payload' in body)) {
+      const responseBody: ProcessRunResponseBody = buildValidationErrorResponse({
+        message: 'payload is required.',
+        details: [{ field: 'payload', reason: 'payload is required.' }],
+      });
+      res.status(400).json(withInstitutionalMeta(res, responseBody));
+      return;
+    }
+    const validation = validateProcessRunRequest(body);
+    if (!validation.success) {
+      const responseBody: ProcessRunResponseBody = buildValidationErrorResponse({
+        message: validation.error.message,
+        details: validation.error.details,
+        code: validation.error.code,
+      });
+      res.status(400).json(withInstitutionalMeta(res, responseBody));
+      return;
+    }
+    const context = normalizeToContext(validation.data);
+    const rawEngineResult: AdministrativeProcessResult = await runAdministrativeProcess(context);
+    const engineResult: AdministrativeProcessResult = applyAiAssistiveLayer(rawEngineResult);
+    const responseBody: ProcessRunResponseBody = buildEngineResponse(engineResult);
+    const httpStatus = engineResult.success ? 200 : engineResult.halted ? 409 : 422;
+    // Endpoint de preflight: sem persistencia por desenho.
+    res.status(httpStatus).json(
+      withInstitutionalMeta(res, {
+        ...responseBody,
+        preflight: true,
+        persisted: false,
+      })
+    );
+  } catch (error) {
+    logger.error(`${rid}[PROCESS_PREFLIGHT_ERROR] Erro ao executar preflight — ${error instanceof Error ? error.message : String(error)}`);
+    const responseBody: ProcessRunResponseBody = buildInternalErrorResponse(error);
+    res.status(500).json(withInstitutionalMeta(res, responseBody));
+  }
+}
+
+export function guidanceOptionsController(_req: Request, res: Response): void {
+  res.status(200).json(
+    withInstitutionalMeta(res, {
+      success: true,
+      data: {
+        legalRegime: [...COVERAGE_DIMENSIONS.legalRegime],
+        objectType: [...COVERAGE_DIMENSIONS.objectType],
+        objectStructure: [...COVERAGE_DIMENSIONS.objectStructure],
+        executionForm: [...COVERAGE_DIMENSIONS.executionForm],
+      },
+      source: 'coverage-matrix',
+    })
+  );
 }
 

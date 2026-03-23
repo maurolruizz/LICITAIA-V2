@@ -493,3 +493,45 @@ Situação oficial vigente:
 Referência normativa:
 
 - `01-planejamento/governanca/TOPOLOGIA-GIT-OFICIAL-E-REGULARIZACAO.md`
+
+23. Classificação oficial dos frontends para a ETAPA E
+
+Fica estabelecido, para fins de execução da ETAPA E (Frente 6), o seguinte enquadramento canônico:
+
+- `02-frontend/licitaia-v2-web` é o núcleo modular frontend, fonte de contratos, módulos, validações estruturais, eventos e lógica central de conformidade.
+- `02-frontend/licitaia-v2-demo` é a camada operacional de interação guiada do usuário e frontend oficial de condução da ETAPA E.
+
+Regra de fronteira obrigatória:
+
+- a camada operacional em `licitaia-v2-demo` é subordinada ao núcleo;
+- é proibido duplicar regra normativa central na interface;
+- em conflito entre interface e motor, prevalece o motor.
+
+24. Classificação de artefatos estruturais complementares
+
+Ficam classificados os seguintes caminhos físicos:
+
+- `02-frontend/licitaia-v2-web/modules-dist`:
+  - artefato derivado técnico de build/distribuição do núcleo modular;
+  - não é fonte de verdade arquitetural ou normativa;
+  - alterações funcionais devem ocorrer na fonte (`modules`) e não no derivado.
+
+- `.git-backup-raiz`:
+  - artefato técnico/administrativo de backup associado à regularização de topologia Git;
+  - não participa do runtime do sistema;
+  - não constitui camada funcional do produto.
+
+25. Regra de prevenção de bifurcação de frontend
+
+Risco reconhecido:
+
+- a coexistência de dois frontends sem papéis formais gera risco de bifurcação operacional e dupla verdade de comportamento.
+
+Mitigação normativa obrigatória:
+
+- manter `licitaia-v2-demo` como frontend oficial da ETAPA E;
+- manter `licitaia-v2-web` como núcleo modular;
+- qualquer mudança de papel entre esses caminhos exige atualização prévia dos artefatos:
+  - `01-planejamento/ESTRUTURA REAL DO PROJETO — LICITAIA V2.md.txt`
+  - `01-planejamento/PLANO-MESTRE-DECYON-V2.md`
+  - `01-planejamento/governanca/MATRIZ-DE-FECHAMENTO-DECYON-V2.md`

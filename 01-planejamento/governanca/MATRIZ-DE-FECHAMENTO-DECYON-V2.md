@@ -95,6 +95,19 @@ As Etapas **G** e **H** **não** são Frentes adicionais: incidem sobre o trabal
 | **Dependências principais** | Etapas **A–D** em 10/10. |
 | **Etapa** | **E** |
 
+Diretriz operacional vinculante da Frente 6:
+
+- frontend oficial da ETAPA E: `02-frontend/licitaia-v2-demo`;
+- núcleo modular de referência: `02-frontend/licitaia-v2-web`;
+- a condução em UI deve ser subordinada ao núcleo, sem duplicar regra central.
+
+Critérios adicionais de conformidade para a ETAPA E:
+
+- não iniciar decisão crítica em campo livre;
+- bloquear avanço de microetapa sem pré-condição mínima;
+- invalidar downstream impactado quando decisão estrutural upstream for alterada;
+- preservar rastreabilidade e leitura de códigos/eventos oficiais do motor.
+
 ---
 
 ### FRENTE 7 — Produto real (SaaS)
@@ -172,3 +185,26 @@ Artefatos de referência:
 
 - `01-planejamento/governanca/CATALOGO-MESTRE-FASES-1-A-49.md`
 - `01-planejamento/governanca/MATRIZ-DE-CONTINUIDADE-FASES-1-49-PARA-ETAPAS-A-H.md`
+
+## 10. Protocolo operacional obrigatório (validade de fase/etapa)
+
+Toda execução de fase, etapa, frente ou fase interna depende de aplicação integral do:
+
+- `01-planejamento/governanca/PROTOCOLO-OPERACIONAL-OBRIGATORIO.md`
+
+Regra de validade:
+
+1. sem protocolo aplicado, não há 10/10 válido;
+2. sem protocolo aplicado, o avanço deve ser bloqueado;
+3. sem protocolo aplicado, o encerramento é inválido para governança.
+
+## 11. Regra de execução controlada do Cursor
+
+Para qualquer execução operacional com Cursor, é obrigatório:
+
+1. declarar leitura obrigatória dos artefatos normativos centrais;
+2. declarar aderência ao protocolo operacional obrigatório;
+3. aplicar checkpoint normativo na mesma etapa da alteração;
+4. preservar coerência integral entre implementação, arquitetura e governança.
+
+Sem cumprimento cumulativo destes itens, a execução não pode ser classificada como concluída.

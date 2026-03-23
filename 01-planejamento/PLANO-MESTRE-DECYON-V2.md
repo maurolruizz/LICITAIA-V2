@@ -629,3 +629,51 @@ Artefatos oficiais:
 
 - `01-planejamento/governanca/CATALOGO-MESTRE-FASES-1-A-49.md`
 - `01-planejamento/governanca/MATRIZ-DE-CONTINUIDADE-FASES-1-49-PARA-ETAPAS-A-H.md`
+
+11.14 REGRA DE PROTOCOLO OPERACIONAL OBRIGATÓRIO (BLOQUEIO ABSOLUTO)
+
+Fica obrigatório aplicar, em toda execução futura, o protocolo oficial:
+
+`01-planejamento/governanca/PROTOCOLO-OPERACIONAL-OBRIGATORIO.md`.
+
+Sem aplicação explícita e integral deste protocolo:
+
+→ nenhuma fase, etapa, frente ou fase interna é válida para critério 10/10;  
+→ o avanço operacional deve ser bloqueado;  
+→ o encerramento é normativamente inválido.
+
+11.15 REGRA DE EXECUÇÃO CONTROLADA DO CURSOR
+
+Toda execução do Cursor deve, obrigatoriamente:
+
+1) declarar leitura obrigatória dos artefatos centrais de governança;
+2) declarar aderência ao PROTOCOLO OPERACIONAL OBRIGATÓRIO;
+3) aplicar checkpoint normativo antes de declarar conclusão;
+4) manter coerência integral entre código, arquitetura, norma e rastreabilidade.
+
+Sem cumprimento cumulativo desta regra, a execução não pode ser aceita como fechamento 10/10.
+
+11.16 DIRETRIZ CANÔNICA DA ETAPA E (FRENTE 6) — CAMADA OPERACIONAL DE CONDUÇÃO
+
+Para a ETAPA E (Condução total do usuário), fica estabelecido:
+
+1) frontend oficial de condução operacional:
+- `02-frontend/licitaia-v2-demo`.
+
+2) frontend de núcleo modular:
+- `02-frontend/licitaia-v2-web`, com foco em módulos, contratos, validações e orquestração estrutural.
+
+3) relação obrigatória entre camadas:
+- a UI conduz, mas não decide;
+- a camada operacional deve consumir e respeitar as capacidades e travas do núcleo;
+- é proibido duplicar regra jurídica, matemática ou de conformidade central no frontend operacional;
+- em conflito, o motor prevalece.
+
+4) fronteiras inalteráveis nesta etapa:
+- a ETAPA E não altera o motor central;
+- a ETAPA E não altera backend de IA;
+- a ETAPA E não altera camada premium documental;
+- a ETAPA E não altera a estrutura documental determinística consolidada.
+
+5) objetivo material da ETAPA E:
+- converter validações e travas já existentes em condução operacional preventiva, sem página em branco em decisões críticas e sem salto indevido de fluxo.

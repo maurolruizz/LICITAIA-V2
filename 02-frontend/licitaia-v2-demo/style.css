@@ -1027,6 +1027,7 @@ body {
   .detail-metrics       { grid-template-columns: 1fr 1fr; }
   .history-filters      { flex-direction: column; align-items: stretch; }
   .filter-search        { min-width: unset; width: 100%; }
+  .guidance-fields      { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
@@ -1034,4 +1035,85 @@ body {
   .main                 { padding: 1.25rem 1rem; }
   .detail-metrics       { grid-template-columns: 1fr; }
   .payload-row          { grid-template-columns: 1fr; }
+}
+
+/* ETAPA E — Conducao guiada */
+.guidance-progress {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.guidance-step {
+  font-size: 0.75rem;
+  border: 1px solid var(--gray-300);
+  color: var(--gray-600);
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.5rem;
+}
+
+.guidance-step.active {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-light);
+}
+
+.guidance-step.done {
+  border-color: var(--green-border);
+  color: var(--green);
+  background: var(--green-light);
+}
+
+.guidance-card {
+  margin-top: 1rem;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.guidance-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.guidance-context {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  margin-bottom: 0.75rem;
+}
+
+.guidance-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.guidance-warning {
+  margin-top: 0.75rem;
+  background: var(--amber-light);
+  border: 1px solid var(--amber-border);
+  color: var(--amber);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+.guidance-preflight {
+  margin-top: 0.75rem;
+  min-height: 1.25rem;
+}
+
+.guidance-ok {
+  font-size: 0.78rem;
+  color: var(--green);
+}
+
+.guidance-block {
+  font-size: 0.78rem;
+  color: var(--red);
 }

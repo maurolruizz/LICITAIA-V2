@@ -523,3 +523,580 @@ function escapeFormHtml(str) {
 function escapeFormAttr(str) {
   return String(str).replace(/"/g, '&quot;');
 }
+
+/* ==========================================================================
+ * ETAPA E — CAMADA DE CONDUCAO OPERACIONAL (FASE INTERNA 1)
+ * ========================================================================== */
+
+var GUIDANCE_OPTIONS = {
+  legalRegimes: [
+    { value: 'LICITACAO', label: 'Licitacao' },
+    { value: 'DISPENSA', label: 'Dispensa' },
+    { value: 'INEXIGIBILIDADE', label: 'Inexigibilidade' },
+  ],
+  objectTypes: [
+    { value: 'MATERIAL_CONSUMO', label: 'Material de Consumo', durable: false },
+    { value: 'BEM_PERMANENTE', label: 'Bem Permanente', durable: true },
+    { value: 'SERVICO_CONTINUO', label: 'Servico Continuo', durable: false },
+    { value: 'SERVICO_TECNICO_ESPECIALIZADO', label: 'Servico Tecnico Especializado', durable: false },
+  ],
+  objectStructures: [
+    { value: 'ITEM_UNICO', label: 'Item Unico' },
+    { value: 'MULTIPLOS_ITENS', label: 'Multiplos Itens' },
+    { value: 'LOTE', label: 'Lote' },
+  ],
+  executionForms: [
+    { value: 'ENTREGA_UNICA', label: 'Entrega Unica' },
+    { value: 'ENTREGA_PARCELADA', label: 'Entrega Parcelada' },
+    { value: 'EXECUCAO_CONTINUA', label: 'Execucao Continua' },
+    { value: 'EXECUCAO_POR_ETAPAS', label: 'Execucao por Etapas' },
+  ],
+  memoryModels: [
+    { value: 'CONSUMO', label: 'Memoria por Consumo' },
+    { value: 'DIMENSIONAMENTO', label: 'Memoria por Dimensionamento Institucional' },
+  ],
+  pricingModels: [
+    { value: 'ITEM_UNICO', label: 'Pesquisa para Item Unico' },
+    { value: 'MULTIPLOS_ITENS', label: 'Pesquisa por Multiplos Itens' },
+    { value: 'LOTE', label: 'Pesquisa por Lote' },
+  ],
+};
+
+var GUIDANCE_TEXT = {
+  MATERIAL_CONSUMO: {
+    dfd: 'Demanda de suprimento recorrente de itens consumiveis.',
+    etp: 'Solução voltada a reposicao com quantidade estimada por historico de consumo.',
+    tr: 'Objeto contratavel por especificacao de item de consumo e critérios de recebimento.',
+  },
+  BEM_PERMANENTE: {
+    dfd: 'Demanda de incorporacao patrimonial com ciclo de vida duravel.',
+    etp: 'Solução com foco em capacidade institucional e adequacao tecnica.',
+    tr: 'Objeto contratavel com garantia, requisitos tecnicos e aceite funcional.',
+  },
+  SERVICO_CONTINUO: {
+    dfd: 'Demanda de servico essencial com necessidade de continuidade.',
+    etp: 'Solução com medicao recorrente, rotina operacional e nivel de servico.',
+    tr: 'Objeto contratavel por desempenho e aceite periodico.',
+  },
+  SERVICO_TECNICO_ESPECIALIZADO: {
+    dfd: 'Demanda de conhecimento especializado e produto tecnico rastreavel.',
+    etp: 'Solução orientada a entrega por etapas e resultado tecnico comprovavel.',
+    tr: 'Objeto contratavel com escopo tecnico, marcos e criterio de aceite de entrega.',
+  },
+};
+
+var guidanceState = {
+  step: 0,
+  answers: {},
+  invalidations: [],
+  preflight: null,
+  initializedFromCanonical: false,
+  loadingOfficialOptions: false,
+};
+
+var GUIDANCE_STEPS = [
+  { id: 'dfd', title: 'DFD — Fundamentacao', fields: ['department', 'legalRegime', 'objectType', 'objectStructure', 'executionForm', 'motivation'] },
+  { id: 'etp', title: 'ETP — Solucao e Calculo', fields: ['problemModel', 'expectedOutcomeModel', 'solutionModel', 'memoryModel'] },
+  { id: 'tr', title: 'TR — Contratacao e Aceite', fields: ['requirementModel', 'executionControlModel', 'acceptanceModel'] },
+  { id: 'pricing', title: 'Pricing — Estrutura Economica', fields: ['pricingModel', 'estimatedTotalValue', 'itemCount'] },
+  { id: 'review', title: 'Revisao Guiada', fields: [] },
+];
+
+function generateGuidanceProcessId() {
+  var now = new Date();
+  return 'PROC-E' +
+    now.getFullYear() +
+    String(now.getMonth() + 1).padStart(2, '0') +
+    String(now.getDate()).padStart(2, '0') + '-' +
+    String(Math.floor(Math.random() * 900) + 100);
+}
+
+function renderFormSection(containerId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  initializeGuidanceOptionsFromCanonical();
+  if (!guidanceState.answers.processId) guidanceState.answers.processId = generateGuidanceProcessId();
+  if (!guidanceState.answers.department) guidanceState.answers.department = DEPARTMENTS[0];
+
+  var step = GUIDANCE_STEPS[guidanceState.step];
+  container.innerHTML =
+    '<p class="section-title">Conducao Operacional Guiada — ETAPA E</p>' +
+    '<p class="section-desc">Sem pagina em branco: o fluxo e conduzido por microetapas com bloqueio preventivo e impacto downstream visivel.</p>' +
+    buildProgressHtml() +
+    buildInvalidationHtml() +
+    '<div class="guidance-card">' +
+      '<div class="guidance-title">' + escapeFormHtml(step.title) + '</div>' +
+      '<div class="guidance-context">' + buildStepContext(step.id) + '</div>' +
+      '<div class="guidance-fields">' + buildFieldsHtml(step.id) + '</div>' +
+      '<div class="guidance-preflight" id="guidance-preflight"></div>' +
+    '</div>' +
+    '<div class="form-actions">' +
+      '<button class="btn-secondary" id="btn-step-back"' + (guidanceState.step === 0 ? ' disabled' : '') + '>Voltar</button>' +
+      '<button class="btn-secondary" id="btn-step-next">' + (step.id === 'review' ? 'Executar Processo' : 'Validar e Avancar') + '</button>' +
+      '<span class="execute-hint" id="form-hint">' + buildHint(step.id) + '</span>' +
+    '</div>' +
+    '<div id="form-result-section" class="result-section" style="display:none;">' +
+      '<div id="form-result-header" class="result-header"></div>' +
+      '<div id="form-result-body" class="result-body"></div>' +
+    '</div>';
+
+  bindGuidanceActions();
+}
+
+function initializeGuidanceOptionsFromCanonical() {
+  if (guidanceState.initializedFromCanonical) return;
+  if (guidanceState.loadingOfficialOptions) return;
+  guidanceState.loadingOfficialOptions = true;
+  fetch(BACKEND_URL + '/api/process/guidance-options', { method: 'GET' })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var d = data && data.data ? data.data : null;
+      if (!d) throw new Error('invalid options response');
+      if (Array.isArray(d.legalRegime) && d.legalRegime.length) {
+        GUIDANCE_OPTIONS.legalRegimes = d.legalRegime.map(function(v) { return { value: v, label: prettifyOption(v) }; });
+      }
+      if (Array.isArray(d.objectType) && d.objectType.length) {
+        GUIDANCE_OPTIONS.objectTypes = d.objectType.map(function(v) {
+          return { value: v, label: prettifyOption(v), durable: v === 'BEM_PERMANENTE' };
+        });
+      }
+      if (Array.isArray(d.objectStructure) && d.objectStructure.length) {
+        GUIDANCE_OPTIONS.objectStructures = d.objectStructure.map(function(v) { return { value: v, label: prettifyOption(v) }; });
+      }
+      if (Array.isArray(d.executionForm) && d.executionForm.length) {
+        GUIDANCE_OPTIONS.executionForms = d.executionForm.map(function(v) { return { value: v, label: prettifyOption(v) }; });
+      }
+    })
+    .catch(function() {
+      // Fallback transitório: sem promover fixtures a fonte oficial.
+    })
+    .finally(function() {
+      guidanceState.initializedFromCanonical = true;
+      guidanceState.loadingOfficialOptions = false;
+      var container = document.getElementById('form-container');
+      if (container) renderFormSection('form-container');
+    });
+
+  // Fallback transitório imediato para nao quebrar uso offline.
+  if (typeof DEMO_SCENARIOS === 'undefined' || !Array.isArray(DEMO_SCENARIOS) || !DEMO_SCENARIOS.length) {
+    return;
+  }
+  var legalMap = {};
+  var typeMap = {};
+  var structureMap = {};
+  var executionMap = {};
+  DEMO_SCENARIOS.forEach(function(s) {
+    var p = (s && s.request && s.request.payload) || {};
+    if (p.legalRegime) legalMap[p.legalRegime] = true;
+    if (p.objectType) typeMap[p.objectType] = true;
+    if (p.objectStructure) structureMap[p.objectStructure] = true;
+    if (p.executionForm) executionMap[p.executionForm] = true;
+  });
+  GUIDANCE_OPTIONS.legalRegimes = Object.keys(legalMap).map(function(v) { return { value: v, label: prettifyOption(v) }; });
+  GUIDANCE_OPTIONS.objectTypes = Object.keys(typeMap).map(function(v) {
+    return { value: v, label: prettifyOption(v), durable: v === 'BEM_PERMANENTE' };
+  });
+  GUIDANCE_OPTIONS.objectStructures = Object.keys(structureMap).map(function(v) { return { value: v, label: prettifyOption(v) }; });
+  GUIDANCE_OPTIONS.executionForms = Object.keys(executionMap).map(function(v) { return { value: v, label: prettifyOption(v) }; });
+}
+
+function prettifyOption(raw) {
+  return String(raw).replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+}
+
+function buildProgressHtml() {
+  var html = '<div class="guidance-progress">';
+  for (var i = 0; i < GUIDANCE_STEPS.length; i++) {
+    var cls = i === guidanceState.step ? ' active' : (i < guidanceState.step ? ' done' : '');
+    html += '<div class="guidance-step' + cls + '">' + (i + 1) + '. ' + escapeFormHtml(GUIDANCE_STEPS[i].id.toUpperCase()) + '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function buildInvalidationHtml() {
+  if (!guidanceState.invalidations.length) return '';
+  return '<div class="guidance-warning">Mudanca estrutural detectada: ' + escapeFormHtml(guidanceState.invalidations.join(' | ')) + '</div>';
+}
+
+function buildStepContext(stepId) {
+  var objType = guidanceState.answers.objectType;
+  var text = objType && GUIDANCE_TEXT[objType] ? GUIDANCE_TEXT[objType][stepId] : null;
+  if (stepId === 'review') return buildReviewHtml();
+  return text || 'Defina esta microetapa para liberar o proximo bloco sem inconsistencia silenciosa.';
+}
+
+function buildFieldsHtml(stepId) {
+  if (stepId === 'dfd') {
+    return '' +
+      selectField('department', 'Unidade Requisitante', DEPARTMENTS.map(function(d) { return { value: d, label: d }; })) +
+      selectField('legalRegime', 'Regime Juridico', GUIDANCE_OPTIONS.legalRegimes) +
+      selectField('objectType', 'Tipo de Objeto', GUIDANCE_OPTIONS.objectTypes) +
+      selectField('objectStructure', 'Estrutura do Objeto', GUIDANCE_OPTIONS.objectStructures) +
+      selectField('executionForm', 'Forma de Execucao', eligibleExecutionOptions()) +
+      selectField('motivation', 'Motivacao Inicial', [
+        { value: 'CONTINUIDADE', label: 'Continuidade de servico' },
+        { value: 'MODERNIZACAO', label: 'Modernizacao operacional' },
+        { value: 'ADEQUACAO_NORMATIVA', label: 'Adequacao normativa' },
+      ]);
+  }
+  if (stepId === 'etp') {
+    return '' +
+      selectField('problemModel', 'Problema Administrativo', [
+        { value: 'INSUFICIENCIA_CAPACIDADE', label: 'Insuficiencia de capacidade' },
+        { value: 'RISCO_DESCONTINUIDADE', label: 'Risco de descontinuidade' },
+        { value: 'LACUNA_TECNICA', label: 'Lacuna tecnica especializada' },
+      ]) +
+      selectField('expectedOutcomeModel', 'Resultado Pretendido', [
+        { value: 'CONTINUIDADE_OPERACIONAL', label: 'Continuidade operacional' },
+        { value: 'GANHO_EFICIENCIA', label: 'Ganho de eficiencia' },
+        { value: 'REDUCAO_RISCO', label: 'Reducao de risco administrativo' },
+      ]) +
+      selectField('solutionModel', 'Solucao Administrativa', [
+        { value: 'AQUISICAO', label: 'Aquisicao estruturada' },
+        { value: 'CONTRATACAO_SERVICO', label: 'Contratacao de servico' },
+      ]) +
+      selectField('memoryModel', 'Modelo de Memoria de Calculo', eligibleMemoryOptions());
+  }
+  if (stepId === 'tr') {
+    return '' +
+      selectField('requirementModel', 'Requisitos Tecnicos e Administrativos', [
+        { value: 'ESPECIFICACAO_OBJETIVA', label: 'Especificacao objetiva por requisito' },
+        { value: 'REQUISITO_DESEMPENHO', label: 'Requisito por desempenho' },
+      ]) +
+      selectField('executionControlModel', 'Modelo de Execucao Contratual', [
+        { value: 'CRONOGRAMA_ETAPAS', label: 'Cronograma por etapas' },
+        { value: 'ROTINA_CONTINUA', label: 'Rotina continua com medicao' },
+        { value: 'ENTREGA_FISICA', label: 'Entrega fisica com recebimento' },
+      ]) +
+      selectField('acceptanceModel', 'Criterio de Medicao e Aceite', [
+        { value: 'ACEITE_TECNICO', label: 'Aceite tecnico formal' },
+        { value: 'ACEITE_POR_MEDICAO', label: 'Aceite por medicao periodica' },
+        { value: 'ACEITE_POR_ENTREGA', label: 'Aceite por entrega validada' },
+      ]);
+  }
+  if (stepId === 'pricing') {
+    return '' +
+      selectField('pricingModel', 'Modelo de Pesquisa', eligiblePricingOptions()) +
+      textField('estimatedTotalValue', 'Valor Total Estimado (R$)', '50000') +
+      selectField('itemCount', 'Quantidade de Itens', [
+        { value: '1', label: '1 item' },
+        { value: '2', label: '2 itens' },
+        { value: '3', label: '3 itens' },
+      ]);
+  }
+  return '';
+}
+
+function buildReviewHtml() {
+  var missing = collectMissingForAllSteps();
+  if (missing.length) {
+    return 'Pendencias para consolidacao: ' + escapeFormHtml(missing.join(', '));
+  }
+  return 'Revisao concluida: microetapas preenchidas. Proximo passo executa o motor com rastreabilidade.';
+}
+
+function buildHint(stepId) {
+  if (stepId === 'review') return 'Revise pendencias e execute.';
+  return 'Avance apenas apos pre-validacao da microetapa.';
+}
+
+function selectField(id, label, options) {
+  var value = guidanceState.answers[id] || '';
+  var html = '<div class="form-group"><label class="form-label" for="g-' + id + '">' + escapeFormHtml(label) + '</label>';
+  html += '<select class="form-select" id="g-' + id + '"><option value="">Selecione...</option>';
+  options.forEach(function(o) {
+    var selected = o.value === value ? ' selected' : '';
+    html += '<option value="' + escapeFormAttr(o.value) + '"' + selected + '>' + escapeFormHtml(o.label) + '</option>';
+  });
+  html += '</select></div>';
+  return html;
+}
+
+function textField(id, label, fallback) {
+  var value = guidanceState.answers[id] || fallback || '';
+  return '<div class="form-group"><label class="form-label" for="g-' + id + '">' + escapeFormHtml(label) + '</label>' +
+    '<input class="form-input" id="g-' + id + '" type="number" min="1" step="0.01" value="' + escapeFormAttr(value) + '" /></div>';
+}
+
+function eligibleExecutionOptions() {
+  var type = guidanceState.answers.objectType;
+  if (type === 'SERVICO_CONTINUO') return [{ value: 'EXECUCAO_CONTINUA', label: 'Execucao Continua' }];
+  if (type === 'SERVICO_TECNICO_ESPECIALIZADO') return [{ value: 'EXECUCAO_POR_ETAPAS', label: 'Execucao por Etapas' }];
+  return [
+    { value: 'ENTREGA_UNICA', label: 'Entrega Unica' },
+    { value: 'ENTREGA_PARCELADA', label: 'Entrega Parcelada' },
+  ];
+}
+
+function eligibleMemoryOptions() {
+  var type = guidanceState.answers.objectType;
+  if (type === 'BEM_PERMANENTE') return [{ value: 'DIMENSIONAMENTO', label: 'Memoria por Dimensionamento Institucional' }];
+  return GUIDANCE_OPTIONS.memoryModels;
+}
+
+function eligiblePricingOptions() {
+  var structure = guidanceState.answers.objectStructure;
+  if (structure === 'ITEM_UNICO') return [{ value: 'ITEM_UNICO', label: 'Pesquisa para Item Unico' }];
+  if (structure === 'LOTE') return [{ value: 'LOTE', label: 'Pesquisa por Lote' }];
+  return [{ value: 'MULTIPLOS_ITENS', label: 'Pesquisa por Multiplos Itens' }];
+}
+
+function bindGuidanceActions() {
+  var step = GUIDANCE_STEPS[guidanceState.step];
+  step.fields.forEach(function(field) {
+    var el = document.getElementById('g-' + field);
+    if (!el) return;
+    el.addEventListener('change', function() {
+      registerAnswer(field, this.value);
+    });
+    if (el.tagName === 'INPUT') {
+      el.addEventListener('input', function() { registerAnswer(field, this.value); });
+    }
+  });
+
+  var back = document.getElementById('btn-step-back');
+  if (back) back.addEventListener('click', function() {
+    guidanceState.step = Math.max(0, guidanceState.step - 1);
+    renderFormSection('form-container');
+  });
+
+  var next = document.getElementById('btn-step-next');
+  if (next) next.addEventListener('click', function() {
+    runPreValidationAndAdvance(step.id);
+  });
+}
+
+function registerAnswer(field, value) {
+  var prev = guidanceState.answers[field];
+  guidanceState.answers[field] = value;
+  if (prev && prev !== value && isUpstreamField(field)) {
+    invalidateDownstream(field);
+  }
+}
+
+function isUpstreamField(field) {
+  return ['legalRegime', 'objectType', 'objectStructure', 'executionForm', 'solutionModel', 'memoryModel'].indexOf(field) !== -1;
+}
+
+function invalidateDownstream(field) {
+  var impacted = [];
+  var clearFields = [];
+  if (field === 'legalRegime' || field === 'objectType' || field === 'objectStructure' || field === 'executionForm') {
+    impacted = ['ETP', 'TR', 'PRICING'];
+    clearFields = ['problemModel', 'expectedOutcomeModel', 'solutionModel', 'memoryModel', 'requirementModel', 'executionControlModel', 'acceptanceModel', 'pricingModel'];
+  } else if (field === 'solutionModel' || field === 'memoryModel') {
+    impacted = ['TR', 'PRICING'];
+    clearFields = ['requirementModel', 'executionControlModel', 'acceptanceModel', 'pricingModel'];
+  }
+  clearFields.forEach(function(f) { delete guidanceState.answers[f]; });
+  guidanceState.invalidations = ['Alteracao em ' + field + ' invalidou: ' + impacted.join(', ')];
+}
+
+function collectMissingForStep(stepId) {
+  var step = GUIDANCE_STEPS.filter(function(s) { return s.id === stepId; })[0];
+  var missing = [];
+  if (!step) return missing;
+  step.fields.forEach(function(f) {
+    if (!guidanceState.answers[f]) missing.push(f);
+  });
+  return missing;
+}
+
+function collectMissingForAllSteps() {
+  var all = [];
+  GUIDANCE_STEPS.forEach(function(s) {
+    if (s.id === 'review') return;
+    all = all.concat(collectMissingForStep(s.id));
+  });
+  return all;
+}
+
+function runPreValidationAndAdvance(stepId) {
+  var hint = document.getElementById('form-hint');
+  var preflight = document.getElementById('guidance-preflight');
+  var missing = collectMissingForStep(stepId);
+  if (missing.length) {
+    if (preflight) preflight.innerHTML = '<span class="guidance-block">Bloqueado: faltam ' + escapeFormHtml(missing.join(', ')) + '.</span>';
+    return;
+  }
+  var structuralError = checkLocalStructuralConsistency();
+  if (structuralError) {
+    if (preflight) preflight.innerHTML = '<span class="guidance-block">Bloqueio preventivo: ' + escapeFormHtml(structuralError) + '.</span>';
+    return;
+  }
+
+  if (stepId === 'review') {
+    executeForm();
+    return;
+  }
+
+  if (hint) hint.textContent = 'Pre-validando no motor...';
+  runServerPreflight()
+    .then(function(msg) {
+      if (preflight) preflight.innerHTML = '<span class="guidance-ok">' + escapeFormHtml(msg) + '</span>';
+      guidanceState.step = Math.min(GUIDANCE_STEPS.length - 1, guidanceState.step + 1);
+      setTimeout(function() { renderFormSection('form-container'); }, 200);
+    })
+    .catch(function(err) {
+      if (preflight) preflight.innerHTML = '<span class="guidance-block">' + escapeFormHtml(String(err)) + '</span>';
+    });
+}
+
+function checkLocalStructuralConsistency() {
+  var type = guidanceState.answers.objectType;
+  var memory = guidanceState.answers.memoryModel;
+  var structure = guidanceState.answers.objectStructure;
+  var pricing = guidanceState.answers.pricingModel;
+  var execution = guidanceState.answers.executionForm;
+
+  if (type === 'BEM_PERMANENTE' && memory === 'CONSUMO') {
+    return 'bem permanente nao pode usar memoria por consumo';
+  }
+  if (structure && pricing && structure !== pricing) {
+    return 'modelo de pricing deve refletir a estrutura do objeto';
+  }
+  if (type === 'SERVICO_CONTINUO' && execution && execution !== 'EXECUCAO_CONTINUA') {
+    return 'servico continuo exige execucao continua';
+  }
+  if (type === 'SERVICO_TECNICO_ESPECIALIZADO' && execution && execution !== 'EXECUCAO_POR_ETAPAS') {
+    return 'servico tecnico especializado exige execucao por etapas';
+  }
+  return null;
+}
+
+function runServerPreflight() {
+  var request = buildPayloadFromForm();
+  return fetch(BACKEND_URL + '/api/process/preflight', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(request),
+  })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      var result = data.result || {};
+      var validations = Array.isArray(data.validations) ? data.validations : [];
+      var block = validations.some(function(v) { return v && (v.severity === 'BLOCK' || v.severity === 'ERROR'); });
+      if (block || result.halted) {
+        var code = firstValidationCode(validations) || result.haltedBy || 'MOTOR_BLOCK';
+        throw new Error('motor bloqueou no preflight: ' + code);
+      }
+      return 'preflight aprovado: sem bloqueio impeditivo do motor';
+    });
+}
+
+function firstValidationCode(validations) {
+  for (var i = 0; i < validations.length; i++) {
+    if (validations[i] && validations[i].code) return validations[i].code;
+  }
+  return null;
+}
+
+function buildPayloadFromForm() {
+  var a = guidanceState.answers;
+  var processId = (a.processId || generateGuidanceProcessId()).trim();
+  a.processId = processId;
+  var now = new Date().toISOString();
+  var itemCount = parseInt(a.itemCount || '1', 10);
+  var totalValue = parseFloat(a.estimatedTotalValue || '50000');
+  var unitValue = Math.round((totalValue / Math.max(itemCount, 1)) * 100) / 100;
+
+  var objectLabel = optionLabel(GUIDANCE_OPTIONS.objectTypes, a.objectType);
+  var regimeLabel = optionLabel(GUIDANCE_OPTIONS.legalRegimes, a.legalRegime);
+
+  var payload = {
+    legalRegime: a.legalRegime,
+    objectType: a.objectType,
+    objectStructure: a.objectStructure,
+    executionForm: a.executionForm,
+    demandDescription: 'Demanda estruturada para ' + objectLabel + ' sob regime ' + regimeLabel + '.',
+    hiringJustification: 'Motivacao inicial: ' + (a.motivation || '') + '.',
+    administrativeObjective: 'Resultado pretendido: ' + (a.expectedOutcomeModel || '') + '.',
+    requestingDepartment: a.department,
+    requesterName: 'Responsavel pelo Planejamento de Contratacoes',
+    requestDate: now,
+    needDescription: 'Problema administrativo classificado como ' + (a.problemModel || '') + '.',
+    expectedResults: 'Resultado institucional esperado: ' + (a.expectedOutcomeModel || '') + '.',
+    solutionSummary: 'Solucao administrativa: ' + (a.solutionModel || '') + '.',
+    technicalJustification: 'Modelo de memoria de calculo: ' + (a.memoryModel || '') + '.',
+    analysisDate: now,
+    responsibleAnalyst: 'Analista de Planejamento de Contratacoes',
+    objectDescription: 'Objeto contratavel estruturado para ' + objectLabel + '.',
+    contractingPurpose: 'Finalidade da contratacao orientada ao problema administrativo classificado.',
+    technicalRequirements: 'Modelo de requisitos: ' + (a.requirementModel || '') + '.',
+    executionConditions: 'Modelo de execucao contratual: ' + (a.executionControlModel || '') + '.',
+    acceptanceCriteria: 'Modelo de aceite: ' + (a.acceptanceModel || '') + '.',
+    referenceDate: now,
+    responsibleAuthor: 'Responsavel pelo Termo de Referencia',
+    pricingSourceDescription: 'Modelo de pesquisa selecionado: ' + (a.pricingModel || '') + '.',
+    referenceItemsDescription: 'Estrutura declarada: ' + (a.objectStructure || '') + '.',
+    estimatedUnitValue: unitValue,
+    estimatedTotalValue: totalValue,
+    pricingJustification: 'Consolidacao economica orientada por estrutura do objeto.',
+    requestingDepartmentForPricing: a.department,
+    requestingDepartmentPricingAlias: shortDepartment(a.department),
+  };
+
+  if (itemCount > 1) {
+    payload.items = [];
+    payload.procurementStrategies = [];
+    payload.administrativeJustifications = [];
+    for (var i = 1; i <= itemCount; i++) {
+      var itemId = 'item-' + i;
+      payload.items.push({ id: itemId, description: objectLabel + ' - Item ' + i, quantity: 1, unit: 'un' });
+      payload.procurementStrategies.push({
+        targetType: 'item',
+        targetId: itemId,
+        procurementModality: mapRegimeToModality(a.legalRegime),
+        competitionStrategy: a.legalRegime === 'LICITACAO' ? 'OPEN_COMPETITION' : 'DIRECT_SELECTION',
+        divisionStrategy: a.objectStructure === 'LOTE' ? 'LOTS' : 'MULTIPLE_ITEMS',
+        contractingJustification: 'Estrategia estruturada por item e coerencia de objeto.',
+      });
+      payload.administrativeJustifications.push({
+        targetType: 'item',
+        targetId: itemId,
+        problemStatement: 'Problema administrativo classificado em microetapa ETP.',
+        administrativeNeed: 'Necessidade administrativa estruturada para o item.',
+        expectedOutcome: 'Resultado esperado orientado por conducao guiada.',
+      });
+    }
+  } else {
+    payload.procurementStrategy = {
+      targetType: 'process',
+      procurementModality: mapRegimeToModality(a.legalRegime),
+      competitionStrategy: a.legalRegime === 'LICITACAO' ? 'OPEN_COMPETITION' : 'DIRECT_SELECTION',
+      divisionStrategy: 'SINGLE_CONTRACT',
+      contractingJustification: 'Estrategia estruturada sem campo livre inicial.',
+    };
+    payload.administrativeJustification = {
+      targetType: 'process',
+      problemStatement: 'Problema administrativo classificado em microetapa ETP.',
+      administrativeNeed: 'Necessidade administrativa orientada por contexto.',
+      expectedOutcome: 'Resultado esperado definido antes da consolidacao.',
+    };
+  }
+
+  return {
+    processId: processId,
+    phase: 'PLANNING',
+    tenantId: 'tenant-operacional',
+    userId: 'user-conducao-etapa-e',
+    correlationId: 'etapa-e-' + Date.now(),
+    payload: payload,
+  };
+}
+
+function mapRegimeToModality(regime) {
+  if (regime === 'LICITACAO') return 'PREGAO';
+  if (regime === 'INEXIGIBILIDADE') return 'INEXIGIBILIDADE';
+  return 'DISPENSA';
+}
+
+function optionLabel(options, value) {
+  var found = options.filter(function(o) { return o.value === value; })[0];
+  return found ? found.label : value;
+}
+
+function shortDepartment(dep) {
+  return String(dep || '').split(' ').slice(-2).join(' ') || 'Depto';
+}
