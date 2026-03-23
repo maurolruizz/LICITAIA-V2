@@ -81,3 +81,10 @@ Quando houver lacuna histórica:
 ## 10. Aplicação imediata
 
 Este padrão entra em vigor na data da auditoria de regularização Git e é obrigatório para todas as etapas/fases a partir deste ponto.
+
+## 11. Regra de topologia Git oficial
+
+- topologia oficial vigente: **monorepo único**;
+- diretórios de camada (`02-frontend`, `03-backend-api`, `04-backend-ai`) são versionados no Git da raiz;
+- é proibido registrar gitlink (`mode 160000`) sem norma específica;
+- é proibido estado híbrido (gitlink sem submódulo formal).

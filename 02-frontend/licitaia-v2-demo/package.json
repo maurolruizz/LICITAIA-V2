@@ -1,0 +1,10 @@
+{
+  "name": "licitaia-v2-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Frontend mínimo de demonstração DECYON — Fase 39",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  }
+}

@@ -468,3 +468,28 @@ arquitetura de implementação dos módulos definida
 infraestrutura real do núcleo modular implementada
 
 O projeto encontra-se agora com a Fase 11 tecnicamente executada e documentalmente registrada.
+
+22. Atualização oficial de topologia Git (governança global)
+
+No ciclo de regularização de governança Git, foi consolidada a topologia oficial:
+
+monorepo único na raiz `C:\LICITAIA-V2`.
+
+Situação anterior regularizada:
+
+- havia repositórios aninhados em:
+  - `02-frontend/licitaia-v2-demo`
+  - `02-frontend/licitaia-v2-web`
+  - `03-backend-api/licitaia-v2-api`
+  - `04-backend-ai/licitaia-v2-ai-core`
+- estes caminhos estavam sob risco de ambiguidade de rastreabilidade no Git da raiz.
+
+Situação oficial vigente:
+
+- o conteúdo desses caminhos foi absorvido para rastreio no Git da raiz;
+- não há submódulo formal ativo como topologia oficial;
+- não é permitido estado híbrido (gitlink sem submódulo formal) sem norma explícita.
+
+Referência normativa:
+
+- `01-planejamento/governanca/TOPOLOGIA-GIT-OFICIAL-E-REGULARIZACAO.md`

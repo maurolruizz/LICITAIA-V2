@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+.vite/
+.env
+.env.local
+.env.development
+.env.production
+data/
+f46-shutdown-audit.log
+prove-out.txt

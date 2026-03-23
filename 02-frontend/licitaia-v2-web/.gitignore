@@ -1,0 +1,11 @@
+node_modules/
+.next/
+dist/
+build/
+.vite/
+.env
+.env.local
+.env.development
+.env.production
+
+modules-dist/

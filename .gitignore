@@ -4,5 +4,6 @@ build/
 .vite/
 .env
 .git-backup-raiz/
+**/.git-backup-subrepo/
 backend-err.txt
 backend-log.txt

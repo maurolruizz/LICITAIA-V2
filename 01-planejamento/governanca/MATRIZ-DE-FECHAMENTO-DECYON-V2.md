@@ -159,3 +159,16 @@ Antes de declarar qualquer etapa/fase em 10/10, registrar formalmente:
 4. evidência de que o padrão oficial de versionamento foi seguido.
 
 Sem checkpoint Git aplicado, o encerramento não é válido.
+
+## 9. Continuidade histórica obrigatória
+
+Toda execução de Etapas A–H deve preservar vínculo explícito com o histórico das Fases 1–49 por meio de:
+
+1. consulta obrigatória ao catálogo mestre de fases;
+2. consulta obrigatória à matriz de continuidade passado -> plano atual;
+3. registro explícito de lacuna histórica quando não houver prova suficiente.
+
+Artefatos de referência:
+
+- `01-planejamento/governanca/CATALOGO-MESTRE-FASES-1-A-49.md`
+- `01-planejamento/governanca/MATRIZ-DE-CONTINUIDADE-FASES-1-49-PARA-ETAPAS-A-H.md`

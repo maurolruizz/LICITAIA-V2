@@ -614,3 +614,18 @@ Encerramento sem evidência Git rastreável é inválido para critério 10/10.
 A regra operacional detalhada está consolidada em:
 
 `01-planejamento/governanca/PADRAO-OFICIAL-DE-VERSIONAMENTO-GIT.md`.
+
+11.13 REGRA DE CONTINUIDADE HISTÓRICA FASES 1–49 -> ETAPAS A–H
+
+Fica obrigatório manter catálogo mestre oficial das Fases 1–49 com evidência de:
+
+1) status documental/técnico de cada fase;
+2) vínculo de commit/tag quando houver;
+3) lacuna histórica formal quando a evidência for insuficiente.
+
+Fica obrigatório manter matriz de continuidade entre o ciclo histórico (Fases 1–49) e o ciclo de fechamento (Etapas A–H), sem perda de contexto.
+
+Artefatos oficiais:
+
+- `01-planejamento/governanca/CATALOGO-MESTRE-FASES-1-A-49.md`
+- `01-planejamento/governanca/MATRIZ-DE-CONTINUIDADE-FASES-1-49-PARA-ETAPAS-A-H.md`

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="DECYON — Motor de Conformidade Administrativa Preventiva — Base Operacional Fase 41" />
+  <title>DECYON — Base Operacional</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ════ HEADER ════ -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="header-logo">DECYON</span>
+        <span class="header-tagline">Motor de Conformidade Administrativa Preventiva</span>
+      </div>
+      <div class="header-status" role="status" aria-live="polite">
+        <span class="status-dot checking" id="status-dot"></span>
+        <span id="status-label">Verificando backend...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════ TABS DE NAVEGAÇÃO ════ -->
+  <nav class="tabs-nav" role="tablist" aria-label="Navegação principal">
+    <button
+      class="tab-btn active"
+      id="tab-demo"
+      role="tab"
+      aria-selected="true"
+      aria-controls="section-demo"
+      data-tab="demo"
+    >Demo</button>
+    <button
+      class="tab-btn"
+      id="tab-form"
+      role="tab"
+      aria-selected="false"
+      aria-controls="section-form"
+      data-tab="form"
+    >Formulário</button>
+    <button
+      class="tab-btn"
+      id="tab-history"
+      role="tab"
+      aria-selected="false"
+      aria-controls="section-history"
+      data-tab="history"
+    >Histórico</button>
+  </nav>
+
+  <!-- ════ MAIN ════ -->
+  <main class="main" role="main">
+
+    <!-- ══ SEÇÃO: DEMO (Fase 39) ══ -->
+    <section
+      id="section-demo"
+      role="tabpanel"
+      aria-labelledby="tab-demo"
+    >
+      <p class="section-title">Cenários Oficiais de Demonstração</p>
+      <p class="section-desc">
+        Selecione um cenário oficial (Fase 37) e execute o motor DECYON em tempo real contra o backend.
+        Nenhuma simulação local — o motor roda no servidor.
+      </p>
+
+      <div class="scenarios-grid" id="scenarios-grid" role="radiogroup" aria-label="Cenários de demonstração">
+        <!-- Preenchido por app.js via DEMO_SCENARIOS (fixtures.js) -->
+      </div>
+
+      <div class="execute-bar">
+        <button
+          class="btn-execute"
+          id="btn-execute"
+          disabled
+          aria-label="Executar cenário selecionado no backend"
+        >
+          ▶ Executar Cenário
+        </button>
+        <span class="execute-hint" id="execute-hint">Selecione um cenário acima para continuar</span>
+      </div>
+
+      <section
+        class="result-section"
+        id="result-section"
+        style="display: none;"
+        aria-labelledby="result-title"
+        aria-live="polite"
+      >
+        <div class="result-header" id="result-header"></div>
+        <div class="result-body" id="result-body"></div>
+      </section>
+    </section>
+
+    <!-- ══ SEÇÃO: FORMULÁRIO CONTROLADO ══ -->
+    <section
+      id="section-form"
+      role="tabpanel"
+      aria-labelledby="tab-form"
+      style="display: none;"
+    >
+      <!-- Preenchido por form.js via renderFormSection() -->
+      <div id="form-container"></div>
+    </section>
+
+    <!-- ══ SEÇÃO: HISTÓRICO ══ -->
+    <section
+      id="section-history"
+      role="tabpanel"
+      aria-labelledby="tab-history"
+      style="display: none;"
+    >
+      <div class="history-toolbar">
+        <p class="section-title">Histórico de Execuções</p>
+        <button class="btn-secondary" id="btn-refresh-history" aria-label="Atualizar histórico">↻ Atualizar</button>
+      </div>
+      <p class="section-desc">
+        Execuções persistidas pelo backend — ordenadas da mais recente à mais antiga.
+        Use os filtros para localizar execuções. Clique em uma linha para ver o detalhe auditável completo.
+      </p>
+
+      <!-- Filtros (renderizados por history-ui.js) -->
+      <div id="history-filters-container"></div>
+
+      <div id="history-list-container" aria-live="polite">
+        <!-- Preenchido por history-ui.js -->
+      </div>
+
+      <div
+        id="history-detail-container"
+        class="history-detail-panel"
+        style="display: none;"
+        aria-live="polite"
+      >
+        <!-- Preenchido por history-ui.js ao clicar em uma linha -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ════ FOOTER ════ -->
+  <footer class="footer" role="contentinfo">
+    <span>LICITAIA V2 · DECYON · Fase 41 · Base Operacional Auditável</span>
+    <span>Backend: <code id="footer-backend-url">http://localhost:3001</code></span>
+  </footer>
+
+  <!-- ════ LOADING OVERLAY ════ -->
+  <div
+    class="loading-overlay"
+    id="loading-overlay"
+    style="display: none;"
+    role="status"
+    aria-label="Executando motor DECYON"
+  >
+    <div class="spinner" aria-hidden="true"></div>
+    <span class="loading-text">Executando motor DECYON...</span>
+  </div>
+
+  <!-- ════ ERROR TOAST ════ -->
+  <div
+    class="error-toast"
+    id="error-toast"
+    style="display: none;"
+    role="alert"
+    aria-live="assertive"
+  >
+    <span class="error-toast-msg" id="error-toast-msg"></span>
+    <button class="error-toast-close" id="error-toast-close" aria-label="Fechar alerta">✕</button>
+  </div>
+
+  <!-- Scripts: fixtures (define DEMO_SCENARIOS), execution-summary, form, history-ui, app -->
+  <script src="fixtures.js"></script>
+  <script src="execution-summary.js"></script>
+  <script src="form.js"></script>
+  <script src="history-ui.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>

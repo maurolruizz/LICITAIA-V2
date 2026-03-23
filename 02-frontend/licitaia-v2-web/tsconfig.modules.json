@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "declaration": false,
+    "noEmitOnError": false,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "outDir": "modules-dist"
+  },
+  "include": ["modules/**/*.ts"],
+  "exclude": ["modules/**/*.test.ts", "node_modules"]
+}
