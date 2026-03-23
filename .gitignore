@@ -1,0 +1,8 @@
+**/node_modules/
+dist/
+build/
+.vite/
+.env
+.git-backup-raiz/
+backend-err.txt
+backend-log.txt
