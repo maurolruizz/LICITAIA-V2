@@ -308,9 +308,33 @@ function loadExecutionDetail(id) {
  * -------------------------------------------------------------------------- */
 
 function renderDetail(container, execution) {
-  // FASE 42 — leitura defensiva: garante arrays mesmo em registros antigos
+  // ETAPA F — leitura defensiva: garante arrays mesmo em registros antigos
   var safeModules = Array.isArray(execution.modulesExecuted) ? execution.modulesExecuted : [];
   var safeCodes   = Array.isArray(execution.validationCodes)  ? execution.validationCodes  : [];
+
+  // ETAPA F — extrai objetos de validação completos do response persistido
+  // Prioridade: response.validations > response.result.validations > fallback vazio
+  var responseData = (execution.response && typeof execution.response === 'object') ? execution.response : {};
+  var fullValidations = [];
+  if (Array.isArray(responseData['validations'])) {
+    fullValidations = responseData['validations'].filter(function(v) {
+      return v && typeof v === 'object' && typeof v['code'] === 'string' && v['code'];
+    });
+  } else {
+    var resultData = (responseData['result'] && typeof responseData['result'] === 'object')
+      ? responseData['result'] : {};
+    if (Array.isArray(resultData['validations'])) {
+      fullValidations = resultData['validations'].filter(function(v) {
+        return v && typeof v === 'object' && typeof v['code'] === 'string' && v['code'];
+      });
+    }
+  }
+
+  var blockingCount    = fullValidations.filter(function(v) {
+    var sev = typeof v['severity'] === 'string' ? v['severity'].toUpperCase() : '';
+    return sev === 'BLOCK' || sev === 'ERROR';
+  }).length;
+  var nonBlockingCount = fullValidations.length - blockingCount;
 
   var isHalted    = Boolean(execution.halted);
   var statusClass = isHalted ? 'halted' : 'success';
@@ -328,28 +352,38 @@ function renderDetail(container, execution) {
   var summary    = buildExecutionSummary(summaryInput);
   var summaryTypeClass = 'summary-' + summary.type;
 
-  // Camada 2: Módulos e códigos (leitura executiva)
+  // Camada 2: Módulos (leitura executiva)
   var modulesHtml = safeModules.length
     ? safeModules.map(function(m) {
         return '<span class="module-chip">' + escapeHtml(String(m)) + '</span>';
       }).join('')
-    : '<span class="text-muted">não registrado</span>';
+    : '<span class="text-muted">n\u00e3o registrado</span>';
 
-  var codesHtml = safeCodes.length
-    ? safeCodes.map(function(c) {
-        var isBlock = typeof c === 'string' &&
-          (c.indexOf('BLOCK') !== -1 || c.indexOf('MISMATCH') !== -1);
-        return '<span class="code-chip' + (isBlock ? ' block' : '') + '">' +
-          escapeHtml(String(c)) + '</span>';
-      }).join('')
-    : '<span class="text-muted">nenhum código</span>';
+  // ETAPA F — render semântico: usa fullValidations se disponíveis, senão fallback para string codes
+  var validationsHtml;
+  if (fullValidations.length > 0) {
+    validationsHtml = buildValidationListHtml(fullValidations);
+  } else if (safeCodes.length > 0) {
+    validationsHtml = '<div class="val-list">' +
+      safeCodes.map(function(c) {
+        return '<div class="val-item sev-info"><div class="val-item-header">' +
+          '<span class="val-code">' + escapeHtml(String(c)) + '</span>' +
+          '</div></div>';
+      }).join('') + '</div>';
+  } else {
+    validationsHtml = '<span class="text-muted">nenhum c\u00f3digo</span>';
+  }
+
+  var successWarningBannerHtml = (!isHalted && nonBlockingCount > 0)
+    ? buildSuccessWithWarningsBanner(nonBlockingCount)
+    : '';
 
   var haltedByHtml = execution.haltedBy
     ? '<span class="field-value mono">' + escapeHtml(execution.haltedBy) + '</span>'
-    : '<span class="text-muted">—</span>';
+    : '<span class="text-muted">\u2014</span>';
 
   var haltedValueClass = isHalted ? 'field-value status-halt' : 'field-value status-success';
-  var haltedText       = isHalted ? '⛔ SIM — processo bloqueado' : '✅ NÃO — pipeline concluído';
+  var haltedText       = isHalted ? '\u26d4 SIM \u2014 processo bloqueado' : '\u2705 N\u00c3O \u2014 pipeline conclu\u00eddo';
 
   // Camada 3: Payload resumido
   var payloadSummaryHtml = buildPayloadSummary(execution.requestPayload);
@@ -396,8 +430,8 @@ function renderDetail(container, execution) {
           haltedByHtml +
         '</div>' +
         '<div class="result-field">' +
-          '<div class="field-label">Validações</div>' +
-          '<div class="field-value mono">' + safeCodes.length + '</div>' +
+          '<div class="field-label">Valida\u00e7\u00f5es</div>' +
+          '<div class="field-value mono">' + (fullValidations.length > 0 ? fullValidations.length : safeCodes.length) + '</div>' +
         '</div>' +
         '<div class="result-field">' +
           '<div class="field-label">Módulos</div>' +
@@ -410,16 +444,20 @@ function renderDetail(container, execution) {
       '</div>' +
     '</div>' +
 
+    // ── Framing: sucesso com warnings ──
+    (successWarningBannerHtml ? '<div>' + successWarningBannerHtml + '</div>' : '') +
+
     // ── Módulos executados ──
     '<div class="detail-section">' +
-      '<div class="detail-section-title">Módulos Executados (' + safeModules.length + ')</div>' +
+      '<div class="detail-section-title">M\u00f3dulos Executados (' + safeModules.length + ')</div>' +
       '<div class="modules-wrap" style="padding:0.75rem 1rem">' + modulesHtml + '</div>' +
     '</div>' +
 
-    // ── Códigos de validação ──
+    // ── Validações semânticas ──
     '<div class="detail-section">' +
-      '<div class="detail-section-title">Códigos de Validação (' + safeCodes.length + ')</div>' +
-      '<div class="codes-wrap" style="padding:0.75rem 1rem">' + codesHtml + '</div>' +
+      '<div class="detail-section-title">Valida\u00e7\u00f5es do Motor (' +
+        (fullValidations.length > 0 ? fullValidations.length : safeCodes.length) + ')</div>' +
+      '<div style="padding:0.75rem 1rem">' + validationsHtml + '</div>' +
     '</div>' +
 
     // ── Camada 3: Leitura técnica — Payload enviado ──

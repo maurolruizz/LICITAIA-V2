@@ -137,10 +137,11 @@ function checkHealth() {
  * -------------------------------------------------------------------------- */
 
 var BADGE_CLASS_MAP = {
-  SOLID_SUCCESS:    'badge-success',
-  SOLID_JURIDICAL:  'badge-juridical',
-  LEGITIMATE_BLOCK: 'badge-block',
-  SOLID_MULTI_ITEM: 'badge-success',
+  SOLID_SUCCESS:       'badge-success',
+  SOLID_JURIDICAL:     'badge-juridical',
+  LEGITIMATE_BLOCK:    'badge-block',
+  SOLID_MULTI_ITEM:    'badge-success',
+  SOLID_CALCULATION:   'badge-calculation',
 };
 
 function renderScenarios() {
@@ -263,9 +264,12 @@ function renderResult(scenario, data, httpStatus) {
   var validations  = Array.isArray(data.validations)   ? data.validations
                    : Array.isArray(result.validations) ? result.validations : [];
 
-  var codes = validations
-    .filter(function(v) { return v && typeof v.code === 'string' && v.code; })
-    .map(function(v) { return { code: v.code, severity: v.severity || '' }; });
+  var fullValidations = validations.filter(function(v) { return v && typeof v.code === 'string' && v.code; });
+  var blockingCount   = fullValidations.filter(function(v) {
+    var sev = typeof v.severity === 'string' ? v.severity.toUpperCase() : '';
+    return sev === 'BLOCK' || sev === 'ERROR';
+  }).length;
+  var nonBlockingCount = fullValidations.length - blockingCount;
 
   var haltedBy   = result.haltedBy || null;
   var haltDetail = (result.haltedDetail && result.haltedDetail.code) || null;
@@ -284,12 +288,7 @@ function renderResult(scenario, data, httpStatus) {
     ? executedMods.map(function(m) { return '<span class="module-chip">' + escapeHtml(String(m)) + '</span>'; }).join('')
     : '<span style="font-size:0.8125rem;color:var(--gray-400)">n\u00e3o registrado</span>';
 
-  var codesHtml = codes.length
-    ? codes.map(function(c) {
-        var isBlock = c.severity === 'BLOCK' || c.severity === 'ERROR';
-        return '<span class="code-chip' + (isBlock ? ' block' : '') + '">' + escapeHtml(c.code) + '</span>';
-      }).join('')
-    : '<span style="font-size:0.8125rem;color:var(--gray-400)">nenhum c\u00f3digo emitido</span>';
+  var validationsHtml = buildValidationListHtml(fullValidations);
 
   var haltedByHtml = haltedBy
     ? '<span class="field-value mono">' + escapeHtml(haltedBy) + '</span>'
@@ -302,7 +301,52 @@ function renderResult(scenario, data, httpStatus) {
     ? '\u26d4 SIM \u2014 processo bloqueado'
     : '\u2705 N\u00c3O \u2014 pipeline conclu\u00eddo';
 
+  var successWarningBannerHtml = (!halted && nonBlockingCount > 0)
+    ? buildSuccessWithWarningsBanner(nonBlockingCount)
+    : '';
+
+  // ETAPA F — Blindagem: detecta divergência entre resultado real e expectativa do cenário oficial.
+  var divergenceHtml = '';
+  var expectedHalt        = scenario.expectedHalt !== undefined ? Boolean(scenario.expectedHalt) : null;
+  var expectedFinalStatus = scenario.expectedFinalStatus || null;
+  var haltMismatch   = expectedHalt !== null && halted !== expectedHalt;
+  var statusMismatch = expectedFinalStatus !== null && finalStatus !== expectedFinalStatus;
+  if (haltMismatch || statusMismatch) {
+    var divergenceLines = [];
+    if (haltMismatch) {
+      divergenceLines.push(
+        'halt: esperado ' + (expectedHalt ? 'bloqueado' : 'sucesso') +
+        ', obtido ' + (halted ? 'bloqueado' : 'sucesso')
+      );
+    }
+    if (statusMismatch) {
+      divergenceLines.push(
+        'finalStatus: esperado ' + escapeHtml(expectedFinalStatus) +
+        ', obtido ' + escapeHtml(finalStatus)
+      );
+    }
+    divergenceHtml =
+      '<div style="grid-column:1/-1;display:flex;align-items:flex-start;gap:0.625rem;' +
+        'padding:0.75rem 1rem;background:var(--red-light);border:1.5px solid var(--red-border);' +
+        'border-radius:var(--radius);margin-bottom:0.25rem">' +
+        '<span style="font-size:1rem;flex-shrink:0">\u26a0\ufe0f</span>' +
+        '<div>' +
+          '<div style="font-size:0.8125rem;font-weight:700;color:var(--red);margin-bottom:0.25rem">' +
+            'DIVERG\u00caNCIA: resultado n\u00e3o corresponde \u00e0 expectativa oficial do cen\u00e1rio' +
+          '</div>' +
+          '<div style="font-size:0.75rem;color:var(--gray-700);line-height:1.5">' +
+            escapeHtml(divergenceLines.join(' | ')) +
+          '</div>' +
+          '<div style="font-size:0.75rem;color:var(--gray-500);margin-top:0.25rem;font-style:italic">' +
+            'Cen\u00e1rio oficial requer corre\u00e7\u00e3o de payload ou de expectativa.' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
   els.resultBody.innerHTML =
+    divergenceHtml +
+    (successWarningBannerHtml ? successWarningBannerHtml : '') +
     '<div class="result-field">' +
       '<div class="field-label">Status Final</div>' +
       '<div class="field-value mono">' + escapeHtml(finalStatus) + '</div>' +
@@ -324,8 +368,8 @@ function renderResult(scenario, data, httpStatus) {
       '<div class="modules-wrap">' + modulesHtml + '</div>' +
     '</div>' +
     '<div class="result-field" style="grid-column: 1 / -1">' +
-      '<div class="field-label">C\u00f3digos de Valida\u00e7\u00e3o (' + codes.length + ')</div>' +
-      '<div class="codes-wrap">' + codesHtml + '</div>' +
+      '<div class="field-label">Valida\u00e7\u00f5es do Motor (' + fullValidations.length + ')</div>' +
+      '<div style="margin-top:0.25rem">' + validationsHtml + '</div>' +
     '</div>' +
     '<div class="result-proof">' +
       '<div class="proof-label">O que este cen\u00e1rio prova</div>' +

@@ -215,10 +215,11 @@ body {
   letter-spacing: 0.04em;
 }
 
-.badge-success   { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
-.badge-juridical { background: var(--indigo-light); color: var(--indigo); border: 1px solid #c7d2fe; }
-.badge-block     { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
-.badge-partial   { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber-border); }
+.badge-success      { background: var(--green-light); color: var(--green); border: 1px solid var(--green-border); }
+.badge-juridical    { background: var(--indigo-light); color: var(--indigo); border: 1px solid #c7d2fe; }
+.badge-block        { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+.badge-partial      { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber-border); }
+.badge-calculation  { background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd; }
 
 .card-desc {
   font-size: 0.8125rem;
@@ -1035,6 +1036,149 @@ body {
   .main                 { padding: 1.25rem 1rem; }
   .detail-metrics       { grid-template-columns: 1fr; }
   .payload-row          { grid-template-columns: 1fr; }
+}
+
+/* ─── ITENS DE VALIDAÇÃO SEMÂNTICOS (ETAPA F) ─── */
+
+.val-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.val-item {
+  border: 1px solid var(--gray-200);
+  border-left: 3px solid var(--gray-300);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.875rem;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+}
+
+.val-item.sev-info    { border-left-color: var(--gray-400); }
+.val-item.sev-warning { border-left-color: var(--amber); background: var(--amber-light); border-color: var(--amber-border); }
+.val-item.sev-error   { border-left-color: var(--red); background: var(--red-light); border-color: var(--red-border); }
+.val-item.sev-block   { border-left-color: var(--red); background: var(--red-light); border-color: var(--red-border); }
+
+.val-item-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4375rem;
+}
+
+.val-sev-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 0.125rem 0.4375rem;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.val-sev-badge.sev-info    { background: var(--gray-100); color: var(--gray-600); border: 1px solid var(--gray-300); }
+.val-sev-badge.sev-warning { background: var(--amber-light); color: var(--amber); border: 1px solid var(--amber-border); }
+.val-sev-badge.sev-error   { background: var(--red-light); color: var(--red); border: 1px solid var(--red-border); }
+.val-sev-badge.sev-block   { background: var(--red); color: var(--white); border: 1px solid var(--red); }
+
+.val-code {
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  color: var(--gray-700);
+  background: rgba(255,255,255,0.65);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-200);
+  word-break: break-all;
+}
+
+.val-module {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  background: var(--gray-100);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+
+.val-blocking {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.125rem 0.4375rem;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.val-item.sev-info .val-blocking,
+.val-item.sev-warning .val-blocking {
+  color: var(--green);
+  background: var(--green-light);
+  border: 1px solid var(--green-border);
+}
+
+.val-item.sev-error .val-blocking,
+.val-item.sev-block .val-blocking {
+  color: var(--red);
+  background: var(--red-light);
+  border: 1px solid var(--red-border);
+}
+
+.val-msg {
+  font-size: 0.8125rem;
+  color: var(--gray-700);
+  line-height: 1.5;
+}
+
+.val-action {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+/* ─── FRAMING: SUCESSO COM WARNINGS (ETAPA F) ─── */
+
+.success-warn-banner {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--amber-light);
+  border: 1.5px solid var(--amber-border);
+  border-radius: var(--radius);
+}
+
+.success-warn-icon {
+  font-size: 1.125rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.success-warn-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3125rem;
+}
+
+.success-warn-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.success-warn-detail {
+  font-size: 0.8125rem;
+  color: var(--gray-600);
+  line-height: 1.5;
 }
 
 /* ETAPA E — Conducao guiada */
