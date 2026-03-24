@@ -9,12 +9,17 @@
  *            timeout defensivo para não pendurar o processo indefinidamente.
  * FASE 47 — GET /diagnostics: diagnóstico operacional controlado (distinto de /health).
  * FASE 48 — Meta institucional (`meta`) e erros com `error.code` alinhados na borda HTTP.
+ * ETAPA G / FASE INTERNA 3 — Autenticação JWT + tenant resolution.
+ *            Novo módulo auth: POST /api/auth/login, /api/auth/refresh, /api/auth/logout.
+ *            Middleware authenticateMiddleware disponível para rotas protegidas.
+ *            Rotas existentes permanecem abertas (RBAC é implementado na Fase Interna 4).
  *
  * Integra: config por ambiente, CORS controlado, healthcheck,
  * correlação por requestId, logging mínimo com duração, 404 e error handler global.
  * O contrato do /api/process/run (Fases 33/34) permanece intocável.
  */
 
+import 'dotenv/config';
 import { appendFileSync } from 'fs';
 import type { Server } from 'http';
 import express from 'express';
@@ -29,6 +34,7 @@ import { healthRouter } from './routes/health.routes';
 import { diagnosticsRouter } from './routes/diagnostics.routes';
 import { processRouter } from './routes/process.routes';
 import { processExecutionRouter } from './modules/process-execution/process-execution.routes';
+import { authRouter } from './modules/auth/auth.routes';
 
 const app = express();
 
@@ -69,6 +75,7 @@ app.use((req, res, next) => {
 // --- Rotas ---
 app.use('/health', healthRouter);
 app.use('/diagnostics', diagnosticsRouter);
+app.use('/api/auth', authRouter);
 app.use('/api/process', processRouter);
 app.use('/api/process-executions', processExecutionRouter);
 
