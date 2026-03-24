@@ -121,14 +121,32 @@ Critérios adicionais de conformidade para a ETAPA E:
 
 ---
 
-## 4. ETAPA G — Auditoria transversal
+## 4. ETAPA G — Produto real (SaaS) — RECONCILIAÇÃO APLICADA
+
+> **Nota de reconciliação (2026-03-24):** Por evolução formal de nomenclatura registrada no Plano Mestre Sec. 11.17, a ETAPA G absorve o escopo da Frente 7 (Produto real). A auditoria transversal, originalmente designada ETAPA G, está incorporada na Fase Interna 8 da ETAPA G e na ETAPA H.
 
 | Campo | Conteúdo |
 |--------|-----------|
-| **Objetivo verificável** | Auditoria **100%** do conjunto entregue nas Frentes 1–7: reabrir riscos, provas, trilhas e consistência normativa. |
-| **Escopo** | Revisão independente (interna ou externa conforme política do projeto) com registro de achados classificados (CRÍTICO / IMPORTANTE / SECUNDÁRIO / FORA DE FOCO). |
-| **Travas** | Achados **CRÍTICOS** corrigidos ou formalmente aceitos com plano antes de **H**. |
-| **Prova 10/10** | Relatório de auditoria fechado sem pendência crítica aberta. |
+| **Objetivo verificável** | Produto **operável** em ambiente real: multi-tenant, segurança, observabilidade, deploy, continuidade — conforme Secções 5 e 6 do Plano Mestre e arquitetura formal aprovada em `ARQUITETURA-SAAS-ETAPA-G-FASE-INTERNA-1.md`. |
+| **Escopo** | Auth, RBAC, banco PostgreSQL, isolamento por tenant (RLS), auditoria de usuário, configuração institucional por órgão, migração de persistência JSON → banco. |
+| **Travas obrigatórias** | Isolamento por tenant; auditoria de ações; dados sensíveis protegidos; motor intocável; regressão zero em DEMO-D1 a D4. |
+| **Prova de aceite 10/10** | Checklist de segurança e operações mínimas cumprido; evidências de segregação e de auditoria; percurso completo login → execução → histórico com autoria demonstrável. |
+| **Dependências** | Etapas A–E em 10/10. |
+
+### Fases internas da ETAPA G
+
+| Fase | Descrição | Status |
+|---|---|---|
+| 1 | Arquitetura formal (sem código) | **ENCERRADA — 2026-03-24** |
+| 2 | Banco de dados: schema base + migrations | Pendente |
+| 3 | Backend: autenticação e tenant resolution | Pendente |
+| 4 | Backend: RBAC e módulo de usuários | Pendente |
+| 5 | Backend: ProcessExecution + AuditLog SaaS | Pendente |
+| 6 | Backend: configuração institucional | Pendente |
+| 7 | Frontend: login, tenant, admin básico | Pendente |
+| 8 | Validação integrada + encerramento + auditoria transversal | Pendente |
+
+Artefato arquitetural de referência: `01-planejamento/governanca/ARQUITETURA-SAAS-ETAPA-G-FASE-INTERNA-1.md`
 
 ---
 

@@ -653,6 +653,26 @@ Toda execução do Cursor deve, obrigatoriamente:
 
 Sem cumprimento cumulativo desta regra, a execução não pode ser aceita como fechamento 10/10.
 
+11.17 RECONCILIAÇÃO OFICIAL DE NOMENCLATURA — ETAPAS F E G
+
+Registrado em: 2026-03-24
+Artefato de referência: `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-G-FASE-INTERNA-1.md`
+
+Durante a execução do projeto, ocorreu evolução formal de nomenclatura entre o planejamento original (Secções 11.4) e a execução real:
+
+| Nomenclatura original | Nomenclatura adotada na execução |
+|---|---|
+| ETAPA F = Produto real (Frente 7 / SaaS) | ETAPA G = Produto real (Frente 7 / SaaS) |
+| ETAPA G = Auditoria transversal 100% | Incorporada como Fase Interna 8 da ETAPA G + ETAPA H |
+
+Justificativa formal: As ETAPAS A a E foram executadas e encerradas. A ETAPA F, conforme originalmente planejada para o produto SaaS real, não foi implementada no ciclo A–E. O ciclo atual (ETAPA G) absorve formalmente o escopo da Frente 7 (Produto real). A auditoria transversal, originalmente designada ETAPA G, está incorporada na Fase Interna 8 da ETAPA G e na ETAPA H.
+
+Regra: esta reconciliação não altera nenhum dos pilares inegociáveis (Secção 3), nenhuma regra arquitetural (Secção 2) e nenhuma regra operacional do motor. Altera apenas o mapeamento Etapa ↔ Frente para refletir a realidade de execução.
+
+A Matriz de Fechamento foi atualizada para refletir esta reconciliação.
+
+---
+
 11.16 DIRETRIZ CANÔNICA DA ETAPA E (FRENTE 6) — CAMADA OPERACIONAL DE CONDUÇÃO
 
 Para a ETAPA E (Condução total do usuário), fica estabelecido:
