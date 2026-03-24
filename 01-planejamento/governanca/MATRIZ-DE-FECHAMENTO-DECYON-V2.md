@@ -138,7 +138,7 @@ Critérios adicionais de conformidade para a ETAPA E:
 | Fase | Descrição | Status |
 |---|---|---|
 | 1 | Arquitetura formal (sem código) | **ENCERRADA — 2026-03-24** |
-| 2 | Banco de dados: schema base + migrations | Pendente |
+| 2 | Banco de dados: schema base + migrations | **ENCERRADA — 2026-03-24** |
 | 3 | Backend: autenticação e tenant resolution | Pendente |
 | 4 | Backend: RBAC e módulo de usuários | Pendente |
 | 5 | Backend: ProcessExecution + AuditLog SaaS | Pendente |
