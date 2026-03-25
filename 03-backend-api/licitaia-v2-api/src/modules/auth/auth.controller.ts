@@ -39,7 +39,22 @@ function handleAuthError(err: unknown, res: Response): void {
     return;
   }
   const msg = err instanceof Error ? err.message : 'Erro interno inesperado.';
-  logger.error(`[AUTH] Erro interno: ${msg}`);
+  const stack = err instanceof Error ? err.stack : undefined;
+  let serialized: string | undefined;
+  try {
+    serialized = JSON.stringify(err);
+  } catch {
+    serialized = undefined;
+  }
+  const detail =
+    msg && msg.trim() !== ''
+      ? msg
+      : stack && stack.trim() !== ''
+        ? stack
+        : serialized && serialized.trim() !== ''
+          ? serialized
+          : String(err);
+  logger.error(`[AUTH] Erro interno: ${detail}`);
   res.status(500).json({
     success: false,
     error: { code: 'INTERNAL_ERROR', message: 'Erro interno inesperado.' },

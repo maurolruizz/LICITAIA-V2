@@ -671,6 +671,9 @@ Regra: esta reconciliação não altera nenhum dos pilares inegociáveis (Secç�
 
 A Matriz de Fechamento foi atualizada para refletir esta reconciliação.
 
+Estado de execução (registro factual):
+- ETAPA G — Fase Interna 3 (Autenticação + Tenant Resolution) — **ENCERRADA — 2026-03-25** (prova operacional 9/9 em `src/proof/etapa-g-fase3-auth-validation.ts`).
+
 ---
 
 11.16 DIRETRIZ CANÔNICA DA ETAPA E (FRENTE 6) — CAMADA OPERACIONAL DE CONDUÇÃO

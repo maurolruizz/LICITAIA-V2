@@ -43,7 +43,7 @@ VALUES (
     'Administrador Exemplo',
     'TENANT_ADMIN',
     'active',
-    '$2b$12$PLACEHOLDER_HASH_ADMIN_DO_NOT_USE_IN_PRODUCTION'
+    '$2b$12$wjFnUGF01iQCPlAcWd.aT.BDDjjj.6jVKCFh/ovbp5U53rm0aRb2.'
 );
 
 -- OPERATOR
@@ -55,7 +55,7 @@ VALUES (
     'Operador Exemplo',
     'OPERATOR',
     'active',
-    '$2b$12$PLACEHOLDER_HASH_OPERATOR_DO_NOT_USE_IN_PRODUCTION',
+    '$2b$12$wjFnUGF01iQCPlAcWd.aT.BDDjjj.6jVKCFh/ovbp5U53rm0aRb2.',
     '00000000-0000-0000-0001-000000000001'
 );
 
@@ -68,7 +68,7 @@ VALUES (
     'Auditor Exemplo',
     'AUDITOR',
     'active',
-    '$2b$12$PLACEHOLDER_HASH_AUDITOR_DO_NOT_USE_IN_PRODUCTION',
+    '$2b$12$wjFnUGF01iQCPlAcWd.aT.BDDjjj.6jVKCFh/ovbp5U53rm0aRb2.',
     '00000000-0000-0000-0001-000000000001'
 );
 
