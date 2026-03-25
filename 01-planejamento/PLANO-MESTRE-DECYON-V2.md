@@ -109,116 +109,162 @@ tipos de objeto
 
 estrutura do objeto
 
-4. ESTADO ATUAL DO PROJETO
-Já implementado (até Fase 36)
+## 4. ESTADO ATUAL DO PROJETO
 
-núcleo administrativo completo
+O projeto DECYON (LICITAIA V2) encontra-se com o núcleo do motor administrativo **100% estruturado, validado e auditado**, tendo concluído integralmente as etapas A a E (núcleo validado 10/10), incluindo:
 
-módulos DFD, ETP, TR, PRICING
+- motor de execução administrativa determinístico
+- validações estruturais, jurídicas e de coerência
+- memória de cálculo
+- rastreabilidade completa das decisões
+- geração estruturada de DFD, ETP e TR
+- consolidação do resultado administrativo com status final controlado
+- integração backend de execução (`/api/process/run`) com validação e normalização
 
-validadores estruturais
+Todas essas camadas foram implementadas com **regressão zero**, contratos estáveis e validação por prova operacional.
 
-orchestrator
+### 4.1. TRANSIÇÃO PARA CAMADA DE PRODUTO (ETAPA F → ETAPA G)
 
-backend API funcional
+Conforme reconciliação formal registrada (Sec. 11.17), a evolução do projeto consolidou a seguinte interpretação:
 
-contratos de entrada e saída
+- A **ETAPA F (Produto real)** foi absorvida operacionalmente
+- A **ETAPA G passou a representar a materialização do produto SaaS real**
+- A auditoria transversal foi deslocada para:
+  - Fase Interna 8 da ETAPA G
+  - ETAPA H (auditoria final completa)
 
-blindagem de request (Fase 33)
+Essa reconciliação mantém coerência com o plano original, sem perda de escopo ou integridade normativa.
 
-padronização de response (Fase 34)
+### 4.2. ETAPA G — PRODUTO REAL (SaaS) — ESTADO ATUAL
 
-matriz de cobertura do motor (Fase 35)
+A ETAPA G encontra-se **em execução ativa**, com as seguintes fases internas já concluídas:
 
-correção de lacunas estruturais (Fase 36)
+#### 4.2.1. FASE INTERNA 1 — Arquitetura SaaS (sem código)
 
-multi-itens
+- definição formal da arquitetura multi-tenant
+- separação de responsabilidades
+- definição de isolamento por tenant
+- diretrizes de segurança, auditoria e persistência
 
-lote
+**Status:** **ENCERRADA — 2026-03-24**
 
-fallback auditável de NEED
+#### 4.2.2. FASE INTERNA 2 — Banco de Dados
 
-caso misto validado
+- implementação de schema PostgreSQL
+- estrutura multi-tenant
+- base para RLS (Row-Level Security)
+- migrations versionadas e controladas
 
-cenários canônicos de demonstração institucional (Fase 37)
+**Status:** **ENCERRADA — 2026-03-24**
 
-4 cenários oficiais selecionados (DEMO-D1 a DEMO-D4)
+#### 4.2.3. FASE INTERNA 3 — Autenticação + Tenant Resolution
 
-runner de demonstração auditável e repetível
+**Escopo implementado:**
 
-catálogo com classificação demonstrativa
+- login com resolução de tenant por slug
+- autenticação com validação de credenciais
+- geração de access token e refresh token
+- isolamento por tenant via RLS
+- validação de JWT
+- fluxos de refresh e logout
 
-regressão zero preservada (Fase 35: 7/7, Fase 37: 4/4)
+**Problema crítico identificado:**
 
-backend operacional mínimo para uso externo controlado (Fase 38)
+Durante a validação operacional, foi identificado erro estrutural no contexto transacional de tenant no PostgreSQL:
 
-healthcheck oficial (GET /health)
+- uso de `SET LOCAL ... = $1`
+- incompatibilidade com placeholder
+- erro SQL (`syntax error at or near "$1"`)
+- impacto direto: login retornando HTTP 500 indevido antes da validação de credenciais
 
-configuração centralizada por ambiente (config/env.ts)
+**Correção aplicada:**
 
-CORS mínimo controlado configurável
+- substituição por `SELECT set_config('app.current_tenant_id', $1, true)`
+- manutenção do escopo transacional
+- compatibilidade com RLS
+- preservação da arquitetura
+- ajuste do seed de prova para hash bcrypt real compatível com `SenhaTeste@123`
 
-logging operacional estruturado
+**Prova operacional:**
 
-404 e error handler global
+Execução do script oficial `src/proof/etapa-g-fase3-auth-validation.ts`
 
-regressão zero preservada (Fase 35: 7/7)
+**Resultado:**
 
-frontend mínimo de demonstração funcional ponta a ponta (Fase 39)
+- login válido → 200
+- senha inválida → 401 controlado
+- tenant inexistente → 401 controlado
+- refresh válido → 200
+- refresh inválido → 401
+- logout com/sem token → comportamento correto
+- JWT inválido → 401
+- regressão de rotas preservada
 
-interface de demonstração institucional (02-frontend/licitaia-v2-demo)
+**Status da prova:** 9/9 cenários aprovados
 
-servidor estático mínimo (Node.js built-in, porta 3000, zero dependências externas)
+**Regressão zero confirmada:**
 
-4 cenários oficiais selecionáveis (DEMO-D1 a DEMO-D4)
+- motor administrativo intacto (runner canônico 7/7)
+- IA intacta
+- contratos intactos
+- rota `/api/process/run` inalterada nesta fase
 
-integração real com POST /api/process/run e GET /health
+**Governança aplicada:**
 
-exibição de finalStatus, halt, módulos executados e códigos de validação
+- checkpoint normativo registrado
+- matriz de fechamento atualizada
+- commit formal realizado: `fix(etapa-g-fase3): corrigir RLS tenant context e seed de prova`
+- evidência operacional documentada
 
-tratamento de loading, erro de conexão e backend indisponível
+**Status:** **ENCERRADA — 2026-03-25**
 
-regressão zero preservada (Fase 37: 4/4)
+### 4.3. SITUAÇÃO ATUAL DA ETAPA G
 
-base operacional com persistência, histórico e formulário controlado (Fase 40)
+| Fase | Status |
+|------|--------|
+| Fase 1 — Arquitetura | ENCERRADA |
+| Fase 2 — Banco de Dados | ENCERRADA |
+| Fase 3 — Autenticação | ENCERRADA |
+| Fase 4 — RBAC | Pendente |
+| Fase 5 — AuditLog / ProcessExecution | Pendente |
+| Fase 6 — Configuração institucional | Pendente |
+| Fase 7 — Frontend SaaS | Pendente |
+| Fase 8 — Validação integrada + auditoria transversal | Pendente |
 
-persistência de execuções em arquivo JSON auditável (zero dependências externas)
+### 4.4. POSIÇÃO REAL DO PROJETO
 
-módulo process-execution no backend (entity, repository, service, controller, routes)
+O sistema encontra-se:
 
-POST /api/process/run agora persiste cada execução automaticamente
+- com o **motor administrativo completo e validado**
+- com a **base SaaS iniciada e operacional**
+- com autenticação e isolamento multi-tenant funcionando
+- com persistência estruturada ativa
+- com rastreabilidade preservada
 
-GET /api/process-executions → lista de execuções com metadados essenciais
+Ainda pendente:
 
-GET /api/process-executions/:id → execução completa com payload, resposta e rastreabilidade total
+- RBAC completo
+- auditoria de usuário
+- interface SaaS
+- consolidação final e auditoria transversal
 
-formulário controlado no frontend: seleções estruturadas, zero texto livre em campos críticos
+### 4.5. CONCLUSÃO DO ESTADO ATUAL
 
-tab de histórico na UI: lista ordenada por data, clique abre detalhe completo
+O DECYON evoluiu de:
 
-regressão zero preservada (Fase 37: 4/4)
+- motor validado (Etapas A–E)
 
-consolidação operacional: histórico utilizável, detalhe auditável e fechamento do ciclo de demonstração (Fase 41)
+para
 
-ProcessExecutionSummary enriquecido com haltedBy, validationCodesCount e modulesExecuted
+- sistema SaaS em construção real (ETAPA G)
 
-histórico com 7 colunas: halt, processo/finalStatus, data, HTTP, validações, módulos, seta
+com:
 
-filtros mínimos no histórico: busca por processId, filtro por halt, filtro por finalStatus
+- núcleo sólido
+- autenticação funcional e auditada
+- base pronta para expansão controlada
 
-execution-summary.js: helper explícito de resumo operacional (baseado em finalStatus, halted, haltedBy, validationCodes)
-
-detalhe auditável com duas leituras: executiva (métricas) + técnica (payload + JSON bruto)
-
-resumo operacional no topo do detalhe: leitura institucional sem inventar lógica
-
-botão de gerar novo ID no formulário controlado
-
-ciclo ponta a ponta fechado e demonstrável
-
-regressão zero preservada (Fase 37: 4/4)
-
-👉 O núcleo está consolidado e protegido.
+Sem regressão, sem perda de coerência e com preservação integral de 100% das diretrizes normativas.
 
 5. COMPONENTES OBRIGATÓRIOS (A IMPLEMENTAR)
 5.1 Persistência (BANCO DE DADOS)
