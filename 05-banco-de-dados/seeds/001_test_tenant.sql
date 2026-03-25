@@ -5,11 +5,12 @@
 -- NUNCA executar em produção.
 --
 -- Cria:
---   1 tenant de teste (Prefeitura de Exemplo)
---   1 usuário TENANT_ADMIN
---   1 usuário OPERATOR
---   1 usuário AUDITOR
---   1 organ_config associada ao tenant
+--   2 tenants de teste (Prefeitura de Exemplo + Órgão B — isolamento)
+--   1 usuário TENANT_ADMIN (tenant A)
+--   1 usuário TENANT_USER (tenant A)
+--   1 usuário AUDITOR (tenant A)
+--   1 usuário TENANT_ADMIN (tenant B)
+--   1 organ_config associada ao tenant A
 --
 -- Senhas são hashes bcrypt de "SenhaTeste@123" (apenas para teste).
 -- Em produção, hashes reais devem ser gerados pelo backend.
@@ -17,11 +18,11 @@
 -- Limpa dados de teste anteriores (idempotente)
 -- NOTA: audit_logs é append-only (trigger bloqueia DELETE).
 -- Para reset completo, use TRUNCATE diretamente no banco como superusuário.
-DELETE FROM organ_configs      WHERE tenant_id IN (SELECT id FROM tenants WHERE slug = 'prefeitura-exemplo');
-DELETE FROM process_executions WHERE tenant_id IN (SELECT id FROM tenants WHERE slug = 'prefeitura-exemplo');
-DELETE FROM user_sessions      WHERE tenant_id IN (SELECT id FROM tenants WHERE slug = 'prefeitura-exemplo');
-DELETE FROM users              WHERE tenant_id IN (SELECT id FROM tenants WHERE slug = 'prefeitura-exemplo');
-DELETE FROM tenants            WHERE slug = 'prefeitura-exemplo';
+DELETE FROM organ_configs      WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
+DELETE FROM process_executions WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
+DELETE FROM user_sessions      WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
+DELETE FROM users              WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
+DELETE FROM tenants            WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b');
 
 -- Tenant de teste
 INSERT INTO tenants (id, slug, name, cnpj, status, plan_type)
@@ -46,14 +47,14 @@ VALUES (
     '$2b$12$wjFnUGF01iQCPlAcWd.aT.BDDjjj.6jVKCFh/ovbp5U53rm0aRb2.'
 );
 
--- OPERATOR
+-- TENANT_USER
 INSERT INTO users (id, tenant_id, email, name, role, status, password_hash, created_by)
 VALUES (
     '00000000-0000-0000-0001-000000000002',
     '00000000-0000-0000-0000-000000000001',
     'operador@exemplo.gov.br',
     'Operador Exemplo',
-    'OPERATOR',
+    'TENANT_USER',
     'active',
     '$2b$12$wjFnUGF01iQCPlAcWd.aT.BDDjjj.6jVKCFh/ovbp5U53rm0aRb2.',
     '00000000-0000-0000-0001-000000000001'
@@ -70,6 +71,28 @@ VALUES (
     'active',
     '$2b$12$wjFnUGF01iQCPlAcWd.aT.BDDjjj.6jVKCFh/ovbp5U53rm0aRb2.',
     '00000000-0000-0000-0001-000000000001'
+);
+
+-- Segundo tenant (isolamento multi-tenant nas provas)
+INSERT INTO tenants (id, slug, name, cnpj, status, plan_type)
+VALUES (
+    '00000000-0000-0000-0000-000000000002',
+    'orgao-isolamento-b',
+    'Órgão B — isolamento',
+    '11.111.111/0001-11',
+    'trial',
+    'trial'
+);
+
+INSERT INTO users (id, tenant_id, email, name, role, status, password_hash)
+VALUES (
+    '00000000-0000-0000-0002-000000000001',
+    '00000000-0000-0000-0000-000000000002',
+    'admin-b@exemplo.gov.br',
+    'Administrador Órgão B',
+    'TENANT_ADMIN',
+    'active',
+    '$2b$12$wjFnUGF01iQCPlAcWd.aT.BDDjjj.6jVKCFh/ovbp5U53rm0aRb2.'
 );
 
 -- Configuração institucional do tenant de teste

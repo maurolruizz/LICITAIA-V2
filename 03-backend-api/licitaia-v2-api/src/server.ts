@@ -12,7 +12,8 @@
  * ETAPA G / FASE INTERNA 3 — Autenticação JWT + tenant resolution.
  *            Novo módulo auth: POST /api/auth/login, /api/auth/refresh, /api/auth/logout.
  *            Middleware authenticateMiddleware disponível para rotas protegidas.
- *            Rotas existentes permanecem abertas (RBAC é implementado na Fase Interna 4).
+ * ETAPA G / FASE INTERNA 4 — RBAC + módulo de usuários: /api/users (JWT + TENANT_ADMIN).
+ *            Rotas do motor e /api/process/run permanecem sem auth indevido.
  *
  * Integra: config por ambiente, CORS controlado, healthcheck,
  * correlação por requestId, logging mínimo com duração, 404 e error handler global.
@@ -35,6 +36,7 @@ import { diagnosticsRouter } from './routes/diagnostics.routes';
 import { processRouter } from './routes/process.routes';
 import { processExecutionRouter } from './modules/process-execution/process-execution.routes';
 import { authRouter } from './modules/auth/auth.routes';
+import { usersRouter } from './modules/users/users.routes';
 
 const app = express();
 
@@ -76,6 +78,7 @@ app.use((req, res, next) => {
 app.use('/health', healthRouter);
 app.use('/diagnostics', diagnosticsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/process', processRouter);
 app.use('/api/process-executions', processExecutionRouter);
 

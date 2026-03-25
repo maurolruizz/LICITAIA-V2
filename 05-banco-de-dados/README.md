@@ -27,7 +27,8 @@ Schema PostgreSQL base + migrations para o produto SaaS.
 │   ├── 003_create_user_sessions.sql
 │   ├── 004_create_process_executions.sql
 │   ├── 005_create_audit_logs.sql
-│   └── 006_create_organ_configs.sql
+│   ├── 006_create_organ_configs.sql
+│   └── 007_alter_users_role_add_tenant_user.sql
 └── seeds/
     └── 001_test_tenant.sql   # Apenas desenvolvimento
 ```

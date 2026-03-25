@@ -218,6 +218,41 @@ Execução do script oficial `src/proof/etapa-g-fase3-auth-validation.ts`
 
 **Status:** **ENCERRADA — 2026-03-25**
 
+#### 4.2.4. FASE INTERNA 4 — RBAC + Módulo de Usuários
+
+**Escopo implementado:**
+
+- RBAC determinístico com papéis `TENANT_ADMIN` e `TENANT_USER`
+- endpoints `POST /api/users`, `GET /api/users`, `PATCH /api/users/:id`, `GET /api/users/me`
+- validação de papel no backend (não confiar apenas no banco)
+- auditoria obrigatória em `audit_logs` (`USER_CREATED`, `USER_UPDATED`, `USER_ROLE_CHANGED`, `USER_DEACTIVATED`)
+- proteção LGPD (sem exposição de `password_hash`)
+
+**Prova operacional:**
+
+Execução do script oficial `src/proof/etapa-g-fase4-rbac-validation.ts`
+
+**Resultado:**
+
+- admin cria usuário → 201
+- admin lista usuários → 200
+- tenant_user tenta criar → 403
+- tenant_user tenta listar → 403
+- admin altera role → 200
+- admin desativa usuário → 200
+- usuário desativado não loga → 403
+- isolamento entre tenants → OK
+- auditoria registrada + regressão `/api/process/run` sem auth indevido → OK
+
+**Status da prova:** 9/9 cenários aprovados
+
+**Regra operacional de prova (RLS):**
+
+- validação de isolamento multi-tenant deve usar role PostgreSQL **não-superuser** e **sem BYPASSRLS** (ex.: `licitaia_app`)
+- validação com role superuser (`postgres`) não é evidência válida de RLS
+
+**Status:** **ENCERRADA — 2026-03-25**
+
 ### 4.3. SITUAÇÃO ATUAL DA ETAPA G
 
 | Fase | Status |
@@ -225,7 +260,7 @@ Execução do script oficial `src/proof/etapa-g-fase3-auth-validation.ts`
 | Fase 1 — Arquitetura | ENCERRADA |
 | Fase 2 — Banco de Dados | ENCERRADA |
 | Fase 3 — Autenticação | ENCERRADA |
-| Fase 4 — RBAC | Pendente |
+| Fase 4 — RBAC | ENCERRADA |
 | Fase 5 — AuditLog / ProcessExecution | Pendente |
 | Fase 6 — Configuração institucional | Pendente |
 | Fase 7 — Frontend SaaS | Pendente |
@@ -243,7 +278,6 @@ O sistema encontra-se:
 
 Ainda pendente:
 
-- RBAC completo
 - auditoria de usuário
 - interface SaaS
 - consolidação final e auditoria transversal

@@ -151,11 +151,11 @@ async function checkMigrationsTable(client: Client): Promise<CheckResult[]> {
   );
   const count = parseInt(res.rows[0]?.count ?? '0', 10);
   return [
-    count >= 6
+    count >= 7
       ? pass(`schema_migrations: ${count} migration(s) registrada(s)`)
       : fail(
           `schema_migrations: ${count} migration(s) registrada(s)`,
-          `Esperado >= 6 migrations aplicadas. Encontrado: ${count}.`,
+          `Esperado >= 7 migrations aplicadas. Encontrado: ${count}.`,
         ),
   ];
 }

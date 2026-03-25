@@ -140,13 +140,15 @@ Critérios adicionais de conformidade para a ETAPA E:
 | 1 | Arquitetura formal (sem código) | **ENCERRADA — 2026-03-24** |
 | 2 | Banco de dados: schema base + migrations | **ENCERRADA — 2026-03-24** |
 | 3 | Backend: autenticação e tenant resolution | **ENCERRADA — 2026-03-25** |
-| 4 | Backend: RBAC e módulo de usuários | Pendente |
+| 4 | Backend: RBAC e módulo de usuários | **ENCERRADA — 2026-03-25** |
 | 5 | Backend: ProcessExecution + AuditLog SaaS | Pendente |
 | 6 | Backend: configuração institucional | Pendente |
 | 7 | Frontend: login, tenant, admin básico | Pendente |
 | 8 | Validação integrada + encerramento + auditoria transversal | Pendente |
 
 Artefato arquitetural de referência: `01-planejamento/governanca/ARQUITETURA-SAAS-ETAPA-G-FASE-INTERNA-1.md`
+
+**Nota de auditoria — FI4 (2026-03-25):** A matriz chegou a registrar a Fase Interna 4 como **ENCERRADA** antes da existência de **prova operacional real 9/9**. Na auditoria, esse encerramento foi **revertido** (sem apagar o registo histórico: ver checkpoint) e a prova completa foi executada (PostgreSQL, migrations incl. 007, seed, API, script oficial), com resultado **9/9**. O encerramento formal foi então restabelecido em 10/10. Regra operacional de evidência RLS: validar com utilizador PostgreSQL **não-superuser** e **sem BYPASSRLS** (ex.: `licitaia_app`), pois com `postgres` o PostgreSQL ignora RLS e invalida a prova de isolamento multi-tenant.
 
 ---
 

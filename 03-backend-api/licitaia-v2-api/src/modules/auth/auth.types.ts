@@ -5,7 +5,12 @@
  * Definem os contratos internos da camada de autenticação.
  */
 
-export type UserRole = 'SYSTEM_ADMIN' | 'TENANT_ADMIN' | 'OPERATOR' | 'AUDITOR';
+export type UserRole =
+  | 'SYSTEM_ADMIN'
+  | 'TENANT_ADMIN'
+  | 'TENANT_USER'
+  | 'OPERATOR'
+  | 'AUDITOR';
 export type UserStatus = 'active' | 'inactive' | 'suspended';
 export type TenantStatus = 'active' | 'suspended' | 'trial';
 
@@ -28,6 +33,8 @@ export interface UserRecord {
   status: UserStatus;
   passwordHash: string;
   lastLoginAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 /** Dados de uma sessão armazenada em user_sessions. */

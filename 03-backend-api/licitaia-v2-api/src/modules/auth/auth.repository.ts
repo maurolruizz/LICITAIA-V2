@@ -86,8 +86,11 @@ export async function findUserByEmail(
     status: string;
     password_hash: string;
     last_login_at: Date | null;
+    created_at: Date;
+    updated_at: Date;
   }>(
-    `SELECT id, tenant_id, email, name, role, status, password_hash, last_login_at
+    `SELECT id, tenant_id, email, name, role, status, password_hash, last_login_at,
+            created_at, updated_at
      FROM users
      WHERE email = $1
      LIMIT 1`,
@@ -105,6 +108,8 @@ export async function findUserByEmail(
     status: row.status as UserRecord['status'],
     passwordHash: row.password_hash,
     lastLoginAt: row.last_login_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 
@@ -121,8 +126,11 @@ export async function findUserById(
     status: string;
     password_hash: string;
     last_login_at: Date | null;
+    created_at: Date;
+    updated_at: Date;
   }>(
-    `SELECT id, tenant_id, email, name, role, status, password_hash, last_login_at
+    `SELECT id, tenant_id, email, name, role, status, password_hash, last_login_at,
+            created_at, updated_at
      FROM users
      WHERE id = $1
      LIMIT 1`,
@@ -140,6 +148,8 @@ export async function findUserById(
     status: row.status as UserRecord['status'],
     passwordHash: row.password_hash,
     lastLoginAt: row.last_login_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 
