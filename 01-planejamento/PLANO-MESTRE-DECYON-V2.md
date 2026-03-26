@@ -253,6 +253,42 @@ Execução do script oficial `src/proof/etapa-g-fase4-rbac-validation.ts`
 
 **Status:** **ENCERRADA — 2026-03-25**
 
+#### 4.2.5. FASE INTERNA 5 — Backend: ProcessExecution + AuditLog SaaS
+
+**Escopo implementado (FI5):**
+
+- persistência real de execuções administrativas em `process_executions` (PostgreSQL) com vínculo de:
+  - `tenant_id` (isolamento multi-tenant via RLS)
+  - `executed_by` (autoria: `userId`)
+- integração operacional com `audit_logs` (append-only) para cada execução relevante:
+  - `action = PROCESS_EXECUTION`
+  - `metadata` contendo `executionId`, `finalStatus`, `halted`, `httpStatus`
+- endpoint seguro de histórico por tenant:
+  - preferencial: `GET /api/process/executions`
+  - compatibilidade: `GET /api/process-executions`
+  - **somente** dados do tenant autenticado (RLS + tenant context)
+- preservação de regressão zero:
+  - `/api/process/run` permanece acessível sem JWT (fluxo consolidado)
+  - persistência ocorre apenas quando `Authorization: Bearer <token>` está presente e válido (camada auxiliar)
+
+**Nota técnica (consistência):**
+
+- execuções com status **HALTED** também são persistidas e auditadas (a trilha de rastreabilidade registra o resultado final real, inclusive travas/halts), sem alterar o comportamento decisório do motor.
+
+**Prova operacional real (FI5):**
+
+Execução do script oficial `src/proof/etapa-g-fase5-process-execution-auditlog-validation.ts`.
+
+**Evidências centrais (12/12):**
+
+- tenant A e tenant B executam `/api/process/run` autenticados e geram persistência em `process_executions` com `tenantId` e `userId`
+- cada execução gera `audit_logs` com `action = PROCESS_EXECUTION` e `metadata` coerente
+- histórico via API retorna apenas registros do tenant autenticado
+- isolamento multi-tenant por RLS comprovado usando role PostgreSQL **não-superuser** e **sem BYPASSRLS** (ex.: `licitaia_app`)
+- regressão zero confirmada: `/api/process/run` permanece funcional sem auth indevido; auth e RBAC permanecem operacionais
+
+**Status:** **ENCERRADA — 2026-03-26**
+
 ### 4.3. SITUAÇÃO ATUAL DA ETAPA G
 
 | Fase | Status |
@@ -261,7 +297,7 @@ Execução do script oficial `src/proof/etapa-g-fase4-rbac-validation.ts`
 | Fase 2 — Banco de Dados | ENCERRADA |
 | Fase 3 — Autenticação | ENCERRADA |
 | Fase 4 — RBAC | ENCERRADA |
-| Fase 5 — AuditLog / ProcessExecution | Pendente |
+| Fase 5 — AuditLog / ProcessExecution | **ENCERRADA — 2026-03-26 (10/10)** |
 | Fase 6 — Configuração institucional | Pendente |
 | Fase 7 — Frontend SaaS | Pendente |
 | Fase 8 — Validação integrada + auditoria transversal | Pendente |
@@ -278,7 +314,7 @@ O sistema encontra-se:
 
 Ainda pendente:
 
-- auditoria de usuário
+- consolidação da auditoria operacional transversal (FI8 / ETAPA H)
 - interface SaaS
 - consolidação final e auditoria transversal
 

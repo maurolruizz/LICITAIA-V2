@@ -141,7 +141,7 @@ Critérios adicionais de conformidade para a ETAPA E:
 | 2 | Banco de dados: schema base + migrations | **ENCERRADA — 2026-03-24** |
 | 3 | Backend: autenticação e tenant resolution | **ENCERRADA — 2026-03-25** |
 | 4 | Backend: RBAC e módulo de usuários | **ENCERRADA — 2026-03-25** |
-| 5 | Backend: ProcessExecution + AuditLog SaaS | Pendente |
+| 5 | Backend: ProcessExecution + AuditLog SaaS | **ENCERRADA — 2026-03-26 (10/10, prova real: persistência + audit_logs + histórico por tenant + isolamento RLS com role não-superuser/sem BYPASSRLS)** |
 | 6 | Backend: configuração institucional | Pendente |
 | 7 | Frontend: login, tenant, admin básico | Pendente |
 | 8 | Validação integrada + encerramento + auditoria transversal | Pendente |
