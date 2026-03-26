@@ -9,8 +9,10 @@ import {
   listExecutionsController,
   getExecutionController,
 } from './process-execution.controller';
+import { authenticateMiddleware } from '../../middleware/authenticate';
 
 export const processExecutionRouter = Router();
 
-processExecutionRouter.get('/', listExecutionsController);
-processExecutionRouter.get('/:id', getExecutionController);
+// FI5: histórico de execuções é endpoint seguro (exige auth + tenant context).
+processExecutionRouter.get('/', authenticateMiddleware, listExecutionsController);
+processExecutionRouter.get('/:id', authenticateMiddleware, getExecutionController);

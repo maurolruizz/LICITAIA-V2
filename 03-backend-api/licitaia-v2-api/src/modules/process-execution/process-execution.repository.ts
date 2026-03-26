@@ -1,119 +1,216 @@
 /**
- * FASE 40 — Repositório de execuções persistidas.
- * FASE 42 — Blindagem: normalização defensiva + filtragem de registros inválidos.
+ * ETAPA G — Fase Interna 5 — Repositório de execuções persistidas (PostgreSQL).
  *
- * Armazenamento em arquivo JSON local.
- * Zero dependências externas além do Node.js built-in (fs, path).
- *
- * Caminho do arquivo: <package-root>/data/executions.json
- * Operações síncronas — seguras no contexto single-thread do Node.js.
+ * Fonte de verdade: tabela `process_executions` (RLS ativo).
+ * Regra: todas as queries devem ser executadas dentro de `withTenantContext`,
+ * pois o isolamento é aplicado via `app.current_tenant_id`.
  */
 
-import fs from 'fs';
-import path from 'path';
+import type { PoolClient } from 'pg';
 import type { ProcessExecution } from './process-execution.entity';
+import type { ProcessExecutionSummary } from './process-execution.entity';
 
-const DATA_DIR = path.resolve(__dirname, '..', '..', '..', 'data');
-const DATA_FILE = path.join(DATA_DIR, 'executions.json');
+interface InsertProcessExecutionInput {
+  id: string;
+  tenantId: string;
+  executedBy: string;
+  requestPayload: Record<string, unknown>;
+  response: Record<string, unknown>;
+  finalStatus: string;
+  halted: boolean;
+  haltedBy?: string;
+  httpStatus: number;
+  modulesExecuted: string[];
+  validationCodes: string[];
+}
 
-function ensureDataDir(): void {
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+export async function insertProcessExecution(
+  client: PoolClient,
+  data: InsertProcessExecutionInput,
+): Promise<ProcessExecution> {
+  const r = await client.query<{
+    id: string;
+    tenant_id: string;
+    executed_by: string;
+    request_payload: unknown;
+    response: unknown;
+    final_status: string;
+    halted: boolean;
+    halted_by: string | null;
+    http_status: number;
+    modules_executed: string[] | null;
+    validation_codes: string[] | null;
+    created_at: Date;
+  }>(
+    `INSERT INTO process_executions
+       (id, tenant_id, executed_by, request_payload, response, final_status, halted, halted_by, http_status, modules_executed, validation_codes)
+     VALUES
+       ($1, $2::uuid, $3::uuid, $4::jsonb, $5::jsonb, $6, $7, $8, $9, $10, $11)
+     RETURNING
+       id, tenant_id, executed_by, request_payload, response, final_status, halted, halted_by, http_status, modules_executed, validation_codes, created_at`,
+    [
+      data.id,
+      data.tenantId,
+      data.executedBy,
+      JSON.stringify(data.requestPayload ?? {}),
+      JSON.stringify(data.response ?? {}),
+      data.finalStatus,
+      data.halted,
+      data.haltedBy ?? null,
+      data.httpStatus,
+      data.modulesExecuted ?? [],
+      data.validationCodes ?? [],
+    ],
+  );
+
+  const row = r.rows[0];
+  if (!row) {
+    throw new Error('Falha ao inserir process_execution: RETURNING vazio.');
   }
-}
 
-/**
- * FASE 42 — Predicado de identidade estrutural mínima.
- *
- * Um registro só pode participar do conjunto operacional se possuir um `id`
- * string não vazio. O campo `id` é insubstituível: sem ele não há trilha de
- * auditoria, não há detalhe recuperável, não há identidade de execução.
- *
- * Todos os demais campos (modulesExecuted, validationCodes, finalStatus, etc.)
- * são toleráveis como ausentes — há defaults auditáveis ([], 'UNKNOWN', 0).
- * O `id` não tem default válido: nenhum valor artificial pode substituir a
- * identidade que o sistema deveria ter gerado no momento da persistência.
- *
- * Registros que falham neste predicado são silenciosamente descartados da
- * leitura operacional. Eles permanecem no arquivo físico sem alteração.
- */
-function hasValidIdentity(raw: Record<string, unknown>): boolean {
-  return typeof raw['id'] === 'string' && raw['id'].length > 0;
-}
-
-/**
- * FASE 42 — Normaliza um registro estruturalmente identificável.
- *
- * Pré-condição: o registro já passou por `hasValidIdentity()`.
- * Portanto, `id` é garantidamente uma string não vazia neste ponto.
- *
- * Campos opcionais ausentes recebem defaults auditáveis:
- *   - modulesExecuted → []  (módulos não registrados nesta execução)
- *   - validationCodes → []  (sem códigos de validação registrados)
- *   - finalStatus     → 'UNKNOWN'  (status não registrado)
- *   - halted          → false  (conservador: não bloquear sem evidência)
- *   - httpStatus      → 0  (HTTP não registrado)
- *   - createdAt       → epoch ISO  (data não registrada)
- *
- * Esses defaults permitem leitura degradada sem mascarar identidade:
- * o auditor vê os dados faltantes como ausentes, não como fabricados.
- */
-function normalizeExecution(raw: Record<string, unknown>): ProcessExecution {
   return {
-    id:              raw['id'] as string,
-    createdAt:       typeof raw['createdAt'] === 'string'   ? raw['createdAt']    : new Date(0).toISOString(),
-    requestPayload:  (raw['requestPayload'] !== null && typeof raw['requestPayload'] === 'object' && !Array.isArray(raw['requestPayload']))
-      ? (raw['requestPayload'] as Record<string, unknown>)
-      : {},
-    response:        (raw['response'] !== null && typeof raw['response'] === 'object' && !Array.isArray(raw['response']))
-      ? (raw['response'] as Record<string, unknown>)
-      : {},
-    finalStatus:     typeof raw['finalStatus'] === 'string'  ? raw['finalStatus'] : 'UNKNOWN',
-    halted:          typeof raw['halted'] === 'boolean'       ? raw['halted']      : false,
-    haltedBy:        typeof raw['haltedBy'] === 'string'      ? raw['haltedBy']    : undefined,
-    httpStatus:      typeof raw['httpStatus'] === 'number'    ? raw['httpStatus']  : 0,
-    modulesExecuted: Array.isArray(raw['modulesExecuted'])
-      ? (raw['modulesExecuted'] as unknown[]).filter((m): m is string => typeof m === 'string')
-      : [],
-    validationCodes: Array.isArray(raw['validationCodes'])
-      ? (raw['validationCodes'] as unknown[]).filter((c): c is string => typeof c === 'string')
-      : [],
+    id: row.id,
+    tenantId: row.tenant_id,
+    executedBy: row.executed_by,
+    createdAt: row.created_at.toISOString(),
+    requestPayload:
+      row.request_payload !== null &&
+      typeof row.request_payload === 'object' &&
+      !Array.isArray(row.request_payload)
+        ? (row.request_payload as Record<string, unknown>)
+        : {},
+    response:
+      row.response !== null && typeof row.response === 'object' && !Array.isArray(row.response)
+        ? (row.response as Record<string, unknown>)
+        : {},
+    finalStatus: row.final_status,
+    halted: row.halted,
+    ...(row.halted_by ? { haltedBy: row.halted_by } : {}),
+    httpStatus: row.http_status,
+    modulesExecuted: Array.isArray(row.modules_executed) ? row.modules_executed : [],
+    validationCodes: Array.isArray(row.validation_codes) ? row.validation_codes : [],
   };
 }
 
-function readAll(): ProcessExecution[] {
-  ensureDataDir();
-  if (!fs.existsSync(DATA_FILE)) return [];
-  try {
-    const raw = fs.readFileSync(DATA_FILE, 'utf-8');
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return (parsed as unknown[])
-      .filter((item): item is Record<string, unknown> =>
-        item !== null && typeof item === 'object' && !Array.isArray(item)
-      )
-      .filter(hasValidIdentity)
-      .map(normalizeExecution);
-  } catch {
-    return [];
-  }
+export async function listProcessExecutions(
+  client: PoolClient,
+  limit: number,
+): Promise<ProcessExecutionSummary[]> {
+  const r = await client.query<{
+    id: string;
+    executed_by: string;
+    created_at: Date;
+    request_payload: unknown;
+    final_status: string;
+    halted: boolean;
+    halted_by: string | null;
+    http_status: number;
+    modules_executed: string[] | null;
+    validation_codes: string[] | null;
+  }>(
+    `SELECT
+       id,
+       executed_by,
+       created_at,
+       request_payload,
+       final_status,
+       halted,
+       halted_by,
+       http_status,
+       modules_executed,
+       validation_codes
+     FROM process_executions
+     ORDER BY created_at DESC
+     LIMIT $1`,
+    [limit],
+  );
+
+  return r.rows.map((row) => {
+    const rp =
+      row.request_payload !== null &&
+      typeof row.request_payload === 'object' &&
+      !Array.isArray(row.request_payload)
+        ? (row.request_payload as Record<string, unknown>)
+        : {};
+    const processId = typeof rp['processId'] === 'string' ? rp['processId'] : undefined;
+    const summary: ProcessExecutionSummary = {
+      id: row.id,
+      executedBy: row.executed_by,
+      createdAt: row.created_at.toISOString(),
+      processId,
+      finalStatus: row.final_status,
+      halted: row.halted,
+      httpStatus: row.http_status,
+      validationCodesCount: Array.isArray(row.validation_codes)
+        ? row.validation_codes.length
+        : 0,
+      modulesExecuted: Array.isArray(row.modules_executed) ? row.modules_executed : [],
+    };
+    if (row.halted_by) summary.haltedBy = row.halted_by;
+    return summary;
+  });
 }
 
-function writeAll(executions: ProcessExecution[]): void {
-  ensureDataDir();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(executions, null, 2), 'utf-8');
-}
+export async function findProcessExecutionById(
+  client: PoolClient,
+  id: string,
+): Promise<ProcessExecution | null> {
+  const r = await client.query<{
+    id: string;
+    tenant_id: string;
+    executed_by: string;
+    created_at: Date;
+    request_payload: unknown;
+    response: unknown;
+    final_status: string;
+    halted: boolean;
+    halted_by: string | null;
+    http_status: number;
+    modules_executed: string[] | null;
+    validation_codes: string[] | null;
+  }>(
+    `SELECT
+       id,
+       tenant_id,
+       executed_by,
+       created_at,
+       request_payload,
+       response,
+       final_status,
+       halted,
+       halted_by,
+       http_status,
+       modules_executed,
+       validation_codes
+     FROM process_executions
+     WHERE id = $1
+     LIMIT 1`,
+    [id],
+  );
 
-export function saveExecution(execution: ProcessExecution): void {
-  const all = readAll();
-  all.push(execution);
-  writeAll(all);
-}
+  const row = r.rows[0];
+  if (!row) return null;
 
-export function findAllExecutions(): ProcessExecution[] {
-  return readAll();
-}
-
-export function findExecutionById(id: string): ProcessExecution | undefined {
-  return readAll().find((e) => e.id === id);
+  return {
+    id: row.id,
+    tenantId: row.tenant_id,
+    executedBy: row.executed_by,
+    createdAt: row.created_at.toISOString(),
+    requestPayload:
+      row.request_payload !== null &&
+      typeof row.request_payload === 'object' &&
+      !Array.isArray(row.request_payload)
+        ? (row.request_payload as Record<string, unknown>)
+        : {},
+    response:
+      row.response !== null && typeof row.response === 'object' && !Array.isArray(row.response)
+        ? (row.response as Record<string, unknown>)
+        : {},
+    finalStatus: row.final_status,
+    halted: row.halted,
+    ...(row.halted_by ? { haltedBy: row.halted_by } : {}),
+    httpStatus: row.http_status,
+    modulesExecuted: Array.isArray(row.modules_executed) ? row.modules_executed : [],
+    validationCodes: Array.isArray(row.validation_codes) ? row.validation_codes : [],
+  };
 }

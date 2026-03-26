@@ -10,12 +10,16 @@
 import { randomUUID } from 'crypto';
 import type { ProcessExecution, ProcessExecutionSummary } from './process-execution.entity';
 import {
-  saveExecution as repoSave,
-  findAllExecutions,
-  findExecutionById,
+  insertProcessExecution,
+  listProcessExecutions,
+  findProcessExecutionById,
 } from './process-execution.repository';
+import { withTenantContext } from '../../lib/db';
+import { insertAuditLog } from '../auth/auth.repository';
 
 export interface SaveExecutionParams {
+  tenantId: string;
+  executedBy: string;
   requestPayload: Record<string, unknown>;
   response: Record<string, unknown>;
   finalStatus: string;
@@ -24,23 +28,49 @@ export interface SaveExecutionParams {
   httpStatus: number;
   modulesExecuted: string[];
   validationCodes: string[];
+  audit: {
+    userId: string;
+    ipAddress: string | null;
+    userAgent: string | null;
+  };
 }
 
-export function saveExecution(params: SaveExecutionParams): ProcessExecution {
-  const execution: ProcessExecution = {
-    id: randomUUID(),
-    createdAt: new Date().toISOString(),
-    requestPayload: params.requestPayload,
-    response: params.response,
-    finalStatus: params.finalStatus,
-    halted: params.halted,
-    ...(params.haltedBy !== undefined ? { haltedBy: params.haltedBy } : {}),
-    httpStatus: params.httpStatus,
-    modulesExecuted: params.modulesExecuted,
-    validationCodes: params.validationCodes,
-  };
-  repoSave(execution);
-  return execution;
+export async function saveExecution(params: SaveExecutionParams): Promise<ProcessExecution> {
+  const executionId = randomUUID();
+  return await withTenantContext(params.tenantId, async (client) => {
+    const execution = await insertProcessExecution(client, {
+      id: executionId,
+      tenantId: params.tenantId,
+      executedBy: params.executedBy,
+      requestPayload: params.requestPayload,
+      response: params.response,
+      finalStatus: params.finalStatus,
+      halted: params.halted,
+      ...(params.haltedBy !== undefined ? { haltedBy: params.haltedBy } : {}),
+      httpStatus: params.httpStatus,
+      modulesExecuted: params.modulesExecuted,
+      validationCodes: params.validationCodes,
+    });
+
+    // Auditoria operacional da execução (append-only).
+    await insertAuditLog(client, {
+      tenantId: params.tenantId,
+      userId: params.audit.userId,
+      action: 'PROCESS_EXECUTION',
+      resourceType: 'process_execution',
+      resourceId: execution.id,
+      metadata: {
+        executionId: execution.id,
+        finalStatus: execution.finalStatus,
+        halted: execution.halted,
+        httpStatus: execution.httpStatus,
+      },
+      ipAddress: params.audit.ipAddress,
+      userAgent: params.audit.userAgent,
+    });
+
+    return execution;
+  });
 }
 
 /**
@@ -54,6 +84,7 @@ export function saveExecution(params: SaveExecutionParams): ProcessExecution {
 export function buildExecutionSummary(e: ProcessExecution): ProcessExecutionSummary {
   const summary: ProcessExecutionSummary = {
     id:                  e.id,
+    executedBy:          e.executedBy,
     createdAt:           e.createdAt,
     processId:           typeof e.requestPayload['processId'] === 'string'
                            ? (e.requestPayload['processId'] as string)
@@ -70,13 +101,20 @@ export function buildExecutionSummary(e: ProcessExecution): ProcessExecutionSumm
   return summary;
 }
 
-export function listExecutions(): ProcessExecutionSummary[] {
-  return findAllExecutions()
-    .slice()
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .map(buildExecutionSummary);
+export async function listExecutions(params: {
+  tenantId: string;
+  limit?: number;
+}): Promise<ProcessExecutionSummary[]> {
+  const limit =
+    typeof params.limit === 'number' && params.limit > 0 ? Math.min(params.limit, 200) : 50;
+  return await withTenantContext(params.tenantId, (client) => listProcessExecutions(client, limit));
 }
 
-export function getExecutionById(id: string): ProcessExecution | undefined {
-  return findExecutionById(id);
+export async function getExecutionById(params: {
+  tenantId: string;
+  id: string;
+}): Promise<ProcessExecution | null> {
+  return await withTenantContext(params.tenantId, (client) =>
+    findProcessExecutionById(client, params.id),
+  );
 }

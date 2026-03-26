@@ -82,17 +82,34 @@ export async function runProcessController(req: Request, res: Response): Promise
         : [];
       const haltedBy =
         typeof engineResult['haltedBy'] === 'string' ? engineResult['haltedBy'] : undefined;
+      const ctx = res.locals as Record<string, unknown>;
+      const tenantId =
+        typeof ctx['authenticatedTenantId'] === 'string' ? ctx['authenticatedTenantId'] : null;
+      const userId =
+        typeof ctx['authenticatedUserId'] === 'string' ? ctx['authenticatedUserId'] : null;
 
-      saveExecution({
-        requestPayload: body as Record<string, unknown>,
-        response: responseBody as unknown as Record<string, unknown>,
-        finalStatus: engineResult.finalStatus,
-        halted: engineResult.halted,
-        ...(haltedBy !== undefined ? { haltedBy } : {}),
-        httpStatus,
-        modulesExecuted,
-        validationCodes,
-      });
+      // Regra FI5 + regressão: /api/process/run NÃO exige auth.
+      // Persistimos apenas quando o contexto autenticado está presente.
+      if (tenantId && userId) {
+        void saveExecution({
+          tenantId,
+          executedBy: userId,
+          requestPayload: body as Record<string, unknown>,
+          response: responseBody as unknown as Record<string, unknown>,
+          finalStatus: engineResult.finalStatus,
+          halted: engineResult.halted,
+          ...(haltedBy !== undefined ? { haltedBy } : {}),
+          httpStatus,
+          modulesExecuted,
+          validationCodes,
+          audit: {
+            userId,
+            ipAddress: typeof req.ip === 'string' ? req.ip : null,
+            userAgent:
+              typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : null,
+          },
+        });
+      }
     } catch (saveError) {
       logger.error(`${rid}[PERSIST_FAIL] Falha ao persistir execução — ${saveError instanceof Error ? saveError.message : String(saveError)}`);
     }

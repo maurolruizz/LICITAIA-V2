@@ -289,6 +289,39 @@ Execução do script oficial `src/proof/etapa-g-fase5-process-execution-auditlog
 
 **Status:** **ENCERRADA — 2026-03-26**
 
+#### 4.2.6. FASE INTERNA 6 — Backend: Configuração Institucional por Tenant
+
+**Escopo implementado (FI6):**
+
+- backend de configuração institucional por tenant com persistência em `organ_configs`;
+- endpoint seguro de leitura por tenant:
+  - `GET /api/institutional-settings`
+- endpoint seguro de atualização por tenant:
+  - `PATCH /api/institutional-settings`
+  - atualização restrita a `TENANT_ADMIN` (RBAC server-side);
+- auditoria operacional obrigatória em `audit_logs`:
+  - `action = INSTITUTIONAL_SETTINGS_UPDATED`;
+- alinhamento físico do banco ao modelo canônico da fase:
+  - migration `008_alter_organ_configs_add_fi6_institutional_fields.sql` aplicada com sucesso.
+
+**Prova operacional real (FI6):**
+
+Execução do script oficial `src/proof/etapa-g-fase6-institutional-settings-validation.ts`.
+
+**Evidências centrais:**
+
+- tenant A atualiza e lê apenas sua própria configuração institucional;
+- tenant B atualiza e lê apenas sua própria configuração institucional;
+- não há vazamento cross-tenant em API nem em banco;
+- `TENANT_USER` recebe `403` no endpoint de atualização;
+- `audit_logs` registra `INSTITUTIONAL_SETTINGS_UPDATED` por tenant;
+- isolamento por RLS validado com role PostgreSQL não-superuser e sem `BYPASSRLS` (`licitaia_app`);
+- regressão zero mantida para FI5, auth, RBAC e `/api/process/run`.
+
+**Status da prova:** critérios obrigatórios aprovados (10/10)
+
+**Status:** **ENCERRADA — 2026-03-26 (10/10)**
+
 ### 4.3. SITUAÇÃO ATUAL DA ETAPA G
 
 | Fase | Status |
@@ -298,7 +331,7 @@ Execução do script oficial `src/proof/etapa-g-fase5-process-execution-auditlog
 | Fase 3 — Autenticação | ENCERRADA |
 | Fase 4 — RBAC | ENCERRADA |
 | Fase 5 — AuditLog / ProcessExecution | **ENCERRADA — 2026-03-26 (10/10)** |
-| Fase 6 — Configuração institucional | Pendente |
+| Fase 6 — Configuração institucional | **ENCERRADA — 2026-03-26 (10/10)** |
 | Fase 7 — Frontend SaaS | Pendente |
 | Fase 8 — Validação integrada + auditoria transversal | Pendente |
 

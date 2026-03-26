@@ -37,6 +37,7 @@ import { processRouter } from './routes/process.routes';
 import { processExecutionRouter } from './modules/process-execution/process-execution.routes';
 import { authRouter } from './modules/auth/auth.routes';
 import { usersRouter } from './modules/users/users.routes';
+import { institutionalSettingsRouter } from './modules/institutional-settings/institutional-settings.routes';
 
 const app = express();
 
@@ -79,7 +80,11 @@ app.use('/health', healthRouter);
 app.use('/diagnostics', diagnosticsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/institutional-settings', institutionalSettingsRouter);
 app.use('/api/process', processRouter);
+// FI5: endpoint seguro de histórico preferencial: /api/process/executions
+// Mantém alias /api/process-executions para compatibilidade, ambos protegidos por auth no router.
+app.use('/api/process/executions', processExecutionRouter);
 app.use('/api/process-executions', processExecutionRouter);
 
 // --- Handlers de borda (devem ser os últimos) ---

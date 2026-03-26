@@ -7,6 +7,8 @@
 
 export interface ProcessExecution {
   id: string;
+  tenantId: string;
+  executedBy: string;
   createdAt: string;
   requestPayload: Record<string, unknown>;
   response: Record<string, unknown>;
@@ -20,6 +22,7 @@ export interface ProcessExecution {
 
 export interface ProcessExecutionSummary {
   id: string;
+  executedBy: string;
   createdAt: string;
   processId?: string;
   finalStatus: string;
