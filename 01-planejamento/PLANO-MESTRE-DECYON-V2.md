@@ -383,6 +383,61 @@ Execução do script oficial:
 
 **Status:** **ENCERRADA — 2026-03-26 (10/10)**
 
+#### 4.2.8. FASE INTERNA 8 — Validação integrada final + encerramento técnico da ETAPA G
+
+**Escopo implementado (FI8):**
+
+- validação integrada final da ETAPA G, sem expansão funcional de escopo;
+- confirmação do ambiente oficial único:
+  - frontend `http://localhost:3000`;
+  - backend `http://localhost:3001`;
+- execução de prova multicamada com evidência real em:
+  - frontend;
+  - backend;
+  - chamadas HTTP;
+  - banco PostgreSQL;
+  - RLS;
+  - trilha de auditoria.
+
+**Cenários integrados validados (A–E):**
+
+- cenário A (`TENANT_ADMIN`):
+  - login real;
+  - sessão e contexto autenticado;
+  - `/api/users/me`;
+  - leitura e atualização de `/api/institutional-settings`;
+  - evidência física em `organ_configs`;
+  - evidência de `audit_logs`;
+- cenário B (`TENANT_USER`):
+  - login real;
+  - sessão e contexto autenticado;
+  - leitura de `/api/institutional-settings`;
+  - tentativa de ação restrita bloqueada com `403`;
+  - frontend refletindo corretamente o bloqueio;
+- cenário C (histórico/execução):
+  - execução autenticada relevante;
+  - persistência em `process_executions`;
+  - geração de `audit_logs`;
+  - histórico por tenant sem overlap;
+- cenário D (isolamento multi-tenant):
+  - tenant A sem acesso a dados de tenant B;
+  - tenant B sem acesso a dados de tenant A;
+  - validação por API e por RLS;
+  - role de prova: `licitaia_app` (não-superuser, sem `BYPASSRLS`);
+- cenário E (regressão global):
+  - FI3, FI4, FI5, FI6 e FI7 preservadas;
+  - `/api/process/run` preservado.
+
+**Artefato final de prova (reexecutável):**
+
+`03-backend-api/licitaia-v2-api/src/proof/etapa-g-fase8-integrated-validation.ts`
+
+**Status da prova:** critérios obrigatórios aprovados (10/10)
+
+**Conclusão da fase:** **ENCERRADA — 2026-03-26 (10/10)**
+
+**Conclusão técnica da ETAPA G:** encerramento técnico concluído com validação integrada final, sem divergência entre `src`, `dist` e banco no ambiente oficial.
+
 ### 4.3. SITUAÇÃO ATUAL DA ETAPA G
 
 | Fase | Status |
@@ -394,7 +449,7 @@ Execução do script oficial:
 | Fase 5 — AuditLog / ProcessExecution | **ENCERRADA — 2026-03-26 (10/10)** |
 | Fase 6 — Configuração institucional | **ENCERRADA — 2026-03-26 (10/10)** |
 | Fase 7 — Frontend SaaS | **ENCERRADA — 2026-03-26 (10/10)** |
-| Fase 8 — Validação integrada + auditoria transversal | Pendente |
+| Fase 8 — Validação integrada + auditoria transversal | **ENCERRADA — 2026-03-26 (10/10)** |
 
 ### 4.4. POSIÇÃO REAL DO PROJETO
 
@@ -408,8 +463,7 @@ O sistema encontra-se:
 
 Ainda pendente:
 
-- consolidação da auditoria operacional transversal (FI8 / ETAPA H)
-- consolidação final e auditoria transversal
+- ETAPA H (readiness final, deploy e apresentação institucional), condicionada ao fechamento técnico já validado da ETAPA G.
 
 ### 4.5. CONCLUSÃO DO ESTADO ATUAL
 
