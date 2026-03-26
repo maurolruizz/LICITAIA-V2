@@ -47,15 +47,32 @@ function loadHistory() {
   container.innerHTML  = '<div class="history-loading">Carregando execuções...</div>';
   if (detail) detail.style.display = 'none';
 
-  fetch(BACKEND_URL + '/api/process-executions', { method: 'GET' })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
+  var authHeaders = (typeof window.getAuthHeaders === 'function') ? window.getAuthHeaders() : {};
+  fetch(BACKEND_URL + '/api/process-executions', { method: 'GET', headers: authHeaders })
+    .then(function(res) {
+      return res.json().then(function(data) {
+        return { status: res.status, data: data };
+      });
+    })
+    .then(function(result) {
+      if (result.status === 401) {
+        throw new Error('UNAUTHORIZED_HISTORY');
+      }
+      var data = result.data;
       historyState.list    = Array.isArray(data.data) ? data.data : [];
       historyState.loading = false;
       applyFiltersAndRender();
     })
-    .catch(function() {
+    .catch(function(err) {
       historyState.loading = false;
+      if (err && err.message === 'UNAUTHORIZED_HISTORY') {
+        container.innerHTML =
+          '<div class="history-empty">' +
+            '<span style="font-size:1.25rem">🔒</span>' +
+            '<span>Histórico protegido: faça login na aba Admin SaaS.</span>' +
+          '</div>';
+        return;
+      }
       container.innerHTML  =
         '<div class="history-empty">' +
           '<span style="font-size:1.25rem">⚠</span>' +
@@ -289,9 +306,19 @@ function loadExecutionDetail(id) {
   detail.innerHTML = '<div class="history-loading">Carregando detalhe...</div>';
   detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-  fetch(BACKEND_URL + '/api/process-executions/' + encodeURIComponent(id), { method: 'GET' })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
+  var authHeaders = (typeof window.getAuthHeaders === 'function') ? window.getAuthHeaders() : {};
+  fetch(BACKEND_URL + '/api/process-executions/' + encodeURIComponent(id), { method: 'GET', headers: authHeaders })
+    .then(function(res) {
+      return res.json().then(function(data) {
+        return { status: res.status, data: data };
+      });
+    })
+    .then(function(result) {
+      var data = result.data;
+      if (result.status === 401) {
+        detail.innerHTML = '<div class="history-empty">Faça login para abrir o detalhe da execução.</div>';
+        return;
+      }
       if (!data.success || !data.data) {
         detail.innerHTML = '<div class="history-empty">Execução não encontrada.</div>';
         return;

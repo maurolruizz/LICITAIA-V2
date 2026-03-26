@@ -322,6 +322,67 @@ Execução do script oficial `src/proof/etapa-g-fase6-institutional-settings-val
 
 **Status:** **ENCERRADA — 2026-03-26 (10/10)**
 
+#### 4.2.7. FASE INTERNA 7 — Frontend administrativo básico (SaaS)
+
+**Escopo implementado (FI7):**
+
+- frontend operacional oficial utilizado: `02-frontend/licitaia-v2-demo`;
+- login real integrado ao backend (`POST /api/auth/login`);
+- persistência mínima de sessão no frontend para consumo autenticado da API;
+- carregamento de contexto autenticado no frontend:
+  - `GET /api/users/me` (usuário/papel/tenant);
+  - `GET /api/institutional-settings` (configuração institucional por tenant);
+- tela administrativa básica de configuração institucional no frontend com os campos canônicos da FI6:
+  - `organizationName`;
+  - `organizationLegalName`;
+  - `documentNumber`;
+  - `defaultTimezone`;
+  - `defaultLocale`;
+- atualização de configuração institucional pelo frontend para `TENANT_ADMIN`:
+  - `PATCH /api/institutional-settings`;
+- comportamento de RBAC refletido no frontend:
+  - `TENANT_ADMIN` com edição/salvamento;
+  - `TENANT_USER` em leitura somente;
+  - backend preservando bloqueio `403` para update indevido;
+- logout funcional integrado ao backend (`POST /api/auth/logout`);
+- proteção do histórico frontend por sessão autenticada, sem alterar regras do motor.
+
+**Saneamento de ambiente da prova FI7:**
+
+- ambiente oficial unificado e validado:
+  - frontend em `http://localhost:3000`;
+  - backend em `http://localhost:3001`;
+- eliminação de instâncias divergentes em portas concorrentes;
+- validação da API oficial alinhada ao `src` atual (sem comportamento legado paralelo).
+
+**Prova operacional real (FI7):**
+
+Execução do script oficial:
+
+`src/proof/etapa-g-fase7-frontend-admin-validation.ts`
+
+**Evidências centrais:**
+
+- cenário `TENANT_ADMIN`:
+  - login `200`;
+  - `/api/users/me` `200`;
+  - leitura de `/api/institutional-settings` `200`;
+  - atualização de settings `200`;
+  - confirmação física no banco (`organ_configs`);
+  - evidência de `audit_logs` (`INSTITUTIONAL_SETTINGS_UPDATED`);
+- cenário `TENANT_USER`:
+  - login `200`;
+  - `/api/users/me` `200`;
+  - leitura de `/api/institutional-settings` `200`;
+  - tentativa de update bloqueada com `403`;
+  - frontend refletindo bloqueio por perfil sem mascarar erro;
+- cenário de regressão:
+  - auth, RBAC, FI5, FI6 e `/api/process/run` preservados no ambiente oficial.
+
+**Status da prova:** critérios obrigatórios aprovados (10/10)
+
+**Status:** **ENCERRADA — 2026-03-26 (10/10)**
+
 ### 4.3. SITUAÇÃO ATUAL DA ETAPA G
 
 | Fase | Status |
@@ -332,7 +393,7 @@ Execução do script oficial `src/proof/etapa-g-fase6-institutional-settings-val
 | Fase 4 — RBAC | ENCERRADA |
 | Fase 5 — AuditLog / ProcessExecution | **ENCERRADA — 2026-03-26 (10/10)** |
 | Fase 6 — Configuração institucional | **ENCERRADA — 2026-03-26 (10/10)** |
-| Fase 7 — Frontend SaaS | Pendente |
+| Fase 7 — Frontend SaaS | **ENCERRADA — 2026-03-26 (10/10)** |
 | Fase 8 — Validação integrada + auditoria transversal | Pendente |
 
 ### 4.4. POSIÇÃO REAL DO PROJETO
@@ -348,7 +409,6 @@ O sistema encontra-se:
 Ainda pendente:
 
 - consolidação da auditoria operacional transversal (FI8 / ETAPA H)
-- interface SaaS
 - consolidação final e auditoria transversal
 
 ### 4.5. CONCLUSÃO DO ESTADO ATUAL

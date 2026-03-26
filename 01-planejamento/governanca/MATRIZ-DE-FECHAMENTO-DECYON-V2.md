@@ -143,7 +143,7 @@ Critérios adicionais de conformidade para a ETAPA E:
 | 4 | Backend: RBAC e módulo de usuários | **ENCERRADA — 2026-03-25** |
 | 5 | Backend: ProcessExecution + AuditLog SaaS | **ENCERRADA — 2026-03-26 (10/10, prova real: persistência + audit_logs + histórico por tenant + isolamento RLS com role não-superuser/sem BYPASSRLS)** |
 | 6 | Backend: configuração institucional | **ENCERRADA — 2026-03-26 (10/10, prova real: migration 008 aplicada + leitura por tenant + update admin-only + 403 para TENANT_USER + audit log INSTITUTIONAL_SETTINGS_UPDATED + isolamento RLS)** |
-| 7 | Frontend: login, tenant, admin básico | Pendente |
+| 7 | Frontend: login, tenant, admin básico | **ENCERRADA — 2026-03-26 (10/10, prova real: frontend oficial em 02-frontend/licitaia-v2-demo + login real + /api/users/me + /api/institutional-settings + edição TENANT_ADMIN + bloqueio TENANT_USER(403) + logout + ambiente saneado 3000/3001 + regressão zero FI3/FI4/FI5/FI6//api/process/run)** |
 | 8 | Validação integrada + encerramento + auditoria transversal | Pendente |
 
 Artefato arquitetural de referência: `01-planejamento/governanca/ARQUITETURA-SAAS-ETAPA-G-FASE-INTERNA-1.md`

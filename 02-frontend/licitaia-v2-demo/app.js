@@ -15,6 +15,7 @@
 
 var BACKEND_URL = 'http://localhost:3001';
 var HEALTH_INTERVAL_MS = 30000;
+var SESSION_STORAGE_KEY = 'decyon.fi7.session';
 
 /* --------------------------------------------------------------------------
  * Estado
@@ -25,6 +26,9 @@ var state = {
   isExecuting: false,
   backendOnline: false,
   activeTab: 'demo',
+  session: null,
+  authContext: null,
+  institutionalSettings: null,
 };
 
 /* --------------------------------------------------------------------------
@@ -44,6 +48,14 @@ var els = {
   errorToast:      document.getElementById('error-toast'),
   errorToastMsg:   document.getElementById('error-toast-msg'),
   footerBackend:   document.getElementById('footer-backend-url'),
+  sessionLabel:    document.getElementById('session-label'),
+  btnLogout:       document.getElementById('btn-logout'),
+  loginForm:       document.getElementById('login-form'),
+  loginStatus:     document.getElementById('login-status'),
+  authContextView: document.getElementById('auth-context-view'),
+  settingsForm:    document.getElementById('institutional-settings-form'),
+  settingsStatus:  document.getElementById('settings-status'),
+  btnSaveSettings: document.getElementById('btn-save-settings'),
 };
 
 /* --------------------------------------------------------------------------
@@ -61,7 +73,7 @@ function activateTab(tabName) {
   });
 
   // Mostra/oculta seções
-  var sections = ['section-demo', 'section-form', 'section-history'];
+  var sections = ['section-demo', 'section-form', 'section-admin', 'section-history'];
   sections.forEach(function(id) {
     var el = document.getElementById(id);
     if (!el) return;
@@ -80,6 +92,10 @@ function activateTab(tabName) {
   if (tabName === 'history') {
     loadHistory();
   }
+
+  if (tabName === 'admin') {
+    renderAuthContext();
+  }
 }
 
 function initTabs() {
@@ -93,7 +109,46 @@ function initTabs() {
   if (refreshBtn) {
     refreshBtn.addEventListener('click', loadHistory);
   }
+
+  if (els.loginForm) {
+    els.loginForm.addEventListener('submit', onSubmitLogin);
+  }
+  if (els.settingsForm) {
+    els.settingsForm.addEventListener('submit', onSubmitInstitutionalSettings);
+  }
+  if (els.btnLogout) {
+    els.btnLogout.addEventListener('click', onLogoutClick);
+  }
 }
+
+function persistSession(session) {
+  state.session = session;
+  try {
+    if (session) {
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+    } else {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+    }
+  } catch (_) {}
+}
+
+function restoreSession() {
+  try {
+    var raw = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (!raw) return;
+    var parsed = JSON.parse(raw);
+    if (parsed && parsed.accessToken && parsed.refreshToken && parsed.tenant && parsed.user) {
+      state.session = parsed;
+    }
+  } catch (_) {}
+}
+
+function getAuthHeaders() {
+  if (!state.session || !state.session.accessToken) return {};
+  return { Authorization: 'Bearer ' + state.session.accessToken };
+}
+
+window.getAuthHeaders = getAuthHeaders;
 
 /* --------------------------------------------------------------------------
  * Health Check
@@ -129,6 +184,234 @@ function checkHealth() {
     })
     .catch(function() {
       setStatusOffline();
+    });
+}
+
+function setLoginStatus(message) {
+  if (els.loginStatus) els.loginStatus.textContent = message;
+}
+
+function setSettingsStatus(message) {
+  if (els.settingsStatus) els.settingsStatus.textContent = message;
+}
+
+function updateSessionBadge() {
+  if (!els.sessionLabel || !els.btnLogout) return;
+  if (!state.session || !state.authContext) {
+    els.sessionLabel.textContent = 'Não autenticado';
+    els.btnLogout.style.display = 'none';
+    return;
+  }
+  var role = state.authContext.role || 'sem-role';
+  els.sessionLabel.textContent = state.authContext.email + ' (' + role + ')';
+  els.btnLogout.style.display = 'inline-flex';
+}
+
+function renderAuthContext() {
+  if (!els.authContextView) return;
+  if (!state.session || !state.authContext) {
+    els.authContextView.textContent = 'Sem sessão ativa.';
+    return;
+  }
+  var ctx = state.authContext;
+  els.authContextView.innerHTML =
+    '<div><strong>Usuário:</strong> ' + escapeHtml(ctx.name || '') + ' (' + escapeHtml(ctx.email || '') + ')</div>' +
+    '<div><strong>Papel:</strong> ' + escapeHtml(ctx.role || '') + '</div>' +
+    '<div><strong>Tenant:</strong> ' + escapeHtml(ctx.tenantSlug || '') + ' (' + escapeHtml(ctx.tenantName || '') + ')</div>';
+}
+
+function applySettingsEditability() {
+  if (!els.settingsForm || !els.btnSaveSettings) return;
+  var isAdmin = state.authContext && state.authContext.role === 'TENANT_ADMIN';
+  var inputs = els.settingsForm.querySelectorAll('input');
+  inputs.forEach(function(input) {
+    input.readOnly = !isAdmin;
+    input.disabled = !state.session;
+  });
+  els.btnSaveSettings.disabled = !isAdmin;
+  els.btnSaveSettings.style.display = isAdmin ? 'inline-flex' : 'none';
+  if (!state.session) {
+    setSettingsStatus('Faça login para carregar dados.');
+  } else if (!isAdmin) {
+    setSettingsStatus('Perfil TENANT_USER: leitura permitida; atualização bloqueada (RBAC backend mantém 403).');
+  } else {
+    setSettingsStatus('Perfil TENANT_ADMIN: edição habilitada.');
+  }
+}
+
+function fillSettingsForm(data) {
+  if (!els.settingsForm || !data) return;
+  ['organizationName', 'organizationLegalName', 'documentNumber', 'defaultTimezone', 'defaultLocale'].forEach(function(key) {
+    var input = els.settingsForm.querySelector('[name="' + key + '"]');
+    if (input) input.value = data[key] || '';
+  });
+}
+
+function readSettingsFormPayload() {
+  var payload = {};
+  ['organizationName', 'organizationLegalName', 'documentNumber', 'defaultTimezone', 'defaultLocale'].forEach(function(key) {
+    var input = els.settingsForm ? els.settingsForm.querySelector('[name="' + key + '"]') : null;
+    if (input) payload[key] = input.value;
+  });
+  return payload;
+}
+
+function handleUnauthorizedSession() {
+  persistSession(null);
+  state.authContext = null;
+  state.institutionalSettings = null;
+  renderAuthContext();
+  applySettingsEditability();
+  updateSessionBadge();
+}
+
+function fetchWithAuth(path, opts) {
+  var headers = Object.assign({}, (opts && opts.headers) || {}, getAuthHeaders());
+  var finalOpts = Object.assign({}, opts || {}, { headers: headers });
+  return fetch(BACKEND_URL + path, finalOpts);
+}
+
+function loadAuthContextAndSettings() {
+  if (!state.session || !state.session.accessToken) {
+    renderAuthContext();
+    applySettingsEditability();
+    updateSessionBadge();
+    return Promise.resolve();
+  }
+  return fetchWithAuth('/api/users/me', { method: 'GET' })
+    .then(function(res) {
+      if (res.status === 401) throw new Error('UNAUTH');
+      return res.json().then(function(body) {
+        return { status: res.status, body: body };
+      });
+    })
+    .then(function(payload) {
+      if (payload.status !== 200 || !payload.body.success || !payload.body.data) {
+        throw new Error('Falha ao carregar /api/users/me');
+      }
+      state.authContext = {
+        id: payload.body.data.id,
+        name: payload.body.data.name,
+        email: payload.body.data.email,
+        role: payload.body.data.role,
+        tenantId: state.session.tenant.id,
+        tenantSlug: state.session.tenant.slug,
+        tenantName: state.session.tenant.name,
+      };
+      renderAuthContext();
+      updateSessionBadge();
+      return fetchWithAuth('/api/institutional-settings', { method: 'GET' });
+    })
+    .then(function(res) {
+      if (res.status === 401) throw new Error('UNAUTH');
+      return res.json().then(function(body) {
+        return { status: res.status, body: body };
+      });
+    })
+    .then(function(payload) {
+      if (payload.status !== 200 || !payload.body.success || !payload.body.data) {
+        throw new Error('Falha ao carregar /api/institutional-settings');
+      }
+      state.institutionalSettings = payload.body.data;
+      fillSettingsForm(payload.body.data);
+      applySettingsEditability();
+      setLoginStatus('Sessão ativa e contexto carregado com sucesso.');
+    })
+    .catch(function(err) {
+      if (err && err.message === 'UNAUTH') {
+        handleUnauthorizedSession();
+        setLoginStatus('Sessão expirada. Faça login novamente.');
+        return;
+      }
+      showError('Falha ao carregar contexto autenticado.');
+    });
+}
+
+function onSubmitLogin(evt) {
+  evt.preventDefault();
+  if (!els.loginForm) return;
+  var formData = new FormData(els.loginForm);
+  var payload = {
+    tenantSlug: String(formData.get('tenantSlug') || '').trim(),
+    email: String(formData.get('email') || '').trim(),
+    password: String(formData.get('password') || ''),
+  };
+  setLoginStatus('Autenticando...');
+  fetch(BACKEND_URL + '/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+    .then(function(res) {
+      return res.json().then(function(body) {
+        return { status: res.status, body: body };
+      });
+    })
+    .then(function(result) {
+      if (result.status !== 200 || !result.body.success || !result.body.data) {
+        throw new Error((result.body.error && result.body.error.message) || 'Falha de login.');
+      }
+      persistSession({
+        accessToken: result.body.data.accessToken,
+        refreshToken: result.body.data.refreshToken,
+        tenant: result.body.data.tenant,
+        user: result.body.data.user,
+      });
+      setLoginStatus('Login concluído. Carregando contexto...');
+      return loadAuthContextAndSettings();
+    })
+    .catch(function(err) {
+      handleUnauthorizedSession();
+      setLoginStatus('Falha no login: ' + (err && err.message ? err.message : 'erro inesperado'));
+    });
+}
+
+function onSubmitInstitutionalSettings(evt) {
+  evt.preventDefault();
+  if (!state.authContext) return;
+  if (state.authContext.role !== 'TENANT_ADMIN') {
+    setSettingsStatus('Atualização bloqueada no frontend para TENANT_USER.');
+    return;
+  }
+  setSettingsStatus('Salvando...');
+  fetchWithAuth('/api/institutional-settings', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(readSettingsFormPayload()),
+  })
+    .then(function(res) {
+      return res.json().then(function(body) {
+        return { status: res.status, body: body };
+      });
+    })
+    .then(function(result) {
+      if (result.status === 403) {
+        setSettingsStatus('Backend retornou 403 (RBAC aplicado).');
+        return;
+      }
+      if (result.status !== 200 || !result.body.success) {
+        throw new Error((result.body.error && result.body.error.message) || 'Falha ao salvar.');
+      }
+      state.institutionalSettings = result.body.data;
+      fillSettingsForm(result.body.data);
+      setSettingsStatus('Configuração salva com sucesso.');
+    })
+    .catch(function(err) {
+      setSettingsStatus('Erro ao salvar: ' + (err && err.message ? err.message : 'erro inesperado'));
+    });
+}
+
+function onLogoutClick() {
+  if (!state.session) return handleUnauthorizedSession();
+  fetchWithAuth('/api/auth/logout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken: state.session.refreshToken }),
+  })
+    .finally(function() {
+      handleUnauthorizedSession();
+      setLoginStatus('Sessão encerrada com sucesso.');
+      activateTab('admin');
     });
 }
 
@@ -430,6 +713,7 @@ function init() {
 
   // Tabs
   initTabs();
+  restoreSession();
 
   // Demo: renderiza cards de cenário
   renderScenarios();
@@ -448,6 +732,10 @@ function init() {
   if (closeBtn) {
     closeBtn.addEventListener('click', hideError);
   }
+
+  updateSessionBadge();
+  applySettingsEditability();
+  void loadAuthContextAndSettings();
 }
 
 init();

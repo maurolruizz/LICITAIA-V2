@@ -20,6 +20,10 @@
         <span class="status-dot checking" id="status-dot"></span>
         <span id="status-label">Verificando backend...</span>
       </div>
+      <div class="session-box" id="session-box" aria-live="polite">
+        <span id="session-label">Não autenticado</span>
+        <button class="btn-secondary session-logout-btn" id="btn-logout" style="display:none;">Logout</button>
+      </div>
     </div>
   </header>
 
@@ -41,6 +45,14 @@
       aria-controls="section-form"
       data-tab="form"
     >Formulário</button>
+    <button
+      class="tab-btn"
+      id="tab-admin"
+      role="tab"
+      aria-selected="false"
+      aria-controls="section-admin"
+      data-tab="admin"
+    >Admin SaaS</button>
     <button
       class="tab-btn"
       id="tab-history"
@@ -103,6 +115,80 @@
     >
       <!-- Preenchido por form.js via renderFormSection() com microetapas da ETAPA E -->
       <div id="form-container"></div>
+    </section>
+
+    <!-- ══ SEÇÃO: ADMIN SaaS (FI7) ══ -->
+    <section
+      id="section-admin"
+      role="tabpanel"
+      aria-labelledby="tab-admin"
+      style="display: none;"
+    >
+      <p class="section-title">Acesso e Configuração Institucional</p>
+      <p class="section-desc">
+        Login real com backend, leitura do contexto autenticado e manutenção da configuração institucional por tenant.
+      </p>
+
+      <div class="admin-grid">
+        <article class="admin-card">
+          <h3 class="admin-card-title">Login</h3>
+          <form id="login-form" class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="login-tenant-slug">Tenant slug</label>
+              <input class="form-input" id="login-tenant-slug" name="tenantSlug" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email</label>
+              <input class="form-input" id="login-email" name="email" type="email" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="login-password">Senha</label>
+              <input class="form-input" id="login-password" name="password" type="password" required />
+            </div>
+            <div class="form-actions">
+              <button class="btn-execute" id="btn-login" type="submit">Entrar</button>
+              <span class="text-muted" id="login-status">Preencha as credenciais para autenticar.</span>
+            </div>
+          </form>
+        </article>
+
+        <article class="admin-card">
+          <h3 class="admin-card-title">Contexto Autenticado</h3>
+          <div id="auth-context-view" class="auth-context-view">Sem sessão ativa.</div>
+        </article>
+      </div>
+
+      <article class="admin-card">
+        <h3 class="admin-card-title">Configuração Institucional (FI6)</h3>
+        <form id="institutional-settings-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="organizationName">organizationName</label>
+              <input class="form-input" id="organizationName" name="organizationName" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="organizationLegalName">organizationLegalName</label>
+              <input class="form-input" id="organizationLegalName" name="organizationLegalName" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="documentNumber">documentNumber</label>
+              <input class="form-input" id="documentNumber" name="documentNumber" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="defaultTimezone">defaultTimezone</label>
+              <input class="form-input" id="defaultTimezone" name="defaultTimezone" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="defaultLocale">defaultLocale</label>
+              <input class="form-input" id="defaultLocale" name="defaultLocale" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-execute" id="btn-save-settings" type="submit" disabled>Salvar Configuração</button>
+            <span class="text-muted" id="settings-status">Faça login para carregar dados.</span>
+          </div>
+        </form>
+      </article>
     </section>
 
     <!-- ══ SEÇÃO: HISTÓRICO ══ -->
