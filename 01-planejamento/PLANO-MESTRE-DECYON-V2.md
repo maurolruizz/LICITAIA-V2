@@ -1233,3 +1233,47 @@ Consolidações:
 Regra de status:
 - H-FI8: **concluída em 10/10** no escopo de auditoria hostil + correção mínima + prova;
 - ETAPA H completa: permanece não encerrada se ainda houver subfases/transversais previstas no Plano Mestre fora deste registro.
+
+---
+
+11.28 ENCERRAMENTO FORMAL GLOBAL DA ETAPA H (GOVERNANÇA)
+
+Registrado em: **2026-03-27**  
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ENCERRAMENTO-ETAPA-H.md`
+
+Objetivo desta secção:
+- declarar o **encerramento formal da ETAPA H** em **10/10**, sem alterar o significado histórico dos registos normativos 11.18 a 11.27 (que documentam cada subfase no momento da execução);
+- fixar o **estado normativo vigente** quanto ao fecho global da etapa.
+
+Subfases concluídas (todas documentadas nos registos 11.18 a 11.27 e na Matriz de Fechamento):
+
+| Subfase | Designação resumida |
+|---------|----------------------|
+| H-FI1 | Correção estrutural do núcleo e borda API |
+| H-FI2 | Auditoria de fluxo + hardening canônico |
+| H-FI3 | Auditoria hostil multi-tenant profunda |
+| H-FI3-C | Corretiva cirúrgica (FORCE RLS + histórico sem overlap) |
+| H-FI4 | Audit logs e rastreabilidade total |
+| H-FI5 | Contratos, superfícies e respostas canônicas |
+| H-FI6 / H-FI6-C | Readiness real + corretiva full-stack integral |
+| H-FI7 | Demonstração controlada e operação assistida |
+| H-FI8 | Auditoria hostil final de prontidão para apresentação real |
+
+Prontidão declarada (no âmbito **controlado** e com limites institucionais explícitos, conforme protocolos e checkpoints da ETAPA H):
+
+- **Demonstração controlada:** SIM (sujeita ao `PROTOCOLO-DEMONSTRACAO-CONTROLADA-ETAPA-H-FI7.md` e provas `proof:h-fi6` / `proof:h-fi7` quando aplicável).
+- **Validação externa técnica:** SIM (em regime de consultoria ou revisão técnica, com comunicação de limites e dados de seed/dev).
+- **Piloto controlado:** SIM (não equivalendo a produção nacional ou carga irrestrita).
+
+Declaração explícita de limite:
+
+- **NÃO** se declara **produção plena irrestrita** nem equivalência a go-live nacional sem governança operacional, infraestrutura e compliance adicionais fora do escopo desta etapa.
+
+Revogação normativa pontual:
+
+- Quanto ao **estado de encerramento global da ETAPA H**, prevalece a presente Secção **11.28** sobre qualquer menção anterior de “ETAPA H completa não encerrada” ou equivalente constante dos registos **11.18 a 11.27** (essas menções permanecem como **registo histórico** do momento da subfase; não impedem o fecho global ora declarado).
+
+Veredito:
+
+- **ETAPA H: ENCERRADA formalmente em 10/10** ao abrigo desta secção e do checkpoint global referenciado.

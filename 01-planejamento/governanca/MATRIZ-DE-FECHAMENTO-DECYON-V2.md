@@ -160,6 +160,7 @@ Artefato arquitetural de referência: `01-planejamento/governanca/ARQUITETURA-SA
 | **Escopo** | Go-live controlado, comunicação institucional, handover operacional mínimo. |
 | **Travas** | **H** só inicia com **G** em 10/10. |
 | **Prova 10/10** | Critérios de prontidão verificados e documentados; nenhuma etapa anterior pulada. |
+| **Status** | **ENCERRADA — 2026-03-27 (10/10).** Subfases H-FI1 a H-FI8 concluídas. Encerramento global: `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ENCERRAMENTO-ETAPA-H.md`; Plano Mestre Secção 11.28. |
 
 ---
 
@@ -407,3 +408,10 @@ Registro factual em 2026-03-27:
 - correção mínima: inclusão de `proof:h-fi7` em `package.json` (coerência com protocolo).
 
 Status: **H-FI8 concluída** — apresentação externa em regime controlado sustentada por protocolo e provas, com riscos importantes residuais documentados (não críticos após mitigação).
+
+## 22. Encerramento global da ETAPA H
+
+Registro normativo em **2026-03-27**:
+
+- **ETAPA H** encontra-se **ENCERRADA em 10/10** ao nível de governança, com subfases H-FI1 a H-FI8 concluídas e alinhamento ao Plano Mestre (Secção 11.28).
+- Artefato único de fecho: `CHECKPOINT-NORMATIVO-ENCERRAMENTO-ETAPA-H.md`.
