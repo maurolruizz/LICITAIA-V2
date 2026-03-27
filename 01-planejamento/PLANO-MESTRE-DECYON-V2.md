@@ -1203,3 +1203,33 @@ Regra de status:
 - H-FI6-C: **concluída em 10/10** com prova full-stack integral;
 - H-FI6 (subfase): **encerrada formalmente**;
 - ETAPA H completa: permanece não encerrada (demais subfases transversais fora deste registro).
+
+---
+
+11.26 REGISTRO NORMATIVO — ETAPA H / H-FI7 (DEMONSTRAÇÃO CONTROLADA E OPERAÇÃO ASSISTIDA)
+
+Registrado em: 2026-03-27  
+Artefatos:
+- `01-planejamento/governanca/PROTOCOLO-DEMONSTRACAO-CONTROLADA-ETAPA-H-FI7.md`
+- `03-backend-api/licitaia-v2-api/src/proof/etapa-h-fi7-institutional-demo-readiness.ts`
+- `npm run proof:h-fi7` no `package.json` do backend
+
+Objetivo: protocolo explícito de subida, roteiro de demo, limites institucionais e prova reexecutável que encadeia H-FI6.
+
+---
+
+11.27 REGISTRO NORMATIVO — ETAPA H / H-FI8 (AUDITORIA HOSTIL FINAL DE PRONTIDÃO PARA APRESENTAÇÃO REAL)
+
+Registrado em: 2026-03-27  
+Artefato: `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI8.md`
+
+Objetivo: simular apresentação real, classificar riscos (técnico, operacional, percepção, institucional, demonstração, questionamento) e fechar apenas se não houver bloqueador crítico sem mitigação documental.
+
+Consolidações:
+1) achado crítico A1 — script `proof:h-fi7` ausente no `package.json` — **corrigido**;
+2) simulação reexecutada: `npm run proof:h-fi7` em verde (inclui encadeamento `npm run proof:h-fi6`);
+3) riscos importantes residuais (PostgreSQL manual, dual `DATABASE_URL`, credenciais de seed) **mitigados** pelo protocolo H-FI7 e comunicação de limites, não por feature nova.
+
+Regra de status:
+- H-FI8: **concluída em 10/10** no escopo de auditoria hostil + correção mínima + prova;
+- ETAPA H completa: permanece não encerrada se ainda houver subfases/transversais previstas no Plano Mestre fora deste registro.

@@ -387,3 +387,23 @@ Status de fechamento:
 
 - H-FI6-C: **CONCLUÍDA (10/10)**;
 - H-FI6 (readiness integral com prova full-stack): **FORMALMENTE ENCERRADA**.
+
+## 20. Registro operacional — ETAPA H / H-FI7 (demonstração controlada)
+
+Registro factual em 2026-03-27:
+
+- artefato operacional: `PROTOCOLO-DEMONSTRACAO-CONTROLADA-ETAPA-H-FI7.md`;
+- prova: `npm run proof:h-fi7` (backend);
+- encadeamento regressivo: H-FI6 no mesmo fluxo.
+
+Status: **H-FI7 concluída** no escopo institucional e operacional assistido.
+
+## 21. Registro operacional — ETAPA H / H-FI8 (prontidão para apresentação real)
+
+Registro factual em 2026-03-27:
+
+- natureza: auditoria hostil final — sem feature; simulação de apresentação e classificação de riscos;
+- artefato: `CHECKPOINT-NORMATIVO-ETAPA-H-FI8.md`;
+- correção mínima: inclusão de `proof:h-fi7` em `package.json` (coerência com protocolo).
+
+Status: **H-FI8 concluída** — apresentação externa em regime controlado sustentada por protocolo e provas, com riscos importantes residuais documentados (não críticos após mitigação).
