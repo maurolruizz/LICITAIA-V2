@@ -113,12 +113,25 @@ function collectDetails(
   }
 
   if (
-    bodyObj.correlationId !== undefined &&
-    typeof bodyObj.correlationId !== 'string'
+    bodyObj.correlationId !== undefined
   ) {
     details.push({
       field: 'correlationId',
-      reason: 'correlationId must be a string when provided.',
+      reason: 'correlationId não é aceito no body; use o header x-request-id.',
+    });
+  }
+
+  if (bodyObj.tenantId !== undefined) {
+    details.push({
+      field: 'tenantId',
+      reason: 'tenantId não é aceito na borda pública; o tenant é derivado do contexto autenticado.',
+    });
+  }
+
+  if (bodyObj.userId !== undefined) {
+    details.push({
+      field: 'userId',
+      reason: 'userId não é aceito na borda pública; o usuário é derivado do contexto autenticado.',
     });
   }
 
@@ -189,10 +202,6 @@ export function validateProcessRunRequest(body: unknown): ValidateProcessRunRequ
     bodyObj.phase.trim().length > 0
   ) {
     data.phase = bodyObj.phase.trim();
-  }
-
-  if (typeof bodyObj.correlationId === 'string') {
-    data.correlationId = bodyObj.correlationId;
   }
 
   return { success: true, data };

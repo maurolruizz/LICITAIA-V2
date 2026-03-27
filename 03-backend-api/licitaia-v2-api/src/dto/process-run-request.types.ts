@@ -21,7 +21,11 @@ export interface ProcessRunRequest {
   phase?: string;
   /** Dados do processo. Obrigatório: deve existir e ser objeto. */
   payload: ProcessRunPayload;
-  /** ID de correlação. Opcional. */
+  /**
+   * ID de correlação.
+   * Não é aceito pela borda pública para evitar ambiguidade semântica;
+   * o valor canônico é derivado do header `x-request-id`.
+   */
   correlationId?: string;
 }
 

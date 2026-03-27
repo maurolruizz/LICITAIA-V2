@@ -55,7 +55,7 @@ export function buildInternalErrorResponse(
   return {
     success: false,
     process: {
-      status: 'error',
+      status: 'failure',
       finalStatus: 'HALTED_BY_MODULE',
       halted: true,
     },

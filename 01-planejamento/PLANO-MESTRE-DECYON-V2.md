@@ -1113,3 +1113,39 @@ Prova real executada e evidência SQL consolidada:
 Regra de status:
 - H-FI4: concluída em 10/10 com prova real no PostgreSQL e regressão zero;
 - ETAPA H completa: permanece não encerrada (demais frentes transversais não fazem parte deste registro).
+
+---
+
+11.23 REGISTRO NORMATIVO — ETAPA H / H-FI5 (AUDITORIA HOSTIL DE CONTRATOS, SUPERFÍCIES E RESPOSTAS CANÔNICAS)
+
+Registrado em: 2026-03-27
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI5.md`
+
+Objetivo do registro:
+- provar coerência semântica entre contratos públicos da API e comportamento real do motor;
+- eliminar superfícies públicas perigosas que aceitem contexto de identidade pela borda;
+- validar previsibilidade das respostas canônicas para integradores/auditores.
+
+Consolidações estruturais aplicadas:
+1) endurecimento de contrato de entrada em `/api/process/run`:
+   - `tenantId`, `userId` e `correlationId` passam a ser rejeitados no body (400);
+   - identidade e correlação permanecem derivadas do contexto autenticado e do `x-request-id`;
+2) normalização semântica de erro interno:
+   - resposta 500 passa a usar `process.status='failure'` (alinhado ao contrato canônico), removendo `status='error'` fora da semântica declarada;
+3) prova reexecutável H-FI5 criada:
+   - `03-backend-api/licitaia-v2-api/src/proof/etapa-h-fi5-contract-surface-audit.ts`.
+
+Prova real executada:
+1) cenário de sucesso canônico (`200`, `status=success`, `finalStatus=SUCCESS`);
+2) cenário de halted por validação (`409`, `status=halted`, `finalStatus=HALTED_BY_VALIDATION`);
+3) cenário de halted por dependência (`409`, `status=halted`, `finalStatus=HALTED_BY_DEPENDENCY`);
+4) prova de superfície perigosa bloqueada:
+   - envio de `tenantId/userId/correlationId` no body -> `400 INVALID_PROCESS_RUN_REQUEST`;
+5) regressão zero confirmada por reexecução das provas:
+   - H-FI2 (fluxo/hardening canônico);
+   - H-FI4 (rastreabilidade PostgreSQL).
+
+Regra de status:
+- H-FI5: concluída em 10/10 com prova real reexecutável e sem lacunas críticas de contrato no escopo auditado;
+- ETAPA H completa: permanece não encerrada (subfases transversais subsequentes fora deste registro).

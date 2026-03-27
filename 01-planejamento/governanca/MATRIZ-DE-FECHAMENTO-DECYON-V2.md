@@ -319,3 +319,29 @@ Status de fechamento:
 - Referência de fechamento:
   - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI4.md`
   - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI4-AUDIT-LOGS-E-RASTREABILIDADE-2026-03-27.md`
+
+## 17. Registro operacional — ETAPA H / H-FI5 (contratos, superfícies e respostas canônicas)
+
+Registro factual em 2026-03-27:
+
+- natureza: auditoria hostil de contratos de entrada/saída, superfícies públicas e semântica de respostas (sem expansão funcional);
+- foco: garantir previsibilidade externa e eliminação de ambiguidades de integração na API canônica;
+- artefato normativo:
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI5.md`.
+
+Critérios estruturais aplicados:
+
+1. bloqueio explícito de campos de identidade/correlação na borda pública (`tenantId`, `userId`, `correlationId` no body);
+2. manutenção de identidade/correlação canônicas derivadas de autenticação e `x-request-id`;
+3. alinhamento semântico da resposta 500 para `process.status='failure'`;
+4. prova reexecutável dedicada H-FI5 cobrindo:
+   - `success`,
+   - `validation halt`,
+   - `dependency halt`,
+   - coerência entre HTTP status e body,
+   - bloqueio de superfícies públicas perigosas;
+5. regressão zero revalidada com provas H-FI2 e H-FI4.
+
+Status de fechamento:
+
+- H-FI5: **CONCLUÍDA (10/10, regressão zero)**.
