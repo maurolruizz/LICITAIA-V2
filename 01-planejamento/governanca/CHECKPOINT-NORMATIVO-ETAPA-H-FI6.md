@@ -49,3 +49,9 @@ Readiness de borda, build e runtime HTTP alinhados ao `src`; prova única docume
 - H-FI6 (escopo auditoria + prova + correção CORS): **registrada**  
 - Prova FI4/FI5 embutida na H-FI6 sem PostgreSQL: **não válida** — usar prova parcial só com flag explícita  
 - ETAPA H completa: **permanece não encerrada** (outras subfases/transversais fora deste registro)
+
+---
+
+## Atualização 2026-03-27 — H-FI6-C
+
+O bloqueador ambiental (PostgreSQL) foi eliminado e a prova integral `npm run proof:h-fi6` **sem** `H_FI6_SKIP_DB_REGRESSION` foi executada com sucesso, incluindo regressões H-FI4 e H-FI5. O encerramento formal da subfase **H-FI6** está registrado em `CHECKPOINT-NORMATIVO-ETAPA-H-FI6-C.md` e na Secção 11.25 do Plano Mestre.

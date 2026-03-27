@@ -16,8 +16,11 @@
 -- Em produção, hashes reais devem ser gerados pelo backend.
 
 -- Limpa dados de teste anteriores (idempotente)
--- NOTA: audit_logs é append-only (trigger bloqueia DELETE).
--- Para reset completo, use TRUNCATE diretamente no banco como superusuário.
+-- NOTA: audit_logs é append-only (DELETE/UPDATE bloqueados por trigger).
+-- DELETE em users dispara FK ON DELETE SET NULL em audit_logs (UPDATE implícito) — falha.
+-- TRUNCATE não dispara os triggers BEFORE DELETE desta tabela; executar como superusuário no seed.
+TRUNCATE TABLE audit_logs;
+
 DELETE FROM organ_configs      WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
 DELETE FROM process_executions WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
 DELETE FROM user_sessions      WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));

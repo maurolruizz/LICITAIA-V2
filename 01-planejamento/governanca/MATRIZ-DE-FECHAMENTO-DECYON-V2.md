@@ -367,3 +367,23 @@ Critérios estruturais aplicados:
 Status de fechamento:
 
 - H-FI6: **CONCLUÍDA (10/10 no escopo declarado: auditoria + correção CORS + prova reexecutável + documentação canônica)**.
+
+## 19. Registro operacional — ETAPA H / H-FI6-C (readiness full-stack integral)
+
+Registro factual em 2026-03-27:
+
+- natureza: corretiva final ambiental — sem feature nova; seed ajustado para compatibilidade com imutabilidade de `audit_logs`;
+- foco: PostgreSQL real, migrations, seed, prova `npm run proof:h-fi6` sem skip (FI4/FI5 embutidas);
+- artefato normativo:
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI6-C.md`.
+
+Critérios:
+
+1. `TRUNCATE audit_logs` antes de limpeza idempotente no seed de desenvolvimento;
+2. prova integral reexecutável documentada no checkpoint H-FI6-C;
+3. encerramento formal da subfase **H-FI6** após H-FI6-C.
+
+Status de fechamento:
+
+- H-FI6-C: **CONCLUÍDA (10/10)**;
+- H-FI6 (readiness integral com prova full-stack): **FORMALMENTE ENCERRADA**.

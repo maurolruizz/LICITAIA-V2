@@ -1176,6 +1176,30 @@ Prova real executada (níveis):
 3) camada HTTP: `/health`, `/diagnostics`, CORS preflight, POST `/api/process/run` (motor público) — OK com API em execução;
 4) regressões H-FI4/H-FI5 na mesma prova — exigem PostgreSQL ativo e `DATABASE_URL` válida; em ambiente sem servidor de banco, usar apenas `H_FI6_SKIP_DB_REGRESSION=1` para prova parcial documentada (não substitui prova integral para piloto).
 
+Regra de status (atualizada por H-FI6-C em 2026-03-27):
+- H-FI6: **encerrada formalmente em 10/10** após H-FI6-C — prova integral `npm run proof:h-fi6` sem skip, com PostgreSQL real, migrations/seed e regressões H-FI4/H-FI5 no mesmo fluxo (ver Secção 11.25);
+- ETAPA H completa: permanece não encerrada (demais subfases transversais fora deste registro).
+
+---
+
+11.25 REGISTRO NORMATIVO — ETAPA H / H-FI6-C (CORRETIVA FINAL DE READINESS FULL-STACK)
+
+Registrado em: 2026-03-27  
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI6-C.md`
+
+Objetivo do registro:
+- eliminar o bloqueador ambiental que impedia prova multicamada integral da H-FI6;
+- comprovar, com evidência reexecutável, PostgreSQL acessível, migrations aplicadas, seed coerente e execução de `npm run proof:h-fi6` **sem** `H_FI6_SKIP_DB_REGRESSION`.
+
+Consolidações aplicadas:
+1) PostgreSQL iniciado e validado (`licitaia_dev`, role `licitaia_app`);
+2) migrations verificadas/aplicadas (incl. 009 RLS quando pendente);
+3) correção cirúrgica do seed `001_test_tenant.sql`: `TRUNCATE TABLE audit_logs` antes da limpeza idempotente, evitando UPDATE implícito via FK `ON DELETE SET NULL` que violava imutabilidade de `audit_logs`;
+4) `npm run validate` (schema) em verde;
+5) `npm run proof:h-fi6` integral: FI2 + HTTP + FI5 + FI4 — **OK**.
+
 Regra de status:
-- H-FI6: consolidada em 10/10 no escopo de auditoria, correção de borda e prova reexecutável documentada; bloqueador residual **ambiental** para prova multicamada completa quando PostgreSQL não está disponível;
+- H-FI6-C: **concluída em 10/10** com prova full-stack integral;
+- H-FI6 (subfase): **encerrada formalmente**;
 - ETAPA H completa: permanece não encerrada (demais subfases transversais fora deste registro).
