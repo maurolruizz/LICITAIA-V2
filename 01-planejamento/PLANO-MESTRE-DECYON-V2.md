@@ -1073,3 +1073,43 @@ Correções cirúrgicas aplicadas:
 Regra de status:
 - H-FI3 corretiva: concluída nesta execução com prova reexecutável aprovada;
 - ETAPA H completa: permanece não encerrada.
+
+---
+
+11.22 REGISTRO NORMATIVO — ETAPA H / H-FI4 (AUDITORIA DE AUDIT LOGS E RASTREABILIDADE TOTAL)
+
+Registrado em: 2026-03-27
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI4-AUDIT-LOGS-E-RASTREABILIDADE-2026-03-27.md`
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI4.md`
+
+Objetivo do registro:
+- auditar completude, causalidade e encadeamento de rastreabilidade entre request, execução, validações, eventos, decisão e persistência;
+- eliminar ambiguidade de `correlationId` na superfície `/api/process/run`;
+- fortalecer semântica de `audit_logs` para reconstrução forense.
+
+Consolidações estruturais aplicadas:
+1) `correlationId` do motor passa a ser derivado da borda HTTP (`requestId`) em vez de aceitar valor de cliente como fonte de verdade;
+2) persistência de execução incorpora `correlationId` confiável no `request_payload` salvo;
+3) metadados de `audit_logs` para `PROCESS_EXECUTION` passam a registrar:
+   - `requestId`, `correlationId`, `processId`,
+   - `finalStatus`, `halted`, `haltedBy`, `httpStatus`,
+   - `modulesExecuted`, `validationCodes`, `eventsCount`, `decisionMetadataCount`;
+4) prova reexecutável dedicada da H-FI4 criada em:
+   - `03-backend-api/licitaia-v2-api/src/proof/etapa-h-fi4-audit-traceability-validation.ts`.
+
+Prova real executada e evidência SQL consolidada:
+1) PostgreSQL ativo e conectividade validada para `postgres` e `licitaia_app` no banco `licitaia_dev`;
+2) prova reexecutável H-FI4 executada com sucesso (`src/proof/etapa-h-fi4-audit-trace.ts`) cobrindo:
+   - cenário de sucesso;
+   - cenário de halted por validação;
+   - cenário de halted por dependência;
+3) consultas SQL diretas em `process_executions` e `audit_logs` confirmaram:
+   - persistência de payload e response;
+   - correlação `requestId/correlationId/processId/tenantId/userId`;
+   - coerência temporal e causal;
+   - reconstrução completa da execução a partir do banco.
+
+Regra de status:
+- H-FI4: concluída em 10/10 com prova real no PostgreSQL e regressão zero;
+- ETAPA H completa: permanece não encerrada (demais frentes transversais não fazem parte deste registro).

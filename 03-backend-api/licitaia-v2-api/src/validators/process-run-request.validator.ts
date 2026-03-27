@@ -176,6 +176,12 @@ export function validateProcessRunRequest(body: unknown): ValidateProcessRunRequ
     bodyObj.processId.trim().length > 0
   ) {
     data.processId = bodyObj.processId.trim();
+  } else if (
+    typeof payloadObj['processId'] === 'string' &&
+    (payloadObj['processId'] as string).trim().length > 0
+  ) {
+    // H-FI4: mantém correlação estável quando o cliente envia processId dentro de payload.
+    data.processId = (payloadObj['processId'] as string).trim();
   }
 
   if (

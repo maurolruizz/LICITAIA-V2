@@ -22,12 +22,17 @@ export interface SaveExecutionParams {
   executedBy: string;
   requestPayload: Record<string, unknown>;
   response: Record<string, unknown>;
+  processId: string;
+  correlationId?: string;
+  requestId?: string;
   finalStatus: string;
   halted: boolean;
   haltedBy?: string;
   httpStatus: number;
   modulesExecuted: string[];
   validationCodes: string[];
+  eventsCount: number;
+  decisionMetadataCount: number;
   audit: {
     userId: string;
     ipAddress: string | null;
@@ -61,9 +66,19 @@ export async function saveExecution(params: SaveExecutionParams): Promise<Proces
       resourceId: execution.id,
       metadata: {
         executionId: execution.id,
+        tenantId: params.tenantId,
+        userId: params.audit.userId,
+        processId: params.processId,
+        correlationId: params.correlationId ?? null,
+        requestId: params.requestId ?? null,
         finalStatus: execution.finalStatus,
         halted: execution.halted,
+        haltedBy: execution.haltedBy ?? null,
         httpStatus: execution.httpStatus,
+        modulesExecuted: params.modulesExecuted,
+        validationCodes: params.validationCodes,
+        eventsCount: params.eventsCount,
+        decisionMetadataCount: params.decisionMetadataCount,
       },
       ipAddress: params.audit.ipAddress,
       userAgent: params.audit.userAgent,

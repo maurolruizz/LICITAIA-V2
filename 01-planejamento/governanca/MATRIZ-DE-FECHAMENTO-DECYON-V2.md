@@ -295,3 +295,27 @@ Critérios estruturais aplicados:
    - force RLS ativo nas tabelas críticas;
    - ausência de overlap entre tenants;
    - isolamento hostil de leitura e escrita mantido.
+
+## 16. Registro operacional — ETAPA H / H-FI4 (audit logs e rastreabilidade total)
+
+Registro factual em 2026-03-27:
+
+- natureza: auditoria estrutural de trilha de auditoria e nexo causal ponta a ponta (sem expansão funcional de produto);
+- foco: garantir reconstrução forense entre request/contexto, execução do motor, validações, eventos, decisão e persistência;
+- artefato normativo:
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI4-AUDIT-LOGS-E-RASTREABILIDADE-2026-03-27.md`.
+
+Critérios estruturais aplicados:
+
+1. `correlationId` do fluxo `/api/process/run` passa a ser derivado do `requestId` de borda (fonte confiável), removendo dependência de dado enviado pelo cliente;
+2. `audit_logs` de `PROCESS_EXECUTION` enriquecido com metadados de rastreabilidade completa (`requestId`, `correlationId`, `processId`, resultado e contadores de validação/eventos/metadados);
+3. prova reexecutável específica da H-FI4 adicionada em `src/proof/etapa-h-fi4-audit-traceability-validation.ts`;
+4. prova real no PostgreSQL executada com cenários `success`, `validation halt` e `dependency halt` em verde;
+5. evidência SQL direta validou persistência, correlação completa e reconstrução integral da execução.
+
+Status de fechamento:
+
+- H-FI4: **CONCLUÍDA (10/10, regressão zero)**.
+- Referência de fechamento:
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI4.md`
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI4-AUDIT-LOGS-E-RASTREABILIDADE-2026-03-27.md`

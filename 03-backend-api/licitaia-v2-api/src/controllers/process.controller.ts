@@ -66,6 +66,8 @@ export async function runProcessController(req: Request, res: Response): Promise
         : undefined;
     context.tenantId = authenticatedTenantId;
     context.userId = authenticatedUserId;
+    // CorrelationId confiável da borda HTTP: nunca confiar em valor enviado pelo cliente.
+    context.correlationId = requestId || context.correlationId;
     const rawEngineResult: AdministrativeProcessResult =
       await runAdministrativeProcess(context);
     const engineResult: AdministrativeProcessResult = applyAiAssistiveLayer(rawEngineResult);
@@ -96,14 +98,24 @@ export async function runProcessController(req: Request, res: Response): Promise
         await saveExecution({
           tenantId,
           executedBy: userId,
-          requestPayload: body as Record<string, unknown>,
+          requestPayload: {
+            ...(body as Record<string, unknown>),
+            correlationId: context.correlationId,
+          },
           response: responseBody as unknown as Record<string, unknown>,
+          processId: context.processId,
+          correlationId: context.correlationId,
+          requestId,
           finalStatus: engineResult.finalStatus,
           halted: engineResult.halted,
           ...(haltedBy !== undefined ? { haltedBy } : {}),
           httpStatus,
           modulesExecuted,
           validationCodes,
+          eventsCount: Array.isArray(engineResult.events) ? engineResult.events.length : 0,
+          decisionMetadataCount: Array.isArray(engineResult.decisionMetadata)
+            ? engineResult.decisionMetadata.length
+            : 0,
           audit: {
             userId,
             ipAddress: typeof req.ip === 'string' ? req.ip : null,
