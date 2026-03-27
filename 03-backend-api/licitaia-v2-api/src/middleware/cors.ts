@@ -11,7 +11,8 @@ import type { Request, Response, NextFunction } from 'express';
 import { config } from '../config/env';
 
 const ALLOWED_METHODS = 'GET, POST, OPTIONS';
-const ALLOWED_HEADERS = 'Content-Type, Authorization';
+/** Inclui x-request-id para preflight de browsers alinhado à correlação canônica da borda (H-FI4/H-FI5). */
+const ALLOWED_HEADERS = 'Content-Type, Authorization, x-request-id';
 
 export function corsMiddleware(req: Request, res: Response, next: NextFunction): void {
   const origin = req.headers['origin'];

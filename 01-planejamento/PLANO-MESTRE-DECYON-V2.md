@@ -1149,3 +1149,33 @@ Prova real executada:
 Regra de status:
 - H-FI5: concluída em 10/10 com prova real reexecutável e sem lacunas críticas de contrato no escopo auditado;
 - ETAPA H completa: permanece não encerrada (subfases transversais subsequentes fora deste registro).
+
+---
+
+11.24 REGISTRO NORMATIVO — ETAPA H / H-FI6 (AUDITORIA HOSTIL DE READINESS REAL)
+
+Registrado em: 2026-03-27  
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI6.md`
+
+Objetivo do registro:
+- provar coerência entre código-fonte, build, runtime, configuração e borda HTTP para ambiente controlado;
+- documentar caminho canônico de subida e prova reexecutável única;
+- eliminar lacuna de CORS para o header de correlação `x-request-id` em preflight de browsers.
+
+Consolidações estruturais aplicadas:
+1) `Access-Control-Allow-Headers` atualizado para incluir `x-request-id` (`middleware/cors.ts`), alinhado à correlação canônica da borda (H-FI4/H-FI5);
+2) prova reexecutável H-FI6 adicionada:
+   - `03-backend-api/licitaia-v2-api/src/proof/etapa-h-fi6-readiness-controlled-environment.ts`;
+3) script npm oficial: `npm run proof:h-fi6` no backend;
+4) ordem canônica documentada: build backend → runtime `dist/server.js` → frontend demo `node server.js` (porta 3000) → PostgreSQL para provas com persistência (FI4/FI5 embutidas quando o banco está acessível).
+
+Prova real executada (níveis):
+1) `npm run build` no backend — OK;
+2) regressão H-FI2 in-process — OK;
+3) camada HTTP: `/health`, `/diagnostics`, CORS preflight, POST `/api/process/run` (motor público) — OK com API em execução;
+4) regressões H-FI4/H-FI5 na mesma prova — exigem PostgreSQL ativo e `DATABASE_URL` válida; em ambiente sem servidor de banco, usar apenas `H_FI6_SKIP_DB_REGRESSION=1` para prova parcial documentada (não substitui prova integral para piloto).
+
+Regra de status:
+- H-FI6: consolidada em 10/10 no escopo de auditoria, correção de borda e prova reexecutável documentada; bloqueador residual **ambiental** para prova multicamada completa quando PostgreSQL não está disponível;
+- ETAPA H completa: permanece não encerrada (demais subfases transversais fora deste registro).

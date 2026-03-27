@@ -345,3 +345,25 @@ Critérios estruturais aplicados:
 Status de fechamento:
 
 - H-FI5: **CONCLUÍDA (10/10, regressão zero)**.
+
+## 18. Registro operacional — ETAPA H / H-FI6 (readiness real controlado)
+
+Registro factual em 2026-03-27:
+
+- natureza: auditoria hostil de build, runtime, configuração, borda HTTP e exposição controlada (sem feature nova);
+- foco: caminho canônico reproduzível, CORS alinhado a `x-request-id`, prova única `npm run proof:h-fi6`, coerência `src` → `dist` → execução;
+- artefato normativo:
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-FI6.md`.
+
+Critérios estruturais aplicados:
+
+1. build oficial: `npm run build` (inclui `build:frontend-core-runtime` + `tsc`);
+2. runtime oficial: `npm run dev` ou `npm start` → `dist/server.js`;
+3. frontend oficial ETAPA E: `02-frontend/licitaia-v2-demo` — `node server.js` (sem pipeline de build separado; estático servido na porta 3000);
+4. variáveis obrigatórias em não-development: `CORS_ORIGIN`, `DATABASE_URL`, `JWT_SECRET` (≥32) — fail-fast em `config/env.ts`;
+5. prova H-FI6 integra regressão FI2 + HTTP; FI4/FI5 quando `DATABASE_URL` aponta para PostgreSQL acessível;
+6. prova parcial apenas com `H_FI6_SKIP_DB_REGRESSION=1` explícito, documentada como não substituto de piloto full-stack.
+
+Status de fechamento:
+
+- H-FI6: **CONCLUÍDA (10/10 no escopo declarado: auditoria + correção CORS + prova reexecutável + documentação canônica)**.
