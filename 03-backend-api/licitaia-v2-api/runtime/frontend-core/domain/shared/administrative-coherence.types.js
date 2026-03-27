@@ -1,0 +1,13 @@
+"use strict";
+/**
+ * Tipos do Motor de Coerência Administrativa.
+ * Fase 25 — Integração entre justificativa, objeto e memória de cálculo.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ADMINISTRATIVE_COHERENCE_ISSUE_TYPES = void 0;
+exports.ADMINISTRATIVE_COHERENCE_ISSUE_TYPES = {
+    JUSTIFICATION_TARGET_NOT_FOUND: 'JUSTIFICATION_TARGET_NOT_FOUND',
+    OBJECT_WITHOUT_JUSTIFICATION: 'OBJECT_WITHOUT_JUSTIFICATION',
+    CALCULATION_WITHOUT_JUSTIFICATION: 'CALCULATION_WITHOUT_JUSTIFICATION',
+    JUSTIFICATION_CALCULATION_MISMATCH: 'JUSTIFICATION_CALCULATION_MISMATCH',
+};

@@ -32,6 +32,7 @@ import { executeAdministrativeDocumentEngine } from '../shared/administrative-do
 import { executeAdministrativeDocumentPremiumEngine } from '../shared/administrative-document-premium.engine';
 import { extractAdministrativeNeed } from '../shared/administrative-need.extractor';
 import { extractProcurementStrategy } from '../shared/procurement-strategy.extractor';
+import { appendCommonInvalidationEvents } from '../shared/module-validation-events.helper';
 
 export async function executeTrModule(input: ModuleInputContract): Promise<ModuleOutputContract> {
   const processId: string | undefined = input.context?.processId as string | undefined;
@@ -181,26 +182,19 @@ export async function executeTrModule(input: ModuleInputContract): Promise<Modul
         { processId, payload: { validationCodes: validation.items.map((i) => i.code) } }
       )
     );
-    const calculationMemoryCodes = validation.items.filter((i) => i.code.startsWith('CALCULATION_MEMORY_')).map((i) => i.code);
-    if (calculationMemoryCodes.length > 0) {
-      events.push(buildCalculationMemoryInvalidEvent(ModuleId.TR, { invalidCodes: calculationMemoryCodes, calculationMemoryCount: extractedCalculationMemory.count }, processId));
-    }
-    const administrativeJustificationCodes = validation.items.filter((i) => i.code.startsWith('ADMINISTRATIVE_JUSTIFICATION_')).map((i) => i.code);
-    if (administrativeJustificationCodes.length > 0) {
-      events.push(buildAdministrativeJustificationInvalidEvent(ModuleId.TR, { invalidCodes: administrativeJustificationCodes, totalJustifications: extractedAdministrativeJustification.count }, processId));
-    }
-    const administrativeNeedCodes = validation.items.filter((i) => i.code.startsWith('ADMINISTRATIVE_NEED_')).map((i) => i.code);
-    if (administrativeNeedCodes.length > 0) {
-      events.push(buildAdministrativeNeedInvalidEvent(ModuleId.TR, { invalidCodes: administrativeNeedCodes, totalNeeds: extractedAdministrativeNeed.count, issueTypes: [...new Set(administrativeNeedCodes)] }, processId));
-    }
-    const procurementStrategyCodes = validation.items.filter((i) => i.code.startsWith('PROCUREMENT_STRATEGY_')).map((i) => i.code);
-    if (procurementStrategyCodes.length > 0) {
-      events.push(buildProcurementStrategyInvalidEvent(ModuleId.TR, { totalStrategies: extractedProcurementStrategy.count, issueTypes: [...new Set(procurementStrategyCodes)] }, processId));
-    }
-    const documentConsistencyCodes = validation.items.filter((i) => i.code.startsWith('ADMIN_DOCUMENT_CONSISTENCY_')).map((i) => i.code);
-    if (documentConsistencyCodes.length > 0) {
-      events.push(buildAdministrativeDocumentConsistencyIssuesDetectedEvent(ModuleId.TR, documentConsistencyResult, processId));
-    }
+    appendCommonInvalidationEvents({
+      moduleId: ModuleId.TR,
+      validationItems: validation.items,
+      counts: {
+        calculationMemoryCount: extractedCalculationMemory.count,
+        totalJustifications: extractedAdministrativeJustification.count,
+        totalNeeds: extractedAdministrativeNeed.count,
+        totalStrategies: extractedProcurementStrategy.count,
+      },
+      documentConsistencyResult,
+      processId,
+      events,
+    });
     decisionMetadata = createDecisionMetadata(DecisionOrigin.MODULE, {
       moduleId: ModuleId.TR,
       ruleId: 'TR_REQUIRED_FIELDS',

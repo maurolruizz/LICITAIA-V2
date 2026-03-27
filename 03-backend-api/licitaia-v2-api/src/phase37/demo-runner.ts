@@ -13,12 +13,7 @@
 import type { AdministrativeProcessResult } from '../dto/administrative-process.types';
 import { DEMO_CATALOG, DEMO_CATALOG_SUMMARY } from './demo-catalog';
 import type { DemoScenarioEntry, DemoClassification } from './demo-catalog';
-
-const { runAdministrativeProcess } = require(
-  '../../../../02-frontend/licitaia-v2-web/modules'
-) as {
-  runAdministrativeProcess(context: unknown): Promise<AdministrativeProcessResult>;
-};
+import { getRunAdministrativeProcess } from '../lib/frontend-core-loader';
 
 // ---------------------------------------------------------------------------
 // Tipos internos do runner
@@ -120,6 +115,7 @@ function validateExpectations(
 // ---------------------------------------------------------------------------
 
 async function runDemoScenario(entry: DemoScenarioEntry): Promise<DemoRunResult> {
+  const runAdministrativeProcess = getRunAdministrativeProcess();
   const context = entry.scenario.buildContext();
   const result = await runAdministrativeProcess(context);
 

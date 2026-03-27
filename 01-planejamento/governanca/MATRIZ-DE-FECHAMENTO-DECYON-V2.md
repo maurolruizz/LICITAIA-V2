@@ -228,3 +228,70 @@ Para qualquer execução operacional com Cursor, é obrigatório:
 4. preservar coerência integral entre implementação, arquitetura e governança.
 
 Sem cumprimento cumulativo destes itens, a execução não pode ser classificada como concluída.
+
+## 12. Registro operacional — ETAPA H / H-FI1 (corretiva estrutural)
+
+Registro factual em 2026-03-26:
+
+- natureza: correção estrutural cirúrgica (sem expansão funcional);
+- foco: alinhamento da rota crítica ao `src`, rastreabilidade de persistência e blindagem semântica de identidade;
+- artefato normativo de evidência:
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI1-CORRECAO-ESTRUTURAL-2026-03-26.md`.
+
+Critérios estruturais aplicados nesta corretiva:
+
+1. sem dependência ambígua entre `src` e artefato derivado na execução crítica;
+2. persistência crítica aguardada na borda da API com erro explícito de trilha quando necessário;
+3. identidade/autoria de tenant e usuário não derivada de body público;
+4. redução de duplicação estrutural de contratos e da espinha comum dos módulos;
+5. superfície canônica de orquestração reforçada para evitar dupla porta conceitual.
+
+## 13. Registro operacional — ETAPA H / H-FI2 (fluxo administrativo + hardening canônico)
+
+Registro factual em 2026-03-27:
+
+- natureza: auditoria técnica de fluxo + hardening de execução canônica (sem expansão de feature);
+- foco: ordem determinística do pipeline, sem bypass de dependência e com semântica de halt auditável;
+- artefato normativo:
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI2-FLUXO-E-HARDENING-2026-03-27.md`.
+
+Critérios estruturais aplicados:
+
+1. superfície canônica única de execução para API e runners internos;
+2. hardening de runtime canônico com modo compilado explícito para produção;
+3. prova reexecutável de dependência, validação e coerência de `finalStatus`;
+4. preservação de regressão dos cenários canônicos já homologados (Fase 35 e Fase 37).
+
+## 14. Registro operacional — ETAPA H / H-FI3 (auditoria hostil multi-tenant profunda)
+
+Registro factual em 2026-03-27:
+
+- natureza: auditoria hostil de isolamento multi-tenant (sem expansão de feature);
+- foco: provar ausência de leitura, escrita, trilha e configuração cruzadas entre tenants;
+- artefato normativo:
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI3-AUDITORIA-MULTI-TENANT-PROFUNDA-2026-03-27.md`.
+
+Critérios estruturais aplicados:
+
+1. blindagem de RLS em modo obrigatório com `FORCE ROW LEVEL SECURITY` nas tabelas multi-tenant críticas;
+2. validação hostil reexecutável cobrindo leitura cruzada, escrita cruzada, overlap de histórico e segregação de trilha;
+3. validação explícita da postura de role de prova (`licitaia_app` não-superuser e sem `BYPASSRLS`);
+4. preservação de regressão dos fluxos válidos já consolidados por tenant.
+
+## 15. Registro operacional — ETAPA H / H-FI3-C (corretiva cirúrgica)
+
+Registro factual em 2026-03-27:
+
+- natureza: corretiva cirúrgica focada em blindagem efetiva de RLS e segregação inequívoca da superfície de histórico;
+- foco: eliminar `c10=false` (force RLS não aplicado no banco alvo) e `c7=false` (overlap real de histórico entre tenants);
+- artefato normativo:
+  - `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI3-CORRETIVA-FORCE-RLS-E-HISTORICO-SEM-OVERLAP-2026-03-27.md`.
+
+Critérios estruturais aplicados:
+
+1. migration de force RLS aplicada efetivamente no banco operacional de prova;
+2. endpoint de histórico endurecido com filtro explícito por `tenant_id` em listagem e busca por id;
+3. prova H-FI3 reexecutada com evidência completa de:
+   - force RLS ativo nas tabelas críticas;
+   - ausência de overlap entre tenants;
+   - isolamento hostil de leitura e escrita mantido.

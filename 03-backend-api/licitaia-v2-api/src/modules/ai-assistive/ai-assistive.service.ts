@@ -1,13 +1,9 @@
 import type { AdministrativeProcessResult } from '../../dto/administrative-process.types';
 import { config } from '../../config/env';
 import { logger } from '../../middleware/logger';
+import { getFrontendCoreAssistive } from '../../lib/frontend-core-loader';
 
-const frontendModules = require('../../../../../02-frontend/licitaia-v2-web/modules-dist') as {
-  executeAiAssistiveRefinement?: (request: Record<string, unknown>) => Record<string, unknown>;
-  AI_ASSISTIVE_MODEL_VERSION?: string;
-  AI_ASSISTIVE_PROMPT_VERSION?: string;
-  AI_ASSISTIVE_TRANSFORM_PROFILE_VERSION?: string;
-};
+const frontendModules = getFrontendCoreAssistive();
 
 type PremiumSectionRaw = {
   sectionId?: unknown;
@@ -177,7 +173,7 @@ export function applyAiAssistiveLayer(
 
   const execute = frontendModules.executeAiAssistiveRefinement;
   if (typeof execute !== 'function') {
-    logger.warn('[AI_ASSISTIVE] executeAiAssistiveRefinement indisponível em modules-dist.');
+    logger.warn('[AI_ASSISTIVE] executeAiAssistiveRefinement indisponivel no nucleo src.');
     return {
       ...engineResult,
       metadata: {

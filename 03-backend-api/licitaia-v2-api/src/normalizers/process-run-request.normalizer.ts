@@ -36,9 +36,6 @@ export function normalizeToContext(
     phase,
     payload,
     timestamp: new Date().toISOString(),
-    tenantId:
-      typeof request.tenantId === 'string' ? request.tenantId : undefined,
-    userId: typeof request.userId === 'string' ? request.userId : undefined,
     correlationId:
       typeof request.correlationId === 'string'
         ? request.correlationId

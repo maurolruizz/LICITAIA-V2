@@ -21,10 +21,6 @@ export interface ProcessRunRequest {
   phase?: string;
   /** Dados do processo. Obrigatório: deve existir e ser objeto. */
   payload: ProcessRunPayload;
-  /** Identificador do tenant. Opcional. */
-  tenantId?: string;
-  /** Identificador do usuário. Opcional. */
-  userId?: string;
   /** ID de correlação. Opcional. */
   correlationId?: string;
 }

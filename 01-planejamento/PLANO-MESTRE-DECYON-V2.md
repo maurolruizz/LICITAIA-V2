@@ -963,3 +963,113 @@ Para a ETAPA E (Condução total do usuário), fica estabelecido:
 
 5) objetivo material da ETAPA E:
 - converter validações e travas já existentes em condução operacional preventiva, sem página em branco em decisões críticas e sem salto indevido de fluxo.
+
+---
+
+11.18 REGISTRO NORMATIVO — ETAPA H / H-FI1 (CORREÇÃO ESTRUTURAL DO NÚCLEO E BORDA API)
+
+Registrado em: 2026-03-26
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI1-CORRECAO-ESTRUTURAL-2026-03-26.md`
+
+Objetivo do registro:
+- formalizar correção estrutural cirúrgica da H-FI1 sem expansão de escopo;
+- remover risco de divergência silenciosa entre fonte de verdade (`src`) e execução crítica;
+- reforçar rastreabilidade e coerência de identidade/autoria no fluxo administrativo.
+
+Correções estruturais registradas:
+1) Execução crítica do backend alinhada ao núcleo em `src` (remoção de dependência crítica de `modules-dist`).
+2) Persistência crítica da rota administrativa convertida para fluxo aguardado (`await`) com falha explícita em erro de trilha.
+3) Blindagem semântica de identidade: `tenantId` e `userId` deixam de ser aceitos via body em superfície pública.
+4) Redução de duplicação arriscada de contratos locais redundantes no backend.
+5) Redução de duplicação estrutural transversal nos módulos DFD/ETP/TR/PRICING por extração de helper comum de invalidação.
+6) Superfície canônica de orquestração reforçada por redução de export público ambíguo (`executeFlow` fora da API pública do núcleo).
+
+Regra de status:
+- este registro não declara encerramento total da ETAPA H;
+- este registro declara somente a execução corretiva da H-FI1 com prova reexecutável e sem regressão operacional nas rotas consolidadas.
+
+---
+
+11.19 REGISTRO NORMATIVO — ETAPA H / H-FI2 (AUDITORIA DE FLUXO + HARDENING CANÔNICO)
+
+Registrado em: 2026-03-27
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI2-FLUXO-E-HARDENING-2026-03-27.md`
+
+Objetivo do registro:
+- auditar e blindar o fluxo administrativo canônico (DFD -> ETP -> TR -> PRICING);
+- remover ambiguidade de superfícies de execução do núcleo;
+- concluir hardening da execução canônica sem dependência implícita de `ts-node/register` em modo de produção.
+
+Consolidações estruturais:
+1) loader canônico com modo explícito (`source`/`compiled`/`auto`) e telemetria de runtime para auditoria técnica;
+2) build do backend passa a gerar runtime canônico do núcleo a partir do `src` oficial do frontend modular;
+3) runners de prova internos do backend passam a usar a mesma superfície canônica da API (sem caminho paralelo);
+4) superfície pública ambígua de orquestração (`executeFlow`) removida do núcleo exportável;
+5) prova H-FI2 criada para cobrir:
+   - sucesso completo;
+   - bloqueios por dependência em cadeia;
+   - bloqueio por validação jurídica;
+   - coerência entre `executedModules`, `events`, `validations` e `finalStatus`;
+   - validação de hardening em modo `compiled`.
+
+Regra de status:
+- este registro não encerra a ETAPA H completa;
+- este registro formaliza somente a execução da H-FI2 com evidência técnica reexecutável.
+
+---
+
+11.20 REGISTRO NORMATIVO — ETAPA H / H-FI3 (AUDITORIA HOSTIL MULTI-TENANT PROFUNDA)
+
+Registrado em: 2026-03-27
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI3-AUDITORIA-MULTI-TENANT-PROFUNDA-2026-03-27.md`
+
+Objetivo do registro:
+- executar auditoria hostil de isolamento multi-tenant no backend e na persistência;
+- provar ausência de vazamento e contaminação entre tenants em leitura, gravação e trilha;
+- reforçar que RLS não seja apenas declarativo, mas efetivo contra bypass estrutural.
+
+Consolidações estruturais:
+1) blindagem de RLS contra bypass de owner com `FORCE ROW LEVEL SECURITY` nas tabelas multi-tenant críticas (`users`, `user_sessions`, `process_executions`, `audit_logs`, `organ_configs`);
+2) prova hostil reexecutável H-FI3 criada para validar:
+   - leitura e gravação isoladas por tenant;
+   - ausência de overlap de histórico;
+   - tentativa hostil de leitura cruzada bloqueada por RLS;
+   - tentativa hostil de escrita cruzada bloqueada por policy;
+   - postura de segurança do banco (`licitaia_app` sem superuser/BYPASSRLS + tabelas com force RLS);
+3) manutenção de escopo cirúrgico sem expansão funcional de produto.
+
+Regra de status:
+- este registro não encerra a ETAPA H completa;
+- este registro formaliza a execução da H-FI3 e a atualização de blindagem estrutural multi-tenant.
+
+---
+
+11.21 REGISTRO NORMATIVO — ETAPA H / H-FI3-C (CORRETIVA CIRÚRGICA DE FORCE RLS + HISTÓRICO)
+
+Registrado em: 2026-03-27
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-H-H-FI3-CORRETIVA-FORCE-RLS-E-HISTORICO-SEM-OVERLAP-2026-03-27.md`
+
+Motivação da corretiva:
+- na reexecução hostil da H-FI3 surgiram duas falhas objetivas:
+  - `c10=false` (force RLS não efetivo no banco de prova);
+  - `c7=false` (overlap real no histórico entre tenants).
+
+Causa estrutural consolidada:
+1) migration 009 existia em código, mas não havia sido aplicada no banco efetivo de prova;
+2) endpoint de histórico dependia somente de RLS/contexto transacional, sem filtro explícito por `tenant_id` na query de listagem/consulta por id;
+3) o processo ativo na porta 3001 estava em instância anterior durante tentativas de validação, exigindo reinicialização para carregar a correção.
+
+Correções cirúrgicas aplicadas:
+1) aplicação efetiva da migration `009_force_row_level_security_tenant_tables.sql` no banco `licitaia_dev` com owner das tabelas;
+2) endurecimento da superfície de histórico com filtro explícito por `tenant_id` em:
+   - listagem (`listProcessExecutions`);
+   - busca por id (`findProcessExecutionById`);
+3) reexecução completa da prova H-FI3 com 10/10 checks aprovados.
+
+Regra de status:
+- H-FI3 corretiva: concluída nesta execução com prova reexecutável aprovada;
+- ETAPA H completa: permanece não encerrada.

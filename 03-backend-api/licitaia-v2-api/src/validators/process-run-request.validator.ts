@@ -112,20 +112,6 @@ function collectDetails(
     }
   }
 
-  if (bodyObj.tenantId !== undefined && typeof bodyObj.tenantId !== 'string') {
-    details.push({
-      field: 'tenantId',
-      reason: 'tenantId must be a string when provided.',
-    });
-  }
-
-  if (bodyObj.userId !== undefined && typeof bodyObj.userId !== 'string') {
-    details.push({
-      field: 'userId',
-      reason: 'userId must be a string when provided.',
-    });
-  }
-
   if (
     bodyObj.correlationId !== undefined &&
     typeof bodyObj.correlationId !== 'string'
@@ -197,14 +183,6 @@ export function validateProcessRunRequest(body: unknown): ValidateProcessRunRequ
     bodyObj.phase.trim().length > 0
   ) {
     data.phase = bodyObj.phase.trim();
-  }
-
-  if (typeof bodyObj.tenantId === 'string') {
-    data.tenantId = bodyObj.tenantId;
-  }
-
-  if (typeof bodyObj.userId === 'string') {
-    data.userId = bodyObj.userId;
   }
 
   if (typeof bodyObj.correlationId === 'string') {

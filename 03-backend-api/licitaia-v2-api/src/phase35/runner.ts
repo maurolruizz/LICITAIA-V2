@@ -2,12 +2,7 @@ import type { AdministrativeProcessResult } from '../dto/administrative-process.
 import type { CanonicalScenario, ExpectedOutcome } from './canonical-scenarios';
 import { CANONICAL_SCENARIOS, DERIVED_COVERAGE_MATRIX_FROM_SCENARIOS } from './canonical-scenarios';
 import { formatDimensions as formatCoverageDimensions } from './coverage-matrix';
-
-const { runAdministrativeProcess } = require(
-  '../../../../02-frontend/licitaia-v2-web/modules'
-) as {
-  runAdministrativeProcess(context: unknown): Promise<AdministrativeProcessResult>;
-};
+import { getRunAdministrativeProcess } from '../lib/frontend-core-loader';
 
 type ScenarioRun = {
   id: string;
@@ -74,6 +69,7 @@ function formatScenarioDimensions(s: CanonicalScenario): string {
 }
 
 async function runScenario(s: CanonicalScenario): Promise<ScenarioRun> {
+  const runAdministrativeProcess = getRunAdministrativeProcess();
   const context = s.buildContext();
   const result = await runAdministrativeProcess(context);
 

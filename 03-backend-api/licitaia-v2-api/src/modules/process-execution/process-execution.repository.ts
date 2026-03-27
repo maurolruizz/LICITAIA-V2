@@ -94,6 +94,7 @@ export async function insertProcessExecution(
 
 export async function listProcessExecutions(
   client: PoolClient,
+  tenantId: string,
   limit: number,
 ): Promise<ProcessExecutionSummary[]> {
   const r = await client.query<{
@@ -120,9 +121,10 @@ export async function listProcessExecutions(
        modules_executed,
        validation_codes
      FROM process_executions
+     WHERE tenant_id = $2::uuid
      ORDER BY created_at DESC
      LIMIT $1`,
-    [limit],
+    [limit, tenantId],
   );
 
   return r.rows.map((row) => {
@@ -153,6 +155,7 @@ export async function listProcessExecutions(
 
 export async function findProcessExecutionById(
   client: PoolClient,
+  tenantId: string,
   id: string,
 ): Promise<ProcessExecution | null> {
   const r = await client.query<{
@@ -184,8 +187,9 @@ export async function findProcessExecutionById(
        validation_codes
      FROM process_executions
      WHERE id = $1
+       AND tenant_id = $2::uuid
      LIMIT 1`,
-    [id],
+    [id, tenantId],
   );
 
   const row = r.rows[0];

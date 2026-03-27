@@ -107,7 +107,9 @@ export async function listExecutions(params: {
 }): Promise<ProcessExecutionSummary[]> {
   const limit =
     typeof params.limit === 'number' && params.limit > 0 ? Math.min(params.limit, 200) : 50;
-  return await withTenantContext(params.tenantId, (client) => listProcessExecutions(client, limit));
+  return await withTenantContext(params.tenantId, (client) =>
+    listProcessExecutions(client, params.tenantId, limit),
+  );
 }
 
 export async function getExecutionById(params: {
@@ -115,6 +117,6 @@ export async function getExecutionById(params: {
   id: string;
 }): Promise<ProcessExecution | null> {
   return await withTenantContext(params.tenantId, (client) =>
-    findProcessExecutionById(client, params.id),
+    findProcessExecutionById(client, params.tenantId, params.id),
   );
 }

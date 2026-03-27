@@ -5,8 +5,6 @@
 
 export * from './core';
 export {
-  executeFlow,
-  getModulesForPhaseFromOrchestrator,
   registerModule,
   getModulesForPhase,
   getModuleDefinition,

@@ -16,14 +16,7 @@ import { logger } from '../middleware/logger';
 import { withInstitutionalMeta } from '../lib/response-meta';
 import { applyAiAssistiveLayer } from '../modules/ai-assistive/ai-assistive.service';
 import { COVERAGE_DIMENSIONS } from '../phase35/coverage-matrix';
-
-const { runAdministrativeProcess } = require(
-  '../../../../02-frontend/licitaia-v2-web/modules-dist'
-) as {
-  runAdministrativeProcess(
-    context: AdministrativeProcessContext
-  ): Promise<AdministrativeProcessResult>;
-};
+import { getRunAdministrativeProcess } from '../lib/frontend-core-loader';
 
 export async function runProcessController(req: Request, res: Response): Promise<void> {
   const requestId = (res.locals['requestId'] as string | undefined) ?? '';
@@ -61,6 +54,18 @@ export async function runProcessController(req: Request, res: Response): Promise
     }
 
     const context = normalizeToContext(validation.data);
+    const runAdministrativeProcess = getRunAdministrativeProcess();
+    const locals = res.locals as Record<string, unknown>;
+    const authenticatedTenantId =
+      typeof locals['authenticatedTenantId'] === 'string'
+        ? locals['authenticatedTenantId']
+        : undefined;
+    const authenticatedUserId =
+      typeof locals['authenticatedUserId'] === 'string'
+        ? locals['authenticatedUserId']
+        : undefined;
+    context.tenantId = authenticatedTenantId;
+    context.userId = authenticatedUserId;
     const rawEngineResult: AdministrativeProcessResult =
       await runAdministrativeProcess(context);
     const engineResult: AdministrativeProcessResult = applyAiAssistiveLayer(rawEngineResult);
@@ -82,16 +87,13 @@ export async function runProcessController(req: Request, res: Response): Promise
         : [];
       const haltedBy =
         typeof engineResult['haltedBy'] === 'string' ? engineResult['haltedBy'] : undefined;
-      const ctx = res.locals as Record<string, unknown>;
-      const tenantId =
-        typeof ctx['authenticatedTenantId'] === 'string' ? ctx['authenticatedTenantId'] : null;
-      const userId =
-        typeof ctx['authenticatedUserId'] === 'string' ? ctx['authenticatedUserId'] : null;
+      const tenantId = authenticatedTenantId ?? null;
+      const userId = authenticatedUserId ?? null;
 
       // Regra FI5 + regressão: /api/process/run NÃO exige auth.
       // Persistimos apenas quando o contexto autenticado está presente.
       if (tenantId && userId) {
-        void saveExecution({
+        await saveExecution({
           tenantId,
           executedBy: userId,
           requestPayload: body as Record<string, unknown>,
@@ -112,6 +114,11 @@ export async function runProcessController(req: Request, res: Response): Promise
       }
     } catch (saveError) {
       logger.error(`${rid}[PERSIST_FAIL] Falha ao persistir execução — ${saveError instanceof Error ? saveError.message : String(saveError)}`);
+      const responseBody: ProcessRunResponseBody = buildInternalErrorResponse(
+        new Error('Falha ao persistir trilha critica da execucao.')
+      );
+      res.status(500).json(withInstitutionalMeta(res, responseBody));
+      return;
     }
 
     res.status(httpStatus).json(withInstitutionalMeta(res, responseBody));
@@ -154,6 +161,7 @@ export async function preflightProcessController(req: Request, res: Response): P
       return;
     }
     const context = normalizeToContext(validation.data);
+    const runAdministrativeProcess = getRunAdministrativeProcess();
     const rawEngineResult: AdministrativeProcessResult = await runAdministrativeProcess(context);
     const engineResult: AdministrativeProcessResult = applyAiAssistiveLayer(rawEngineResult);
     const responseBody: ProcessRunResponseBody = buildEngineResponse(engineResult);

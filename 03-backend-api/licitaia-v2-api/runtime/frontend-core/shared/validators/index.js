@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.validateLegalStructure = exports.validateCrossModuleConsistency = exports.validatePhaseConsistency = exports.validateLegalBasis = exports.validateRequiredFields = void 0;
+var required_fields_validator_1 = require("./required-fields.validator");
+Object.defineProperty(exports, "validateRequiredFields", { enumerable: true, get: function () { return required_fields_validator_1.validateRequiredFields; } });
+var legal_basis_validator_1 = require("./legal-basis.validator");
+Object.defineProperty(exports, "validateLegalBasis", { enumerable: true, get: function () { return legal_basis_validator_1.validateLegalBasis; } });
+var phase_consistency_validator_1 = require("./phase-consistency.validator");
+Object.defineProperty(exports, "validatePhaseConsistency", { enumerable: true, get: function () { return phase_consistency_validator_1.validatePhaseConsistency; } });
+var cross_module_1 = require("./cross-module");
+Object.defineProperty(exports, "validateCrossModuleConsistency", { enumerable: true, get: function () { return cross_module_1.validateCrossModuleConsistency; } });
+var legal_1 = require("./legal");
+Object.defineProperty(exports, "validateLegalStructure", { enumerable: true, get: function () { return legal_1.validateLegalStructure; } });
