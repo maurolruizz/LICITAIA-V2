@@ -85,15 +85,23 @@ function collectDetails(
   }
 
   if (bodyObj.processId !== undefined) {
-    if (typeof bodyObj.processId !== 'string') {
+    details.push({
+      field: 'processId',
+      reason: 'processId must not be provided by client; it is assigned by the server.',
+    });
+  }
+
+  if (
+    payload !== null &&
+    payload !== undefined &&
+    typeof payload === 'object' &&
+    !Array.isArray(payload)
+  ) {
+    const payloadRecord = payload as Record<string, unknown>;
+    if (payloadRecord['processId'] !== undefined) {
       details.push({
-        field: 'processId',
-        reason: 'processId must be a string when provided.',
-      });
-    } else if (bodyObj.processId.trim().length === 0) {
-      details.push({
-        field: 'processId',
-        reason: 'processId must be a non-empty string when provided.',
+        field: 'payload.processId',
+        reason: 'processId must not be provided by client; it is assigned by the server.',
       });
     }
   }
@@ -183,19 +191,6 @@ export function validateProcessRunRequest(body: unknown): ValidateProcessRunRequ
   const data: ProcessRunRequest = {
     payload: payloadObj,
   };
-
-  if (
-    typeof bodyObj.processId === 'string' &&
-    bodyObj.processId.trim().length > 0
-  ) {
-    data.processId = bodyObj.processId.trim();
-  } else if (
-    typeof payloadObj['processId'] === 'string' &&
-    (payloadObj['processId'] as string).trim().length > 0
-  ) {
-    // H-FI4: mantém correlação estável quando o cliente envia processId dentro de payload.
-    data.processId = (payloadObj['processId'] as string).trim();
-  }
 
   if (
     typeof bodyObj.phase === 'string' &&

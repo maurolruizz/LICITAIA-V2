@@ -31,6 +31,8 @@ import {
   findUserByEmail,
   createSession,
   findSessionByTokenHash,
+  findSessionByPreviousRefreshTokenHash,
+  rotateSessionRefreshToken,
   findUserById,
   findTenantById,
   revokeSession,
@@ -270,11 +272,30 @@ export async function refresh(
 
   const tokenHash = hashRefreshToken(rawToken);
 
-  // 3. Dentro do contexto RLS do tenant: validar sessão e usuário
+  // 3. Dentro do contexto RLS do tenant: validar sessão e usuário; rotação de refresh com detecção de reuso
   return await withTenantContext(tenantId, async (client) => {
     const session = await findSessionByTokenHash(client, tokenHash);
 
     if (!session) {
+      const reuseSession = await findSessionByPreviousRefreshTokenHash(client, tokenHash);
+      if (reuseSession) {
+        await revokeSession(client, reuseSession.id);
+        await insertAuditLog(client, {
+          tenantId,
+          userId: reuseSession.userId,
+          action: 'REFRESH_TOKEN_REUSE_DETECTED',
+          resourceType: 'user_session',
+          resourceId: reuseSession.id,
+          metadata: { reason: 'refresh_token_reuse' },
+          ipAddress,
+          userAgent,
+        });
+        throw new AuthError(
+          'refresh token reuse detected',
+          'REFRESH_TOKEN_REUSE',
+          401,
+        );
+      }
       throw new AuthError(
         'Sessão inválida ou expirada.',
         'INVALID_REFRESH_TOKEN',
@@ -309,7 +330,22 @@ export async function refresh(
       );
     }
 
-    // 4. Emitir novo access token (sessão continua válida — sem rotação de refresh nesta fase)
+    const newRefreshToken = generateRefreshToken(tenantId);
+    const newRefreshTokenHash = hashRefreshToken(newRefreshToken);
+    const rotated = await rotateSessionRefreshToken(
+      client,
+      session.id,
+      tokenHash,
+      newRefreshTokenHash,
+    );
+    if (!rotated) {
+      throw new AuthError(
+        'Sessão inválida ou expirada.',
+        'INVALID_REFRESH_TOKEN',
+        401,
+      );
+    }
+
     const accessToken = generateAccessToken(user.id, tenant.id, user.role);
 
     await insertAuditLog(client, {
@@ -325,6 +361,7 @@ export async function refresh(
 
     return {
       accessToken,
+      refreshToken: newRefreshToken,
       expiresIn: config.jwtAccessExpiresSecs,
     };
   });

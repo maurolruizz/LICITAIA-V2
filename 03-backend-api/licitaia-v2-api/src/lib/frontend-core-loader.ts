@@ -15,6 +15,16 @@ type FrontendCoreModule = {
   AI_ASSISTIVE_TRANSFORM_PROFILE_VERSION?: string;
 };
 
+const REQUIRED_EXPORTS = ['runAdministrativeProcess'] as const;
+
+function assertRequiredExports(mod: FrontendCoreModule, entry: string): void {
+  for (const key of REQUIRED_EXPORTS) {
+    if (typeof mod[key] !== 'function') {
+      throw new Error(`Missing export: ${key} (${entry})`);
+    }
+  }
+}
+
 let cachedFrontendCore: FrontendCoreModule | null = null;
 let cachedRuntimeInfo: FrontendCoreRuntimeInfo | null = null;
 
@@ -38,9 +48,7 @@ function resolvePaths() {
 function loadFromCompiled(entry: string): FrontendCoreModule {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const mod = require(entry) as FrontendCoreModule;
-  if (!mod || typeof mod.runAdministrativeProcess !== 'function') {
-    throw new Error(`Runtime compilado invalido: ${entry}`);
-  }
+  assertRequiredExports(mod, entry);
   cachedRuntimeInfo = {
     mode: 'compiled',
     entry,
@@ -56,12 +64,7 @@ function loadFromSource(entry: string): FrontendCoreModule {
   require('ts-node/register/transpile-only');
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const mod = require(entry) as FrontendCoreModule;
-
-  if (!mod || typeof mod.runAdministrativeProcess !== 'function') {
-    throw new Error(
-      `Falha ao carregar nucleo frontend por src: runAdministrativeProcess indisponivel em ${entry}.`
-    );
-  }
+  assertRequiredExports(mod, entry);
 
   cachedRuntimeInfo = {
     mode: 'source',

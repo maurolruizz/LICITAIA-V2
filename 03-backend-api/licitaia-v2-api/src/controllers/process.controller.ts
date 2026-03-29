@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import type { Request, Response } from 'express';
 import type {
   AdministrativeProcessContext,
@@ -53,7 +54,8 @@ export async function runProcessController(req: Request, res: Response): Promise
       return;
     }
 
-    const context = normalizeToContext(validation.data);
+    const processId = randomUUID();
+    const context = normalizeToContext({ ...validation.data, processId });
     const runAdministrativeProcess = getRunAdministrativeProcess();
     const locals = res.locals as Record<string, unknown>;
     const authenticatedTenantId =
@@ -92,8 +94,6 @@ export async function runProcessController(req: Request, res: Response): Promise
       const tenantId = authenticatedTenantId ?? null;
       const userId = authenticatedUserId ?? null;
 
-      // Regra FI5 + regressão: /api/process/run NÃO exige auth.
-      // Persistimos apenas quando o contexto autenticado está presente.
       if (tenantId && userId) {
         await saveExecution({
           tenantId,
@@ -101,6 +101,7 @@ export async function runProcessController(req: Request, res: Response): Promise
           requestPayload: {
             ...(body as Record<string, unknown>),
             correlationId: context.correlationId,
+            processId: context.processId,
           },
           response: responseBody as unknown as Record<string, unknown>,
           processId: context.processId,
@@ -172,7 +173,8 @@ export async function preflightProcessController(req: Request, res: Response): P
       res.status(400).json(withInstitutionalMeta(res, responseBody));
       return;
     }
-    const context = normalizeToContext(validation.data);
+    const processId = randomUUID();
+    const context = normalizeToContext({ ...validation.data, processId });
     const runAdministrativeProcess = getRunAdministrativeProcess();
     const rawEngineResult: AdministrativeProcessResult = await runAdministrativeProcess(context);
     const engineResult: AdministrativeProcessResult = applyAiAssistiveLayer(rawEngineResult);

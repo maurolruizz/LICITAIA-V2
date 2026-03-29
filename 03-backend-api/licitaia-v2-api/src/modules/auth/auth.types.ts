@@ -99,6 +99,7 @@ export interface RefreshRequestBody {
 /** Corpo da resposta de refresh bem-sucedido. */
 export interface RefreshResponseBody {
   accessToken: string;
+  refreshToken: string;
   expiresIn: number;
 }
 

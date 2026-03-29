@@ -3,7 +3,9 @@ import { config } from '../../config/env';
 import { logger } from '../../middleware/logger';
 import { getFrontendCoreAssistive } from '../../lib/frontend-core-loader';
 
-const frontendModules = getFrontendCoreAssistive();
+function getAssistiveFrontendCore(): ReturnType<typeof getFrontendCoreAssistive> {
+  return getFrontendCoreAssistive();
+}
 
 type PremiumSectionRaw = {
   sectionId?: unknown;
@@ -100,25 +102,27 @@ function mapAssistiveRequest(result: AdministrativeProcessResult): Record<string
     };
   });
 
+  const core = getAssistiveFrontendCore();
   return {
     processSnapshotId: snapshotId,
     transformProfileVersion:
-      frontendModules.AI_ASSISTIVE_TRANSFORM_PROFILE_VERSION ?? 'ETAPA-D-F2-TRANSFORM-V1',
-    aiModelVersion: frontendModules.AI_ASSISTIVE_MODEL_VERSION ?? 'assistive-deterministic-v1',
-    promptVersion: frontendModules.AI_ASSISTIVE_PROMPT_VERSION ?? 'ETAPA-D-F2-V1',
+      core.AI_ASSISTIVE_TRANSFORM_PROFILE_VERSION ?? 'ETAPA-D-F2-TRANSFORM-V1',
+    aiModelVersion: core.AI_ASSISTIVE_MODEL_VERSION ?? 'assistive-deterministic-v1',
+    promptVersion: core.AI_ASSISTIVE_PROMPT_VERSION ?? 'ETAPA-D-F2-V1',
     documents: docs,
   };
 }
 
 function buildDisabledAssistiveResult(reason: string): Record<string, unknown> {
+  const core = getAssistiveFrontendCore();
   return {
     enabled: false,
     deterministic: true,
     providerId: 'internal-controlled-refiner',
-    modelVersion: frontendModules.AI_ASSISTIVE_MODEL_VERSION ?? 'assistive-deterministic-v1',
-    promptVersion: frontendModules.AI_ASSISTIVE_PROMPT_VERSION ?? 'ETAPA-D-F2-V1',
+    modelVersion: core.AI_ASSISTIVE_MODEL_VERSION ?? 'assistive-deterministic-v1',
+    promptVersion: core.AI_ASSISTIVE_PROMPT_VERSION ?? 'ETAPA-D-F2-V1',
     transformProfileVersion:
-      frontendModules.AI_ASSISTIVE_TRANSFORM_PROFILE_VERSION ?? 'ETAPA-D-F2-TRANSFORM-V1',
+      core.AI_ASSISTIVE_TRANSFORM_PROFILE_VERSION ?? 'ETAPA-D-F2-TRANSFORM-V1',
     decisionInfluence: false,
     reason,
     documents: [],
@@ -171,7 +175,7 @@ export function applyAiAssistiveLayer(
     };
   }
 
-  const execute = frontendModules.executeAiAssistiveRefinement;
+  const execute = getAssistiveFrontendCore().executeAiAssistiveRefinement;
   if (typeof execute !== 'function') {
     logger.warn('[AI_ASSISTIVE] executeAiAssistiveRefinement indisponivel no nucleo src.');
     return {

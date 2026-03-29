@@ -138,7 +138,7 @@ export function getCrossValidationRuleId(pair: CrossModulePair): string {
 /**
  * Aplica regra de consistência entre descrição do módulo anterior e do atual.
  * - BLOCK: quando o módulo atual tem objeto vazio e o anterior tem conteúdo (perda evidente).
- * - WARNING: quando ambos têm conteúdo mas não há overlap mínimo de termos.
+ * - BLOCK: quando ambos têm conteúdo mas não há overlap mínimo de termos.
  * - INFO: quando há overlap ou quando ambos vazios (apenas registro).
  */
 export function applyConsistencyRule(
@@ -191,12 +191,11 @@ export function applyConsistencyRule(
   }
 
   if (!hasMinimumTermOverlap(prevStr, currStr)) {
-    // ETAPA A — overlap lexical sem regra normativa associada: WARNING (não bloqueia pipeline).
     items.push(
       createValidationItem(
         `${ruleId}_NO_OVERLAP`,
         `Pouca correspondência lexical entre ${prevLabel} (${previousModuleId}) e ${currLabel} (${currentModuleId}). Revisar coerência.`,
-        ValidationSeverity.WARNING,
+        ValidationSeverity.BLOCK,
         {
           details: {
             pair,

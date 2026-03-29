@@ -218,6 +218,61 @@ export async function findSessionByTokenHash(
   };
 }
 
+/** Resolve sessão pelo hash do refresh token anterior (após rotação) — detecção de reuso. */
+export async function findSessionByPreviousRefreshTokenHash(
+  client: PoolClient,
+  tokenHash: string,
+): Promise<SessionRecord | null> {
+  const result = await client.query<{
+    id: string;
+    user_id: string;
+    tenant_id: string;
+    refresh_token_hash: string;
+    ip_address: string | null;
+    user_agent: string | null;
+    expires_at: Date;
+    revoked_at: Date | null;
+    created_at: Date;
+  }>(
+    `SELECT id, user_id, tenant_id, refresh_token_hash, ip_address, user_agent,
+            expires_at, revoked_at, created_at
+     FROM user_sessions
+     WHERE previous_refresh_token_hash = $1
+     LIMIT 1`,
+    [tokenHash],
+  );
+
+  if (result.rowCount === 0) return null;
+  const row = result.rows[0];
+  return {
+    id: row.id,
+    userId: row.user_id,
+    tenantId: row.tenant_id,
+    refreshTokenHash: row.refresh_token_hash,
+    ipAddress: row.ip_address,
+    userAgent: row.user_agent,
+    expiresAt: row.expires_at,
+    revokedAt: row.revoked_at,
+    createdAt: row.created_at,
+  };
+}
+
+export async function rotateSessionRefreshToken(
+  client: PoolClient,
+  sessionId: string,
+  expectedCurrentRefreshTokenHash: string,
+  newRefreshTokenHash: string,
+): Promise<boolean> {
+  const result = await client.query(
+    `UPDATE user_sessions
+     SET previous_refresh_token_hash = refresh_token_hash,
+         refresh_token_hash = $1
+     WHERE id = $2 AND refresh_token_hash = $3 AND revoked_at IS NULL`,
+    [newRefreshTokenHash, sessionId, expectedCurrentRefreshTokenHash],
+  );
+  return (result.rowCount ?? 0) > 0;
+}
+
 export async function revokeSession(
   client: PoolClient,
   sessionId: string,
