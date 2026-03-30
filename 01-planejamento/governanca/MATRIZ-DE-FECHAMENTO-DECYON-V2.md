@@ -415,3 +415,22 @@ Registro normativo em **2026-03-27**:
 
 - **ETAPA H** encontra-se **ENCERRADA em 10/10** ao nível de governança, com subfases H-FI1 a H-FI8 concluídas e alinhamento ao Plano Mestre (Secção 11.28).
 - Artefato único de fecho: `CHECKPOINT-NORMATIVO-ENCERRAMENTO-ETAPA-H.md`.
+
+## 23. Registro operacional — ONDA 3 / FlowController (base da conducao operacional v1)
+
+Registro factual em 2026-03-30:
+
+| Campo | Conteúdo |
+|---|---|
+| **Nome da entrega** | Onda 3 — FlowController / base tecnica da conducao operacional v1 |
+| **Status** | **ENCERRADA (entrega da base tecnica) — 10/10** |
+| **Escopo consolidado** | FlowController como maquina de estados deterministica; fluxo obrigatorio v1; integracao canonica com nucleo; sem duplicacao de motor/regra |
+| **Evidencias principais** | testes 15/15 em verde; eliminacao do erro `Modulo nao registrado: DFD`; validacao de comportamento; snapshot imutavel; prova de nao duplicacao do motor; regressao zero da entrega |
+| **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ONDA-3-FLOWCONTROLLER-BASE-2026-03-30.md` |
+| **Limite explicito de escopo** | Este encerramento formaliza a base tecnica da Onda 3 e **nao** declara encerramento integral da Onda 3 como objetivo final de produto |
+| **Registro de item externo** | Divergencia `S5_DISPENSA_SEM_BASE_LEGAL_WARNING` (runner canonico Fase 35) classificada como externa ao escopo desta entrega |
+
+Observacao normativa de validade:
+
+- este registro de matriz trabalha em nivel de entrega estrutural aprovada da Onda 3 (base tecnica);
+- qualquer fechamento de Onda 3 completa exige formalizacao posterior especifica.

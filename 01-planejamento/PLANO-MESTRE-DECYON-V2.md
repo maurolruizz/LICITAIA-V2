@@ -463,7 +463,11 @@ O sistema encontra-se:
 
 Ainda pendente:
 
-- ETAPA H (readiness final, deploy e apresentação institucional), condicionada ao fechamento técnico já validado da ETAPA G.
+ETAPA H:
+
+- ENCERRADA formalmente em 10/10 (vide Secção 11.28)
+- prontidão controlada validada
+- sistema apto para demonstração, validação externa e piloto controlado
 
 ### 4.5. CONCLUSÃO DO ESTADO ATUAL
 
@@ -483,7 +487,14 @@ com:
 
 Sem regressão, sem perda de coerência e com preservação integral de 100% das diretrizes normativas.
 
-5. COMPONENTES OBRIGATÓRIOS (A IMPLEMENTAR)
+5. COMPONENTES OBRIGATÓRIOS (VERSÃO ORIGINAL DO PLANO — REGISTRO HISTÓRICO)
+Observação normativa:
+
+Esta seção representa o estado original de planejamento.
+
+O estado atual de implementação encontra-se atualizado na Secção 11.32.
+
+Em caso de divergência, prevalece a Secção 11.32.
 5.1 Persistência (BANCO DE DADOS)
 
 armazenamento de processos
@@ -1322,3 +1333,256 @@ formalizar como endpoint público controlado
 PRÓXIMO PASSO
 
 Início da ONDA 2 — Inteligência jurídica e coerência estrutural ampliada
+REGISTRO HISTÓRICO:
+
+Este trecho refere-se ao momento original de transição após o encerramento da Onda 1.
+
+Situação atual:
+- Onda 2: ENCERRADA
+- Onda 3: em definição arquitetural
+---
+
+11.29 REGISTRO NORMATIVO — CONSOLIDAÇÃO DAS ONDAS 1 E 2
+
+Registrado em: 2026-03-30
+
+Objetivo:
+- formalizar o encerramento das Ondas 1 e 2 como marcos arquiteturais oficiais;
+- alinhar o Plano Mestre ao estado real do sistema;
+- eliminar lacunas entre execução prática e governança normativa.
+
+### ONDA 1 — HARDENING INICIAL
+
+Status: ENCERRADA (mantida como registro histórico válido)
+
+Escopo consolidado:
+- hardening inicial do backend e borda API
+- autenticação, sessão e segurança base
+- trilha de auditoria inicial
+- validação operacional completa
+
+Observação normativa:
+- quaisquer trechos deste plano que indiquem “próximo passo = início da Onda 2” passam a ser considerados REGISTRO HISTÓRICO, não instrução vigente.
+
+---
+
+### ONDA 2 — CONSOLIDAÇÃO DO MOTOR NORMATIVO
+
+Status: ENCERRADA — 10/10
+
+Escopo implementado e validado:
+
+- regime-behavior-engine como seletor-mestre
+- diferenciação completa entre:
+  - LICITAÇÃO
+  - DISPENSA
+  - INEXIGIBILIDADE
+- bloqueio normativo por regime aplicado corretamente
+- correção de bypass de fundamento mínimo
+- integração correta com módulo de pricing
+- sincronização de runtime e execução canônica
+- preservação integral da arquitetura do núcleo
+- validações estruturais, jurídicas e cruzadas funcionando em conjunto
+- testes completos aprovados
+- auditoria externa validada
+- commit formal realizado
+
+Resultado arquitetural:
+
+O sistema passa a ser:
+
+- determinístico
+- auditável
+- normativamente coerente
+- preparado para operação real
+
+---
+
+### ESTADO PÓS-ONDA 2
+
+O sistema encontra-se:
+
+- com motor administrativo completo e estável
+- com coerência normativa entre regimes
+- com validações estruturais e jurídicas consolidadas
+- com rastreabilidade completa
+- pronto para receber camada de condução operacional
+
+---
+Regra de prevalência:
+
+Esta secção substitui a interpretação normativa anterior da ONDA 1 e ONDA 2 no plano.
+
+Registos anteriores permanecem válidos apenas como histórico técnico, não como diretriz vigente.
+
+11.30 REGISTRO NORMATIVO — CAMADA DE ONDAS (INTERPRETAÇÃO EXECUTIVA)
+
+Objetivo:
+- formalizar o conceito de ONDAS como camada executiva de evolução arquitetural;
+- complementar (sem substituir) as Fases 1–49 e as Etapas A–H.
+
+Definição:
+
+- Onda 1 — hardening inicial
+- Onda 2 — consolidação normativa e comportamental do motor
+- Onda 3 — condução operacional do processo administrativo
+
+Regra:
+
+As Ondas:
+- NÃO substituem Fases nem Etapas;
+- NÃO alteram a hierarquia normativa do Plano Mestre;
+- funcionam como camada de organização estratégica da evolução real do sistema.
+
+---
+
+11.31 REGISTRO NORMATIVO — TRANSIÇÃO PARA ONDA 3
+
+Objetivo:
+- formalizar o próximo passo arquitetural do sistema.
+
+Diagnóstico:
+
+Após a Onda 2:
+- o sistema sabe decidir
+- o sistema ainda não conduz operacionalmente o usuário
+
+Definição:
+
+A Onda 3 é a camada de condução operacional do sistema.
+
+---
+
+### PRINCÍPIO CENTRAL
+
+O FlowController é uma:
+
+máquina de estados determinística do processo administrativo
+
+---
+
+### RESPONSABILIDADES DO FLOWCONTROLLER
+
+- controlar etapa atual
+- impedir saltos indevidos
+- executar fluxo obrigatório
+- acumular snapshot incremental
+- registrar histórico de execução
+- reagir aos resultados dos engines existentes
+
+---
+
+### PROIBIÇÕES ABSOLUTAS
+
+O FlowController NÃO PODE:
+
+- reimplementar regra jurídica
+- duplicar validações existentes
+- substituir o motor (`runAdministrativeProcess`)
+- tomar decisão normativa
+
+---
+
+### FLUXO INICIAL OBRIGATÓRIO
+
+INIT → CONTEXT → REGIME → DFD → ETP → TR → PRICING → REVIEW → OUTPUT
+
+---
+
+### REGRAS CRÍTICAS
+
+- snapshot deve ser imutável por etapa
+- `legalRegime` e `procurementStrategy` devem ser congelados após REGIME
+- REVIEW deve executar validação total via motor existente
+- OUTPUT não recalcula, apenas expõe resultado
+
+---
+
+### STATUS
+
+ONDA 3: EM EXECUCAO CONTROLADA
+
+Status normativo vigente:
+- base tecnica da Onda 3 (FlowController / state machine / conducao operacional v1) aprovada e encerrada em 10/10;
+- o fechamento atual refere-se a entrega estrutural da base tecnica, nao ao encerramento integral da Onda 3 como objetivo final de produto.
+
+---
+
+11.32 ATUALIZAÇÃO NORMATIVA — COMPONENTES OBRIGATÓRIOS (REVISÃO DE ESTADO)
+
+Objetivo:
+- alinhar o plano com o estado real de implementação.
+
+### JÁ IMPLEMENTADOS / INICIADOS
+
+- persistência estruturada de execuções
+- multi-tenant com RLS
+- autenticação e sessão
+- RBAC básico
+- audit_logs e rastreabilidade
+- configuração institucional por tenant
+- histórico de execuções
+- frontend administrativo básico
+
+---
+
+### PENDENTES (EVOLUÇÃO CONTROLADA)
+
+- painel de auditoria completo
+- LGPD avançado
+- perfis adicionais
+- integrações externas (PNCP, IBGE)
+- DevOps completo (staging, produção, CI/CD, backup)
+- readiness institucional ampliado
+
+---
+
+11.33 CORREÇÃO NORMATIVA — SUPERFÍCIE /api/process/run
+
+Objetivo:
+- eliminar contradição histórica no plano.
+
+Correção:
+
+A rota `/api/process/run` permanece como superfície canônica do motor administrativo.
+
+Regras:
+
+- pode operar sem autenticação (modo público controlado)
+- quando autenticada:
+  - permite persistência
+  - permite auditoria vinculada
+- identidade nunca é aceita via body (apenas via contexto seguro)
+
+---
+
+Observação:
+
+Qualquer menção anterior a "autenticação obrigatória" nesta rota deve ser interpretada como estado histórico anterior, não regra vigente.
+
+---
+
+11.34 REGISTRO NORMATIVO — ONDA 3 (FLOWCONTROLLER / BASE TECNICA DA CONDUCAO OPERACIONAL V1)
+
+Registrado em: 2026-03-30  
+Artefato de referencia:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ONDA-3-FLOWCONTROLLER-BASE-2026-03-30.md`
+
+Objetivo do registro:
+- formalizar o encerramento da base tecnica da Onda 3 com aprovacao 10/10;
+- preservar a distincao entre a entrega estrutural aprovada e a Onda 3 completa como resultado operacional mais amplo.
+
+Escopo consolidado da entrega aprovada:
+1) implementacao do FlowController como maquina de estados deterministica;
+2) fluxo obrigatorio v1 (`INIT -> CONTEXT -> REGIME -> DFD -> ETP -> TR -> PRICING -> REVIEW -> OUTPUT`);
+3) integracao canonica com o nucleo sem duplicacao de motor/regra;
+4) testes da entrega da Onda 3 em verde (15/15);
+5) eliminacao do erro de registry (`Modulo nao registrado: DFD`);
+6) evidencia de regressao zero no escopo da propria entrega.
+
+Registro de limite de escopo:
+- este registro encerra a base tecnica da Onda 3;
+- este registro nao deve ser interpretado, por si so, como encerramento integral da Onda 3 (conducao operacional completa), salvo formalizacao posterior expressa.
+
+Registro de item externo:
+- a divergencia `S5_DISPENSA_SEM_BASE_LEGAL_WARNING` no runner canonico da Fase 35 foi classificada como externa ao escopo desta entrega e nao bloqueia este fechamento.
