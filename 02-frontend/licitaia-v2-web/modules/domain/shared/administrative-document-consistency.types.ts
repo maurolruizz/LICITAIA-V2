@@ -104,11 +104,13 @@ export const LEGAL_BASIS_REQUIRED_MODALITIES = ['DISPENSA', 'INEXIGIBILIDADE'] a
 
 /** Termos que indicam base legal para dispensa/inexigibilidade na justificativa. */
 export const LEGAL_BASIS_REQUIRED_KEYWORDS = [
-  'dispensa',
-  'inexigibilidade',
+  'art. 74',
+  'art 74',
   'art. 75',
   'art 75',
   'lei 14.133',
+  'lei nº 14.133',
+  'lei n° 14.133',
 ] as const;
 
 /**

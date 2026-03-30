@@ -1277,3 +1277,48 @@ Revogação normativa pontual:
 Veredito:
 
 - **ETAPA H: ENCERRADA formalmente em 10/10** ao abrigo desta secção e do checkpoint global referenciado.
+
+🔒 ENCERRAMENTO FORMAL — ONDA 1 (HARDENING INICIAL)
+
+A ONDA 1 foi concluída, validada e auditada com base em código real, testes operacionais e evidência em banco de dados.
+
+Status: ✅ ENCERRADA
+Resultado:
+Escopo implementado integralmente
+Nenhum bloqueador crítico identificado
+Validação operacional completa
+Auditoria externa concluída
+Commit formal realizado (2389739)
+Escopo confirmado:
+autenticação obrigatória em /api/process/run
+processId gerado no servidor
+refresh token rotation
+detecção de reuse
+hardening do loader
+_NO_OVERLAP como bloqueio
+Evidência:
+login, refresh e logout validados
+persistência em user_sessions confirmada
+trilha em audit_logs confirmada
+execução autenticada do motor validada
+Referência de auditoria:
+
+01-planejamento/governanca/REGISTRO-OFICIAL-AUDITORIA-EXTERNA-ONDA-1.md
+
+⚠️ PENDÊNCIA ARQUITETURAL REGISTRADA
+Rota /preflight
+executa o motor sem autenticação
+não exige tenant ou user
+sem controle explícito de uso
+Ação obrigatória:
+
+Definir tratamento da rota antes do hardening final:
+
+autenticar
+OU
+aplicar rate limiting e controle
+OU
+formalizar como endpoint público controlado
+PRÓXIMO PASSO
+
+Início da ONDA 2 — Inteligência jurídica e coerência estrutural ampliada

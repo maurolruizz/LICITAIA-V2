@@ -2,6 +2,11 @@
 /**
  * ETAPA A — Pré-verificação de coerência classificação ↔ payload (Frente 2).
  * Executada no motor após snapshot inicial; falhas geram HALTED_BY_VALIDATION.
+ *
+ * Fronteira: valida apenas coerência entre classificadores declarados (objectStructure,
+ * legalRegime, procurementModality, extração estrutural). Não substitui o
+ * regime-behavior-engine (política normativa de regime, matriz operacional e bloqueios
+ * de fundamento/pricing/inexigibilidade), executado na sequência quando este pré-voo passa.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CLASSIFICATION_PREFLIGHT_CODES = void 0;

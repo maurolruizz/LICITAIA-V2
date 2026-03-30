@@ -19,6 +19,7 @@ const module_dependency_1 = require("./module-dependency");
 const validators_1 = require("../shared/validators");
 const process_snapshot_utils_1 = require("./process-snapshot.utils");
 const classification_preflight_1 = require("./classification-preflight");
+const regime_behavior_engine_1 = require("../regime-behavior-engine/regime-behavior-engine");
 const ENGINE_LOG_PREFIX = '[AdministrativeProcessEngine]';
 function buildModuleInput(context, moduleId) {
     return {
@@ -195,6 +196,52 @@ async function runAdministrativeProcess(context) {
             processSnapshot: (0, process_snapshot_utils_1.deepCloneProcessSnapshot)(processSnapshot),
         };
     }
+    const regimeBehavior = (0, regime_behavior_engine_1.runRegimeBehaviorEngine)({
+        processSnapshot,
+        execution: context.execution,
+    });
+    if (regimeBehavior.decision.canProceed === false) {
+        const codes = regimeBehavior.decision.blockingReasonCodes;
+        const primaryCode = codes[0] ?? 'REGIME_BEHAVIOR_BLOCK';
+        const rbItem = (0, validation_result_factory_1.createValidationItem)(primaryCode, `Bloqueio normativo de regime (${codes.join(', ')}).`, validation_severity_enum_1.ValidationSeverity.BLOCK, { details: { phase: 'REGIME_BEHAVIOR_ENGINE', codes } });
+        const rbDm = (0, decision_metadata_factory_1.createDecisionMetadata)(decision_origin_enum_1.DecisionOrigin.SYSTEM, {
+            ruleId: primaryCode,
+            rationale: 'Regime behavior engine bloqueou progressão por política normativa.',
+            payload: {
+                phase: 'REGIME_BEHAVIOR_ENGINE',
+                processId,
+                audit: regimeBehavior.audit,
+            },
+        });
+        const rbEvent = (0, administrative_event_factory_1.createAdministrativeEvent)(event_type_enum_1.EventType.VALIDATION, module_id_enum_1.ModuleId.DFD, 'REGIME_BEHAVIOR_ENGINE_BLOCK', `Bloqueio normativo de regime (${codes.join(', ')}).`, { processId, payload: { codes } });
+        return {
+            success: false,
+            status: 'halted',
+            outputs: [],
+            moduleOutputs: [],
+            validations: [rbItem],
+            events: [rbEvent],
+            metadata: {
+                processSnapshot: (0, process_snapshot_utils_1.deepCloneProcessSnapshot)(processSnapshot),
+                decisionMetadata: [rbDm],
+                regimeBehavior,
+            },
+            decisionMetadata: [rbDm],
+            legalTrace: [],
+            halted: true,
+            haltedBy: module_id_enum_1.ModuleId.DFD,
+            haltedDetail: {
+                moduleId: module_id_enum_1.ModuleId.DFD,
+                type: 'VALIDATION',
+                origin: 'REGIME_BEHAVIOR_ENGINE',
+                code: primaryCode,
+                message: rbItem.message,
+            },
+            finalStatus: 'HALTED_BY_VALIDATION',
+            executedModules: [],
+            processSnapshot: (0, process_snapshot_utils_1.deepCloneProcessSnapshot)(processSnapshot),
+        };
+    }
     for (const moduleId of orderedModuleIds) {
         const dependencyCheck = (0, module_dependency_1.checkModuleDependency)(moduleId, outputs);
         if (dependencyCheck.satisfied === false) {
@@ -330,6 +377,7 @@ async function runAdministrativeProcess(context) {
         ...baseMetadata,
         decisionMetadata,
         processSnapshot: (0, process_snapshot_utils_1.deepCloneProcessSnapshot)(processSnapshot),
+        regimeBehavior,
     };
     const legalTrace = [];
     for (const dm of decisionMetadata) {
@@ -372,7 +420,8 @@ async function runAdministrativeProcess(context) {
     }
     else if (haltReasonType === 'CROSS_VALIDATION' ||
         haltReasonType === 'LEGAL_VALIDATION' ||
-        haltReasonType === 'CLASSIFICATION_PREFLIGHT') {
+        haltReasonType === 'CLASSIFICATION_PREFLIGHT' ||
+        haltReasonType === 'REGIME_BEHAVIOR_ENGINE') {
         finalStatus = 'HALTED_BY_VALIDATION';
     }
     else if (haltReasonType === 'MODULE_SIGNAL') {
@@ -402,7 +451,8 @@ async function runAdministrativeProcess(context) {
                     ? 'DEPENDENCY'
                     : haltReasonType === 'CROSS_VALIDATION' ||
                         haltReasonType === 'LEGAL_VALIDATION' ||
-                        haltReasonType === 'CLASSIFICATION_PREFLIGHT'
+                        haltReasonType === 'CLASSIFICATION_PREFLIGHT' ||
+                        haltReasonType === 'REGIME_BEHAVIOR_ENGINE'
                         ? 'VALIDATION'
                         : 'MODULE',
                 origin: haltReasonType ?? 'MODULE_SIGNAL',

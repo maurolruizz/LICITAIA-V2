@@ -25,7 +25,8 @@ type HaltReasonType =
   | 'CROSS_VALIDATION'
   | 'LEGAL_VALIDATION'
   | 'MODULE_SIGNAL'
-  | 'CLASSIFICATION_PREFLIGHT';
+  | 'CLASSIFICATION_PREFLIGHT'
+  | 'REGIME_BEHAVIOR_ENGINE';
 
 export interface HaltedDetail {
   moduleId: ModuleId;

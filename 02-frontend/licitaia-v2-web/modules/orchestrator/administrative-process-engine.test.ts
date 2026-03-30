@@ -48,6 +48,30 @@ function buildBaseValidPayload(): Record<string, unknown> {
 }
 
 describe('AdministrativeProcessEngine', () => {
+  it('runPreflightBasicRegimeModeMetadata', async () => {
+    const context: AdministrativeProcessContext = {
+      processId: 'TEST_PREFLIGHT_BASIC',
+      tenantId: 'tenant-1',
+      userId: 'user-1',
+      correlationId: 'corr-pf',
+      phase: ProcessPhase.PLANNING as ProcessPhase,
+      payload: buildBaseValidPayload(),
+      timestamp: new Date().toISOString(),
+      execution: { source: 'preflight' },
+    };
+    const result = await runAdministrativeProcess(context);
+    assert.equal(result.finalStatus, 'SUCCESS');
+    const meta = result.metadata as {
+      regimeBehavior?: {
+        audit?: { decisionMode?: string };
+        preflightSafety?: { allowsOnlyBasicDecision?: boolean; allowsFullOperationalDecision?: boolean };
+      };
+    };
+    assert.equal(meta.regimeBehavior?.audit?.decisionMode, 'basic');
+    assert.equal(meta.regimeBehavior?.preflightSafety?.allowsOnlyBasicDecision, true);
+    assert.equal(meta.regimeBehavior?.preflightSafety?.allowsFullOperationalDecision, false);
+  });
+
   it('runValidPipelineTest', async () => {
   const context: AdministrativeProcessContext = {
     processId: 'TEST_VALID_PIPELINE',
@@ -71,11 +95,16 @@ describe('AdministrativeProcessEngine', () => {
   assert.ok(Array.isArray(result.executedModules));
   assert.ok(Array.isArray(result.validations));
   assert.ok(Array.isArray(result.events));
+  const metaRb = result.metadata as {
+    regimeBehavior?: { audit?: { decisionMode?: string }; decision?: { canProceed?: boolean } };
+  };
+  assert.equal(metaRb.regimeBehavior?.audit?.decisionMode, 'full');
+  assert.equal(metaRb.regimeBehavior?.decision?.canProceed, true);
   });
 
-  it('runCrossValidationNoOverlapWarningTest', async () => {
+  it('runCrossValidationNoOverlapBlockTest', async () => {
   const context: AdministrativeProcessContext = {
-    processId: 'TEST_CROSS_VALIDATION_NO_OVERLAP_WARNING',
+    processId: 'TEST_CROSS_VALIDATION_NO_OVERLAP_BLOCK',
     tenantId: 'tenant-1',
     userId: 'user-1',
     correlationId: 'corr-1',
@@ -127,15 +156,15 @@ describe('AdministrativeProcessEngine', () => {
 
   const result = await runAdministrativeProcess(context);
 
-  assert.equal(result.halted, false);
-  assert.equal(result.finalStatus, 'SUCCESS');
+  assert.equal(result.halted, true);
+  assert.equal(result.finalStatus, 'HALTED_BY_VALIDATION');
   assert.ok(
     result.validations.some(
       (v) =>
         typeof v.code === 'string' &&
         v.code.includes('CROSS_MODULE') &&
         v.code.includes('NO_OVERLAP') &&
-        v.severity === 'WARNING'
+        v.severity === 'BLOCK'
     )
   );
   });
@@ -198,11 +227,16 @@ describe('AdministrativeProcessEngine', () => {
   assert.equal(result.finalStatus, 'HALTED_BY_VALIDATION');
   assert.ok(result.haltedDetail);
   assert.equal(result.haltedDetail?.type, 'VALIDATION');
-  assert.ok(result.decisionMetadata.some((dm) =>
-    (dm as any).payload?.hasBlocking === true &&
-    (dm as any).payload?.validationItemCodes?.includes('LEGAL_BASIS_REQUIRED_FOR_DIRECT_REGIME')
-  ));
-  assert.ok(result.legalTrace.length >= 1);
+  assert.equal(result.haltedDetail?.origin, 'REGIME_BEHAVIOR_ENGINE');
+  assert.ok(
+    result.validations.some(
+      (v) =>
+        v.code === 'REGIME_FUNDAMENTO_MINIMO_AUSENTE' ||
+        v.code === 'REGIME_PRICING_EXIGIDO_AUSENTE'
+    )
+  );
+  const meta = result.metadata as { regimeBehavior?: { audit?: { blockingReasonCodes?: string[] } } };
+  assert.ok(meta.regimeBehavior?.audit?.blockingReasonCodes?.length);
   });
 
   it('runDependencyBlockTest', async () => {
