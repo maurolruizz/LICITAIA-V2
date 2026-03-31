@@ -450,3 +450,11 @@ Registro factual em 2026-03-30:
 | **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ONDA-3-CONTINUACAO-ENCERRAMENTO-2026-03-30.md` |
 | **Limite de escopo** | encerramento da Onda 3 no recorte de conducao operacional; sem declarar produto completo encerrado |
 | **Proxima fase** | persistencia real da conducao + integracao SaaS |
+
+---
+
+## 25. Registro de fechamento por ondas (executivo)
+
+| Onda | Escopo | Status | Nota | Evidência |
+|---|---|---|---|---|
+| ONDA 4 | Persistência operacional | CONCLUÍDA | 10/10 | Evidências registradas |

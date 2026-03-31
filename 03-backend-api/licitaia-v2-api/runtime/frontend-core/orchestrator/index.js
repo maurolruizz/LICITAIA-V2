@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runAdministrativeProcess = exports.getAllRegisteredModuleIds = exports.getModuleDefinition = exports.getModulesForPhase = exports.registerModule = exports.dispatchModule = void 0;
+exports.createInitialOperationalState = exports.FlowStateStaleError = exports.FlowController = exports.runAdministrativeProcess = exports.getAllRegisteredModuleIds = exports.getModuleDefinition = exports.getModulesForPhase = exports.registerModule = exports.dispatchModule = void 0;
 var flow_dispatcher_1 = require("./flow-dispatcher");
 Object.defineProperty(exports, "dispatchModule", { enumerable: true, get: function () { return flow_dispatcher_1.dispatchModule; } });
 var flow_registry_1 = require("./flow-registry");
@@ -10,3 +10,8 @@ Object.defineProperty(exports, "getModuleDefinition", { enumerable: true, get: f
 Object.defineProperty(exports, "getAllRegisteredModuleIds", { enumerable: true, get: function () { return flow_registry_1.getAllRegisteredModuleIds; } });
 var administrative_process_engine_1 = require("./administrative-process-engine");
 Object.defineProperty(exports, "runAdministrativeProcess", { enumerable: true, get: function () { return administrative_process_engine_1.runAdministrativeProcess; } });
+var flow_controller_1 = require("./flow-controller");
+Object.defineProperty(exports, "FlowController", { enumerable: true, get: function () { return flow_controller_1.FlowController; } });
+Object.defineProperty(exports, "FlowStateStaleError", { enumerable: true, get: function () { return flow_controller_1.FlowStateStaleError; } });
+var flow_state_factory_1 = require("./flow-state.factory");
+Object.defineProperty(exports, "createInitialOperationalState", { enumerable: true, get: function () { return flow_state_factory_1.createInitialOperationalState; } });

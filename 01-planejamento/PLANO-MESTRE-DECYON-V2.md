@@ -1617,3 +1617,28 @@ Limite explicito:
 Proxima fase:
 - persistencia real da conducao operacional;
 - integracao SaaS ampliada.
+
+---
+
+## ONDA 4 — CONCLUÍDA
+
+Status: **100% concluída**
+
+Resumo:
+- Persistência operacional SaaS consolidada com estado oficial em PostgreSQL (`processes`, `flow_sessions`, `flow_session_revisions`), substituindo dependência de memória local.
+- Pipeline oficial de mutação consolidado no backend com transação, concorrência atômica por `revision + render_token`, trilha de auditoria estruturada e histórico imutável por revisão.
+- Superfícies legadas de mutação em memória removidas, incluindo eliminação do módulo legado `src/modules/flow-ui`, preservando regressão zero do fluxo persistido.
+
+Decisões críticas:
+- banco como única fonte de concorrência
+- FlowController como motor único (sem duplicação)
+- snapshot como estado canônico
+- auditoria obrigatória por evento
+- tenant enforcement no banco (RLS)
+
+Garantias obtidas:
+- retomada real de processos
+- concorrência segura
+- isolamento multi-tenant validado
+- rastreabilidade completa
+- ausência de bypass

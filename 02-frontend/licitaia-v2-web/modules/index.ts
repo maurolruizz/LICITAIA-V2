@@ -14,6 +14,21 @@ export {
 } from './orchestrator';
 export type { AdministrativeProcessContext } from './orchestrator';
 export type { AdministrativeProcessResult, ProcessStatus } from './orchestrator';
+export type {
+  AllowedAction,
+  BlockingReason,
+  CurrentStepFormContract,
+  FlowCommandGuard,
+  FlowStep,
+  NextRequiredAction,
+  OutputPanelContract,
+  OperationalStateContract,
+  RenderToken,
+  ReviewPanelContract,
+  ReviewExecutionResult,
+  StepFormConductionContract,
+  StepStatus,
+} from './orchestrator';
 export { initializeModuleRegistry } from './registry';
 export { executeDfdModule } from './domain/dfd';
 export { executeEtpModule } from './domain/etp';

@@ -9,7 +9,8 @@
     "build": "npm run build:frontend-core-runtime && tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "proof:h-fi6": "ts-node src/proof/etapa-h-fi6-readiness-controlled-environment.ts",
-    "proof:h-fi7": "ts-node src/proof/etapa-h-fi7-institutional-demo-readiness.ts"
+    "proof:h-fi7": "ts-node src/proof/etapa-h-fi7-institutional-demo-readiness.ts",
+    "proof:h-fi8": "ts-node src/proof/etapa-h-fi8-tenant-hostile-rls-validation.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
