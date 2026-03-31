@@ -94,6 +94,8 @@ As Etapas **G** e **H** **não** são Frentes adicionais: incidem sobre o trabal
 | **Prova de aceite 10/10** | Percurso completo demonstrável por persona alvo; ausência de atalhos que gerem decisão inválida. |
 | **Dependências principais** | Etapas **A–D** em 10/10. |
 | **Etapa** | **E** |
+| **Status operacional vigente** | **CONCLUIDA (10/10)** — condução total do usuário comprovada no escopo da Onda 3. |
+| **Vinculo normativo** | Encerramento formal da Onda 3 no escopo de condução operacional (`CHECKPOINT-NORMATIVO-ONDA-3-CONTINUACAO-ENCERRAMENTO-2026-03-30.md`). |
 
 Diretriz operacional vinculante da Frente 6:
 
@@ -434,3 +436,17 @@ Observacao normativa de validade:
 
 - este registro de matriz trabalha em nivel de entrega estrutural aprovada da Onda 3 (base tecnica);
 - qualquer fechamento de Onda 3 completa exige formalizacao posterior especifica.
+
+## 24. Registro operacional — ONDA 3 / Encerramento da continuacao operacional (Frente 6 / Etapa E)
+
+Registro factual em 2026-03-30:
+
+| Campo | Conteúdo |
+|---|---|
+| **Nome da entrega** | Onda 3 — continuacao operacional da conducao total do usuario |
+| **Status** | **ENCERRADA — 10/10** |
+| **Vinculo etapa/frente** | Etapa E / Frente 6 concluida operacionalmente |
+| **Consolidacao material** | contrato operacional aplicado; nucleo de conducao ativo; invalidacao downstream; stale protection; UI subordinada; anti-bypass; eliminacao da pagina em branco |
+| **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ONDA-3-CONTINUACAO-ENCERRAMENTO-2026-03-30.md` |
+| **Limite de escopo** | encerramento da Onda 3 no recorte de conducao operacional; sem declarar produto completo encerrado |
+| **Proxima fase** | persistencia real da conducao + integracao SaaS |

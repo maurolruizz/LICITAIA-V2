@@ -1500,11 +1500,14 @@ INIT → CONTEXT → REGIME → DFD → ETP → TR → PRICING → REVIEW → OU
 
 ### STATUS
 
-ONDA 3: EM EXECUCAO CONTROLADA
+ONDA 3: ENCERRADA FORMALMENTE (CONTINUACAO OPERACIONAL CONCLUIDA)
 
 Status normativo vigente:
-- base tecnica da Onda 3 (FlowController / state machine / conducao operacional v1) aprovada e encerrada em 10/10;
-- o fechamento atual refere-se a entrega estrutural da base tecnica, nao ao encerramento integral da Onda 3 como objetivo final de produto.
+- Onda 3 inicialmente aberta para a camada de conducao operacional do usuario;
+- base tecnica da Onda 3 (FlowController / state machine / conducao operacional v1) concluida e encerrada em 10/10;
+- conducao operacional da continuacao da Onda 3 concluida e formalmente encerrada em 10/10;
+- encerramento da Onda 3 limitado ao escopo de conducao operacional, sem declarar produto completo encerrado;
+- proxima fase definida: persistencia real da conducao + integracao SaaS.
 
 ---
 
@@ -1586,3 +1589,31 @@ Registro de limite de escopo:
 
 Registro de item externo:
 - a divergencia `S5_DISPENSA_SEM_BASE_LEGAL_WARNING` no runner canonico da Fase 35 foi classificada como externa ao escopo desta entrega e nao bloqueia este fechamento.
+
+---
+
+11.35 REGISTRO NORMATIVO — ONDA 3 (CONTINUACAO OPERACIONAL E ENCERRAMENTO FORMAL)
+
+Registrado em: 2026-03-30  
+Artefato de referencia:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ONDA-3-CONTINUACAO-ENCERRAMENTO-2026-03-30.md`
+
+Objetivo do registro:
+- formalizar o encerramento normativo da continuacao da Onda 3 com foco em conducao operacional completa do usuario;
+- registrar limite de escopo e transicao para proxima fase sem extrapolacao de readiness final do sistema.
+
+Consolidacao factual:
+1) Onda 3 inicialmente aberta apos consolidacao das Ondas 1 e 2;
+2) base tecnica FlowController concluida em 10/10;
+3) conducao operacional (continuidade por incrementos) concluida em 10/10;
+4) Onda 3 encerrada formalmente no escopo da Frente 6 / Etapa E.
+
+Limite explicito:
+- este encerramento nao declara sistema completo pronto;
+- este encerramento nao declara produto SaaS final concluido;
+- este encerramento nao declara persistencia real da conducao como concluida;
+- este encerramento nao declara readiness institucional final.
+
+Proxima fase:
+- persistencia real da conducao operacional;
+- integracao SaaS ampliada.
