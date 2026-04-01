@@ -4,7 +4,10 @@ import type {
   AdministrativeProcessContext,
   AdministrativeProcessResult,
 } from '../dto/administrative-process.types';
-import type { ProcessRunResponseBody } from '../dto/process-run-response.types';
+import type {
+  ProcessRunEngineResponseBody,
+  ProcessRunResponseBody,
+} from '../dto/process-run-response.types';
 import { validateProcessRunRequest } from '../validators/process-run-request.validator';
 import { normalizeToContext } from '../normalizers/process-run-request.normalizer';
 import {
@@ -92,11 +95,11 @@ export async function runProcessController(req: Request, res: Response): Promise
       await runAdministrativeProcess(context);
     const engineResult: AdministrativeProcessResult = applyAiAssistiveLayer(rawEngineResult);
 
-    const responseBody: ProcessRunResponseBody = buildEngineResponse(engineResult);
+    const responseBody: ProcessRunEngineResponseBody = buildEngineResponse(engineResult);
 
     const httpStatus = engineResult.success ? 200 : engineResult.halted ? 409 : 422;
 
-    // Persiste a execução — falha de persistência não bloqueia a resposta da API.
+    // Persiste a execução. Em caso de falha, não bloquear a resposta principal do motor.
     try {
       const modulesExecuted = Array.isArray(engineResult['executedModules'])
         ? (engineResult['executedModules'] as unknown[]).filter((m): m is string => typeof m === 'string')
@@ -145,11 +148,14 @@ export async function runProcessController(req: Request, res: Response): Promise
       }
     } catch (saveError) {
       logger.error(`${rid}[PERSIST_FAIL] Falha ao persistir execução — ${saveError instanceof Error ? saveError.message : String(saveError)}`);
-      const responseBody: ProcessRunResponseBody = buildInternalErrorResponse(
-        new Error('Falha ao persistir trilha critica da execucao.')
-      );
-      res.status(500).json(withInstitutionalMeta(res, responseBody));
-      return;
+      responseBody.metadata = {
+        ...(responseBody.metadata ?? {}),
+        persistence: {
+          saved: false,
+          errorCode: 'PERSIST_FAIL',
+          message: 'Falha ao persistir trilha critica da execucao.',
+        },
+      };
     }
 
     res.status(httpStatus).json(withInstitutionalMeta(res, responseBody));

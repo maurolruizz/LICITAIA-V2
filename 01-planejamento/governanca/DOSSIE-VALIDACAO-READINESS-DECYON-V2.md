@@ -598,3 +598,38 @@ O sistema está pronto para o próximo estágio:
 
 \*\*validação no mundo real.\*\*
 
+\---
+
+\## 14. Adendo formal — rodada de resposta à auditoria hostil (HEAD atual)
+
+Data de referência: 2026-04-01.
+
+\### 14.1 Classificação dos achados externos no HEAD atual
+
+\- **C1 (`/api/process/run` com execução anônima): NÃO CONFIRMADO NO HEAD**.  
+Reclassificado como divergência entre artefato auditado externamente e estado atual do repositório.
+
+\- **C2 (`LEGAL_BASIS_REQUIRED_KEYWORDS` aceitando termos genéricos): NÃO CONFIRMADO NO HEAD**.  
+Reclassificado como divergência entre artefato auditado externamente e estado atual do repositório.
+
+\- **C3 (falha de persistência bloqueando resposta principal do motor): CONFIRMADO NO HEAD**.  
+Corrigido no código nesta rodada.
+
+\### 14.2 Correções/Hardening efetivamente aplicados no código
+
+\- correção de C3: falha de persistência não interrompe mais a devolução do resultado principal do motor; falha permanece sinalizada e rastreável no payload/meta;
+\- endurecimento de `/api/process/preflight` com autenticação obrigatória;
+\- implementação de rate limiting operacional em superfícies expostas/sensíveis.
+
+\### 14.3 Evidência reproduzível registrada nesta rodada
+
+\- prova estrutural de HEAD via script:
+  \- `03-backend-api/licitaia-v2-api/scripts/proof-head-hardening.cjs`;
+\- resultado consolidado da prova: **APROVADO** para os controles estruturais validados nesta rodada.
+
+\### 14.4 Distinção obrigatória de evidência (sem mascaramento)
+
+\- **Comprovado nesta rodada:** conformidade estrutural do HEAD com os controles corrigidos/endurecidos;
+\- **Não concluído nesta rodada:** prova runtime E2E completa em ambiente vivo para todos os cenários de reauditoria;
+\- **Pendência residual formal:** executar a bateria E2E completa com ambiente operacional preparado e anexar os artefatos de execução na reabertura de auditoria externa.
+

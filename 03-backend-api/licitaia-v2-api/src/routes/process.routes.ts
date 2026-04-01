@@ -17,7 +17,7 @@ import { requireTenant } from '../middleware/require-tenant';
 export const processRouter = Router();
 
 processRouter.post('/run', authenticateMiddleware, runProcessController);
-processRouter.post('/preflight', preflightProcessController);
+processRouter.post('/preflight', authenticateMiddleware, preflightProcessController);
 processRouter.get('/guidance-options', guidanceOptionsController);
 processRouter.post('/', authenticateMiddleware, requireAuth, requireTenant, createProcessController);
 processRouter.get('/:id', authenticateMiddleware, requireTenant, getProcessController);

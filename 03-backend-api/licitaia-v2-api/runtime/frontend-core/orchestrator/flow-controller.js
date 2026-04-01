@@ -373,9 +373,10 @@ class FlowController {
         return clone(raw);
     }
     syncInternalStateFields() {
-        this.state['_schemaVersion'] =
-            typeof this.state['_schemaVersion'] === 'string' ? this.state['_schemaVersion'] : '1.0';
-        this.state['_stepFieldsByStep'] = clone(this.stepFieldsByStep);
+        const stateAsRecord = this.state;
+        stateAsRecord['_schemaVersion'] =
+            typeof stateAsRecord['_schemaVersion'] === 'string' ? stateAsRecord['_schemaVersion'] : '1.0';
+        stateAsRecord['_stepFieldsByStep'] = clone(this.stepFieldsByStep);
     }
     enforceConsistencyRules() {
         // 1) Nenhum COMPLETED com blocker HARD.

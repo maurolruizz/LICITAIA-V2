@@ -38,3 +38,5 @@ Object.defineProperty(exports, "executeTrModule", { enumerable: true, get: funct
 var pricing_1 = require("./domain/pricing");
 Object.defineProperty(exports, "executePricingModule", { enumerable: true, get: function () { return pricing_1.executePricingModule; } });
 __exportStar(require("./ai-assistive"), exports);
+__exportStar(require("./compliance-ui"), exports);
+__exportStar(require("./dossier-ui"), exports);

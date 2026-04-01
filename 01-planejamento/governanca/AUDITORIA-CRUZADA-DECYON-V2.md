@@ -474,3 +474,27 @@ O sistema pode ser considerado:
 
 A auditoria cruzada é considerada concluída com sucesso.
 
+\---
+
+\## 13. Adendo de contraste — auditoria hostil externa vs HEAD atual
+
+Registro factual em 2026-04-01:
+
+\- C1 (`/api/process/run` com execução anônima): **NÃO CONFIRMADO NO HEAD**;
+\- C2 (`LEGAL_BASIS_REQUIRED_KEYWORDS` aceitando termos genéricos isolados): **NÃO CONFIRMADO NO HEAD**;
+\- C3 (falha de persistência bloqueando resposta do motor): **CONFIRMADO NO HEAD** e **corrigido no código**.
+
+Medidas adicionais aplicadas nesta rodada:
+
+\- `/api/process/preflight` protegido com autenticação;
+\- rate limiting implementado em superfícies expostas/sensíveis.
+
+Evidência desta rodada:
+
+\- prova estrutural reproduzível do HEAD: `03-backend-api/licitaia-v2-api/scripts/proof-head-hardening.cjs` (resultado consolidado: **APROVADO**).
+
+Limite documental explícito:
+
+\- esta rodada formaliza evidência estrutural de HEAD;
+\- a prova runtime E2E completa permanece como pendência residual para a reauditoria externa com artefato limpo atualizado.
+

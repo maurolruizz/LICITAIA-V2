@@ -30,6 +30,7 @@ import { corsMiddleware } from './middleware/cors';
 import { correlationMiddleware } from './middleware/correlation';
 import { securityHeadersMiddleware } from './middleware/security-headers';
 import { logger, logRequest } from './middleware/logger';
+import { createRateLimitMiddleware } from './middleware/rate-limit';
 import { notFoundHandler, globalErrorHandler } from './middleware/error';
 import { healthRouter } from './routes/health.routes';
 import { diagnosticsRouter } from './routes/diagnostics.routes';
@@ -40,6 +41,16 @@ import { usersRouter } from './modules/users/users.routes';
 import { institutionalSettingsRouter } from './modules/institutional-settings/institutional-settings.routes';
 
 const app = express();
+const authRateLimitMiddleware = createRateLimitMiddleware({
+  windowMs: 60_000,
+  maxRequests: 30,
+  keyPrefix: 'auth',
+});
+const processRateLimitMiddleware = createRateLimitMiddleware({
+  windowMs: 60_000,
+  maxRequests: 120,
+  keyPrefix: 'process',
+});
 
 // FASE 44 — Remove o header "X-Powered-By: Express" da superfície HTTP.
 app.disable('x-powered-by');
@@ -78,14 +89,14 @@ app.use((req, res, next) => {
 // --- Rotas ---
 app.use('/health', healthRouter);
 app.use('/diagnostics', diagnosticsRouter);
-app.use('/api/auth', authRouter);
+app.use('/api/auth', authRateLimitMiddleware, authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/institutional-settings', institutionalSettingsRouter);
-app.use('/api/process', processRouter);
+app.use('/api/process', processRateLimitMiddleware, processRouter);
 // FI5: endpoint seguro de histórico preferencial: /api/process/executions
 // Mantém alias /api/process-executions para compatibilidade, ambos protegidos por auth no router.
-app.use('/api/process/executions', processExecutionRouter);
-app.use('/api/process-executions', processExecutionRouter);
+app.use('/api/process/executions', processRateLimitMiddleware, processExecutionRouter);
+app.use('/api/process-executions', processRateLimitMiddleware, processExecutionRouter);
 
 // --- Handlers de borda (devem ser os últimos) ---
 app.use(notFoundHandler);

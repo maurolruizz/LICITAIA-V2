@@ -459,3 +459,32 @@ Registro factual em 2026-03-30:
 |---|---|---|---|---|
 | ONDA 4 | Persistência operacional | CONCLUÍDA | 10/10 | Evidências registradas |
 | ONDA 5 | Prova de conformidade | CONCLUÍDA | 10/10 | Evidências registradas |
+
+## 26. Registro operacional — resposta formal à auditoria hostil (HEAD atual)
+
+Registro factual em 2026-04-01:
+
+| Item | Classificação no HEAD atual | Situação |
+|---|---|---|
+| C1 — `/api/process/run` anônimo | **NÃO CONFIRMADO NO HEAD** | Reclassificado como divergência de artefato auditado externamente |
+| C2 — `LEGAL_BASIS_REQUIRED_KEYWORDS` genérica (`dispensa`/`inexigibilidade`) | **NÃO CONFIRMADO NO HEAD** | Reclassificado como divergência de artefato auditado externamente |
+| C3 — falha de persistência destruindo resposta do motor | **CONFIRMADO NO HEAD** | **CORRIGIDO NO CÓDIGO** (resposta principal preservada + sinalização de falha de persistência) |
+| I1 — `/api/process/preflight` sem autenticação | Confirmado na revisão da rodada | **CORRIGIDO NO CÓDIGO** (`authenticateMiddleware` aplicado) |
+| I2 — ausência de rate limiting | Confirmado na revisão da rodada | **CORRIGIDO NO CÓDIGO** (rate limiting ativo em superfícies expostas/sensíveis) |
+
+Evidência técnica mínima consolidada:
+
+1. prova estrutural reproduzível do HEAD executada por script:
+   - `03-backend-api/licitaia-v2-api/scripts/proof-head-hardening.cjs`;
+2. escopo comprovado na rodada:
+   - proteção de `/api/process/run`;
+   - proteção de `/api/process/preflight`;
+   - regras de base legal específica sem aceitação genérica isolada;
+   - preservação da resposta principal do motor em falha de persistência;
+   - rate limiting ativo.
+
+Limite formal desta rodada:
+
+- a evidência consolidada desta rodada é **estrutural de HEAD** (code-level);
+- **prova runtime E2E completa** (ambiente vivo com autenticação, banco e simulação operacional de falhas) permanece como etapa residual para reauditoria externa controlada;
+- esta limitação é documental e explicitamente reconhecida, sem mascaramento.
