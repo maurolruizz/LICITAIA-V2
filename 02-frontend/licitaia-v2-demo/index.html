@@ -61,6 +61,22 @@
       aria-controls="section-history"
       data-tab="history"
     >Histórico</button>
+    <button
+      class="tab-btn"
+      id="tab-compliance"
+      role="tab"
+      aria-selected="false"
+      aria-controls="section-compliance"
+      data-tab="compliance"
+    >Prova de Conformidade</button>
+    <button
+      class="tab-btn"
+      id="tab-dossier"
+      role="tab"
+      aria-selected="false"
+      aria-controls="section-dossier"
+      data-tab="dossier"
+    >Dossiê</button>
   </nav>
 
   <!-- ════ MAIN ════ -->
@@ -224,6 +240,67 @@
       </div>
     </section>
 
+    <!-- ══ SEÇÃO: PROVA DE CONFORMIDADE (ONDA 5) ══ -->
+    <section
+      id="section-compliance"
+      role="tabpanel"
+      aria-labelledby="tab-compliance"
+      style="display: none;"
+    >
+      <div class="history-toolbar">
+        <p class="section-title">Prova de Conformidade</p>
+      </div>
+      <p class="section-desc">
+        Leitura institucional do relatório canônico de conformidade do processo, sem inferência local.
+      </p>
+
+      <article class="admin-card">
+        <h3 class="admin-card-title">Consulta de Processo</h3>
+        <form id="compliance-query-form" class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="compliance-process-id">Process ID</label>
+            <input class="form-input" id="compliance-process-id" name="processId" required />
+          </div>
+          <div class="form-actions">
+            <button class="btn-secondary" id="btn-load-active-compliance" type="button">Carregar Processo Ativo</button>
+            <button class="btn-execute" id="btn-load-compliance" type="submit">Carregar Relatório</button>
+            <button class="btn-secondary" id="btn-open-dossier-from-compliance" type="button">Ver Dossiê</button>
+            <span class="text-muted" id="compliance-status">Informe o Process ID para consultar.</span>
+          </div>
+        </form>
+      </article>
+
+      <div id="compliance-root" class="compliance-root" aria-live="polite"></div>
+    </section>
+
+    <section
+      id="section-dossier"
+      role="tabpanel"
+      aria-labelledby="tab-dossier"
+      style="display: none;"
+    >
+      <div class="history-toolbar">
+        <p class="section-title">Dossiê Institucional de Conformidade</p>
+        <button class="btn-secondary" id="btn-print-dossier" type="button">Imprimir</button>
+      </div>
+      <p class="section-desc">Peça institucional exportável derivada do ComplianceReport canônico.</p>
+      <article class="admin-card">
+        <h3 class="admin-card-title">Consulta de Dossiê</h3>
+        <form id="dossier-query-form" class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="dossier-process-id">Process ID</label>
+            <input class="form-input" id="dossier-process-id" name="processId" required />
+          </div>
+          <div class="form-actions">
+            <button class="btn-secondary" id="btn-load-active-dossier" type="button">Carregar Processo Ativo</button>
+            <button class="btn-execute" id="btn-load-dossier" type="submit">Carregar Dossiê</button>
+            <span class="text-muted" id="dossier-status">Informe o Process ID para consultar.</span>
+          </div>
+        </form>
+      </article>
+      <div id="dossier-root" class="compliance-root" aria-live="polite"></div>
+    </section>
+
   </main>
 
   <!-- ════ FOOTER ════ -->
@@ -261,6 +338,8 @@
   <script src="execution-summary.js"></script>
   <script src="form.js"></script>
   <script src="history-ui.js"></script>
+  <script src="compliance-ui.js"></script>
+  <script src="dossier-ui.js"></script>
   <script src="app.js"></script>
 
 </body>

@@ -7,6 +7,8 @@ import {
   getProcessController,
   getProcessHistoryController,
   executeProcessActionController,
+  getComplianceReportController,
+  getComplianceDossierController,
 } from '../controllers/process.controller';
 import { authenticateMiddleware } from '../middleware/authenticate';
 import { requireAuth } from '../middleware/require-auth';
@@ -20,5 +22,7 @@ processRouter.get('/guidance-options', guidanceOptionsController);
 processRouter.post('/', authenticateMiddleware, requireAuth, requireTenant, createProcessController);
 processRouter.get('/:id', authenticateMiddleware, requireTenant, getProcessController);
 processRouter.get('/:id/history', authenticateMiddleware, requireTenant, getProcessHistoryController);
+processRouter.get('/:id/compliance-report', authenticateMiddleware, requireTenant, getComplianceReportController);
+processRouter.get('/:id/compliance-dossier', authenticateMiddleware, requireTenant, getComplianceDossierController);
 processRouter.post('/execute', authenticateMiddleware, requireAuth, requireTenant, executeProcessActionController);
 

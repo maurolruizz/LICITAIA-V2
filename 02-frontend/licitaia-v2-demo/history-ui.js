@@ -305,6 +305,10 @@ function loadExecutionDetail(id) {
   detail.style.display = 'block';
   detail.innerHTML = '<div class="history-loading">Carregando detalhe...</div>';
   detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  var selected = historyState.list.find(function(item) { return item.id === id; });
+  if (selected && selected.processId && typeof window.setActiveProcessId === 'function') {
+    window.setActiveProcessId(String(selected.processId));
+  }
 
   var authHeaders = (typeof window.getAuthHeaders === 'function') ? window.getAuthHeaders() : {};
   fetch(BACKEND_URL + '/api/process-executions/' + encodeURIComponent(id), { method: 'GET', headers: authHeaders })
@@ -322,6 +326,9 @@ function loadExecutionDetail(id) {
       if (!data.success || !data.data) {
         detail.innerHTML = '<div class="history-empty">Execução não encontrada.</div>';
         return;
+      }
+      if (data.data && data.data.processId && typeof window.setActiveProcessId === 'function') {
+        window.setActiveProcessId(String(data.data.processId));
       }
       renderDetail(detail, data.data);
     })
@@ -422,6 +429,12 @@ function renderDetail(container, execution) {
       '<span class="result-header-title">' +
         escapeHtml(processId) + ' — ' + escapeHtml(formatDate(execution.createdAt)) +
       '</span>' +
+      (processId !== '—'
+        ? '<button class="btn-secondary" style="margin-right:0.5rem" onclick="openDossierFromHistory(\'' + escapeHtml(processId) + '\')">Abrir Dossiê</button>'
+        : '') +
+      (processId !== '—'
+        ? '<button class="btn-secondary" style="margin-right:0.5rem" onclick="openComplianceFromHistory(\'' + escapeHtml(processId) + '\')">Abrir Prova</button>'
+        : '') +
       '<button class="detail-close-btn" onclick="closeDetail()" aria-label="Fechar detalhe">✕</button>' +
     '</div>' +
 
@@ -506,6 +519,26 @@ function renderDetail(container, execution) {
     '</div>' +
 
     '</div>'; // end detail-body
+}
+
+function openComplianceFromHistory(processId) {
+  if (!processId) return;
+  if (typeof activateTab === 'function') {
+    activateTab('compliance');
+  }
+  if (typeof window.loadComplianceByProcess === 'function') {
+    window.loadComplianceByProcess(processId);
+  }
+}
+
+function openDossierFromHistory(processId) {
+  if (!processId) return;
+  if (typeof activateTab === 'function') {
+    activateTab('dossier');
+  }
+  if (typeof window.loadDossierByProcess === 'function') {
+    window.loadDossierByProcess(processId);
+  }
 }
 
 /* --------------------------------------------------------------------------

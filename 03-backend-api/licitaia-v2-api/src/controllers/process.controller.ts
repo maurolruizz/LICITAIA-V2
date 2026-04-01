@@ -31,6 +31,11 @@ import {
   getProcessById,
   getProcessHistory,
 } from '../modules/process/process.service';
+import {
+  buildComplianceReport,
+  ComplianceReportBuildError,
+} from '../modules/compliance/compliance-report.service';
+import { buildComplianceDossier } from '../modules/compliance/compliance-dossier.service';
 
 export async function runProcessController(req: Request, res: Response): Promise<void> {
   const requestId = (res.locals['requestId'] as string | undefined) ?? '';
@@ -553,6 +558,107 @@ export async function executeProcessActionController(req: Request, res: Response
       withInstitutionalMeta(res, {
         success: false,
         error: { code, message: code },
+      }),
+    );
+  }
+}
+
+export async function getComplianceReportController(req: Request, res: Response): Promise<void> {
+  const ctx = res.locals as Partial<AuthenticatedContext>;
+  if (!ctx.authenticatedTenantId) {
+    res.status(401).json(
+      withInstitutionalMeta(res, {
+        success: false,
+        error: { code: 'MISSING_TENANT_CONTEXT', message: 'Contexto de tenant ausente.' },
+      }),
+    );
+    return;
+  }
+
+  const processId = req.params['id'];
+  try {
+    const report = await buildComplianceReport({
+      tenantId: ctx.authenticatedTenantId,
+      processId,
+    });
+    res.status(200).json(
+      withInstitutionalMeta(res, {
+        success: true,
+        data: report,
+      }),
+    );
+  } catch (error) {
+    if (error instanceof ComplianceReportBuildError) {
+      if (error.code === 'PROCESS_NOT_FOUND') {
+        res.status(404).json(
+          withInstitutionalMeta(res, {
+            success: false,
+            error: { code: 'PROCESS_NOT_FOUND', message: 'Processo não encontrado.' },
+          }),
+        );
+        return;
+      }
+      if (error.code === 'FLOW_SESSION_NOT_FOUND') {
+        res.status(404).json(
+          withInstitutionalMeta(res, {
+            success: false,
+            error: { code: 'FLOW_SESSION_NOT_FOUND', message: 'Sessão de fluxo não encontrada.' },
+          }),
+        );
+        return;
+      }
+    }
+
+    const code = error instanceof Error ? error.message : 'COMPLIANCE_REPORT_READ_ERROR';
+    res.status(500).json(
+      withInstitutionalMeta(res, {
+        success: false,
+        error: { code: 'COMPLIANCE_REPORT_READ_ERROR', message: code },
+      }),
+    );
+  }
+}
+
+export async function getComplianceDossierController(req: Request, res: Response): Promise<void> {
+  const ctx = res.locals as Partial<AuthenticatedContext>;
+  if (!ctx.authenticatedTenantId) {
+    res.status(401).json(
+      withInstitutionalMeta(res, {
+        success: false,
+        error: { code: 'MISSING_TENANT_CONTEXT', message: 'Contexto de tenant ausente.' },
+      }),
+    );
+    return;
+  }
+
+  const processId = req.params['id'];
+  try {
+    const dossier = await buildComplianceDossier({
+      tenantId: ctx.authenticatedTenantId,
+      processId,
+    });
+    res.status(200).json(
+      withInstitutionalMeta(res, {
+        success: true,
+        data: dossier,
+      }),
+    );
+  } catch (error) {
+    if (error instanceof ComplianceReportBuildError) {
+      const status = error.code === 'PROCESS_NOT_FOUND' || error.code === 'FLOW_SESSION_NOT_FOUND' ? 404 : 500;
+      res.status(status).json(
+        withInstitutionalMeta(res, {
+          success: false,
+          error: { code: error.code, message: error.message },
+        }),
+      );
+      return;
+    }
+    const code = error instanceof Error ? error.message : 'COMPLIANCE_DOSSIER_READ_ERROR';
+    res.status(500).json(
+      withInstitutionalMeta(res, {
+        success: false,
+        error: { code: 'COMPLIANCE_DOSSIER_READ_ERROR', message: code },
       }),
     );
   }

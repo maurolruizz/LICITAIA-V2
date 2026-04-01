@@ -29,6 +29,17 @@ var state = {
   session: null,
   authContext: null,
   institutionalSettings: null,
+  compliance: {
+    loading: false,
+    error: null,
+    report: null,
+  },
+  currentProcessId: null,
+  dossier: {
+    loading: false,
+    error: null,
+    data: null,
+  },
 };
 
 /* --------------------------------------------------------------------------
@@ -56,6 +67,18 @@ var els = {
   settingsForm:    document.getElementById('institutional-settings-form'),
   settingsStatus:  document.getElementById('settings-status'),
   btnSaveSettings: document.getElementById('btn-save-settings'),
+  complianceQueryForm: document.getElementById('compliance-query-form'),
+  complianceProcessId: document.getElementById('compliance-process-id'),
+  complianceStatus: document.getElementById('compliance-status'),
+  complianceRoot: document.getElementById('compliance-root'),
+  btnLoadActiveCompliance: document.getElementById('btn-load-active-compliance'),
+  btnOpenDossierFromCompliance: document.getElementById('btn-open-dossier-from-compliance'),
+  dossierQueryForm: document.getElementById('dossier-query-form'),
+  dossierProcessId: document.getElementById('dossier-process-id'),
+  dossierStatus: document.getElementById('dossier-status'),
+  dossierRoot: document.getElementById('dossier-root'),
+  btnLoadActiveDossier: document.getElementById('btn-load-active-dossier'),
+  btnPrintDossier: document.getElementById('btn-print-dossier'),
 };
 
 /* --------------------------------------------------------------------------
@@ -73,7 +96,7 @@ function activateTab(tabName) {
   });
 
   // Mostra/oculta seções
-  var sections = ['section-demo', 'section-form', 'section-admin', 'section-history'];
+  var sections = ['section-demo', 'section-form', 'section-admin', 'section-history', 'section-compliance', 'section-dossier'];
   sections.forEach(function(id) {
     var el = document.getElementById(id);
     if (!el) return;
@@ -95,6 +118,19 @@ function activateTab(tabName) {
 
   if (tabName === 'admin') {
     renderAuthContext();
+  }
+
+  if (tabName === 'compliance') {
+    if (state.currentProcessId && !state.compliance.report && !state.compliance.loading) {
+      loadComplianceByProcess(state.currentProcessId);
+    }
+    renderComplianceState();
+  }
+  if (tabName === 'dossier') {
+    if (state.currentProcessId && !state.dossier.data && !state.dossier.loading) {
+      loadDossierByProcess(state.currentProcessId);
+    }
+    renderDossierState();
   }
 }
 
@@ -118,6 +154,49 @@ function initTabs() {
   }
   if (els.btnLogout) {
     els.btnLogout.addEventListener('click', onLogoutClick);
+  }
+  if (els.complianceQueryForm) {
+    els.complianceQueryForm.addEventListener('submit', onSubmitComplianceQuery);
+  }
+  if (els.btnLoadActiveCompliance) {
+    els.btnLoadActiveCompliance.addEventListener('click', function() {
+      if (!state.currentProcessId) {
+        setComplianceStatus('Nenhum processo ativo detectado ainda. Selecione no Histórico ou execute um cenário.');
+        return;
+      }
+      loadComplianceByProcess(state.currentProcessId);
+    });
+  }
+  if (els.btnOpenDossierFromCompliance) {
+    els.btnOpenDossierFromCompliance.addEventListener('click', function() {
+      if (!state.currentProcessId) {
+        setComplianceStatus('Nenhum processo ativo detectado para abrir dossiê.');
+        return;
+      }
+      activateTab('dossier');
+      loadDossierByProcess(state.currentProcessId);
+    });
+  }
+  if (els.dossierQueryForm) {
+    els.dossierQueryForm.addEventListener('submit', onSubmitDossierQuery);
+  }
+  if (els.btnLoadActiveDossier) {
+    els.btnLoadActiveDossier.addEventListener('click', function() {
+      if (!state.currentProcessId) {
+        setDossierStatus('Nenhum processo ativo detectado.');
+        return;
+      }
+      loadDossierByProcess(state.currentProcessId);
+    });
+  }
+  if (els.btnPrintDossier) {
+    els.btnPrintDossier.addEventListener('click', function() {
+      if (!state.dossier.data) {
+        setDossierStatus('Nenhum dossiê carregado para impressão.');
+        return;
+      }
+      window.print();
+    });
   }
 }
 
@@ -269,6 +348,190 @@ function fetchWithAuth(path, opts) {
   var headers = Object.assign({}, (opts && opts.headers) || {}, getAuthHeaders());
   var finalOpts = Object.assign({}, opts || {}, { headers: headers });
   return fetch(BACKEND_URL + path, finalOpts);
+}
+
+function setComplianceStatus(message) {
+  if (els.complianceStatus) els.complianceStatus.textContent = message;
+}
+
+function setDossierStatus(message) {
+  if (els.dossierStatus) els.dossierStatus.textContent = message;
+}
+
+function setActiveProcessId(processId) {
+  if (!processId || typeof processId !== 'string') return;
+  state.currentProcessId = processId;
+  if (els.complianceProcessId && !els.complianceProcessId.value) {
+    els.complianceProcessId.value = processId;
+  }
+  if (els.dossierProcessId && !els.dossierProcessId.value) {
+    els.dossierProcessId.value = processId;
+  }
+}
+
+function renderComplianceState() {
+  if (!els.complianceRoot) return;
+  if (!state.session || !state.session.accessToken) {
+    els.complianceRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Faça login para consultar a Prova de Conformidade.</p></article>';
+    setComplianceStatus('Autenticação necessária para leitura do relatório.');
+    return;
+  }
+
+  if (state.compliance.loading) {
+    els.complianceRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Carregando relatório de conformidade...</p></article>';
+    return;
+  }
+
+  if (state.compliance.error) {
+    els.complianceRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Erro ao carregar relatório: ' +
+      escapeHtml(state.compliance.error) +
+      '</p></article>';
+    return;
+  }
+
+  if (!state.compliance.report) {
+    els.complianceRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Nenhum relatório carregado para exibição.</p></article>';
+    return;
+  }
+
+  if (!window.ComplianceUI || typeof window.ComplianceUI.renderComplianceReport !== 'function') {
+    els.complianceRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Camada de visualização de compliance indisponível.</p></article>';
+    return;
+  }
+
+  els.complianceRoot.innerHTML = window.ComplianceUI.renderComplianceReport(state.compliance.report);
+}
+
+function onSubmitComplianceQuery(evt) {
+  evt.preventDefault();
+  if (!els.complianceProcessId) return;
+  var processId = String(els.complianceProcessId.value || '').trim();
+  if (!processId) {
+    setComplianceStatus('Informe um Process ID válido.');
+    return;
+  }
+  if (!state.session || !state.session.accessToken) {
+    setComplianceStatus('Autentique-se para consultar o relatório.');
+    renderComplianceState();
+    return;
+  }
+
+  state.compliance.loading = true;
+  state.compliance.error = null;
+  state.compliance.report = null;
+  setComplianceStatus('Consultando relatório de conformidade...');
+  renderComplianceState();
+
+  fetchWithAuth('/api/process/' + encodeURIComponent(processId) + '/compliance-report', { method: 'GET' })
+    .then(function(res) {
+      return res.json().then(function(body) {
+        return { status: res.status, body: body };
+      });
+    })
+    .then(function(result) {
+      if (result.status !== 200 || !result.body || !result.body.success || !result.body.data) {
+        var backendMessage = (result.body && result.body.error && result.body.error.message) || 'Falha na leitura do relatório.';
+        throw new Error(backendMessage);
+      }
+      state.compliance.report = result.body.data;
+      setActiveProcessId(processId);
+      setComplianceStatus('Relatório carregado com sucesso.');
+    })
+    .catch(function(err) {
+      state.compliance.error = err && err.message ? err.message : 'erro inesperado';
+      setComplianceStatus('Falha ao carregar relatório.');
+    })
+    .finally(function() {
+      state.compliance.loading = false;
+      renderComplianceState();
+    });
+}
+
+function loadComplianceByProcess(processId) {
+  if (!els.complianceProcessId || !els.complianceQueryForm) return;
+  els.complianceProcessId.value = processId;
+  var evt = { preventDefault: function() {} };
+  onSubmitComplianceQuery(evt);
+}
+
+function renderDossierState() {
+  if (!els.dossierRoot) return;
+  if (!state.session || !state.session.accessToken) {
+    els.dossierRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Faça login para consultar o dossiê.</p></article>';
+    return;
+  }
+  if (state.dossier.loading) {
+    els.dossierRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Carregando dossiê institucional...</p></article>';
+    return;
+  }
+  if (state.dossier.error) {
+    els.dossierRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Erro ao carregar dossiê: ' +
+      escapeHtml(state.dossier.error) + '</p></article>';
+    return;
+  }
+  if (!state.dossier.data) {
+    els.dossierRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Nenhum dossiê carregado.</p></article>';
+    return;
+  }
+  if (!window.DossierUI || typeof window.DossierUI.renderDossierHtml !== 'function') {
+    els.dossierRoot.innerHTML =
+      '<article class="admin-card"><p class="compliance-empty-line">Camada de renderização de dossiê indisponível.</p></article>';
+    return;
+  }
+  els.dossierRoot.innerHTML = window.DossierUI.renderDossierHtml(state.dossier.data);
+}
+
+function loadDossierByProcess(processId) {
+  if (!processId) return;
+  state.dossier.loading = true;
+  state.dossier.error = null;
+  state.dossier.data = null;
+  if (els.dossierProcessId) els.dossierProcessId.value = processId;
+  setDossierStatus('Consultando dossiê institucional...');
+  renderDossierState();
+
+  fetchWithAuth('/api/process/' + encodeURIComponent(processId) + '/compliance-dossier', { method: 'GET' })
+    .then(function(res) {
+      return res.json().then(function(body) {
+        return { status: res.status, body: body };
+      });
+    })
+    .then(function(result) {
+      if (result.status !== 200 || !result.body || !result.body.success || !result.body.data) {
+        var backendMessage = (result.body && result.body.error && result.body.error.message) || 'Falha na leitura do dossiê.';
+        throw new Error(backendMessage);
+      }
+      state.dossier.data = result.body.data;
+      setActiveProcessId(processId);
+      setDossierStatus('Dossiê carregado com sucesso.');
+    })
+    .catch(function(err) {
+      state.dossier.error = err && err.message ? err.message : 'erro inesperado';
+      setDossierStatus('Falha ao carregar dossiê.');
+    })
+    .finally(function() {
+      state.dossier.loading = false;
+      renderDossierState();
+    });
+}
+
+function onSubmitDossierQuery(evt) {
+  evt.preventDefault();
+  var processId = els.dossierProcessId ? String(els.dossierProcessId.value || '').trim() : '';
+  if (!processId) {
+    setDossierStatus('Informe um Process ID válido.');
+    return;
+  }
+  loadDossierByProcess(processId);
 }
 
 function loadAuthContextAndSettings() {
@@ -489,6 +752,14 @@ function executeScenario() {
   hideError();
 
   var scenario = state.selectedScenario;
+  var processIdFromScenario =
+    scenario &&
+    scenario.request &&
+    scenario.request.payload &&
+    typeof scenario.request.payload.processId === 'string'
+      ? scenario.request.payload.processId
+      : null;
+  if (processIdFromScenario) setActiveProcessId(processIdFromScenario);
 
   fetch(BACKEND_URL + '/api/process/run', {
     method: 'POST',
@@ -503,6 +774,12 @@ function executeScenario() {
     })
     .then(function(payload) {
       renderResult(scenario, payload.data, payload.httpStatus);
+      try {
+        var processIdFromResponse = payload && payload.data && payload.data.process && payload.data.process.processId;
+        if (typeof processIdFromResponse === 'string' && processIdFromResponse) {
+          setActiveProcessId(processIdFromResponse);
+        }
+      } catch (_) {}
       // Atualiza histórico se a aba estiver aberta
       refreshHistoryIfVisible();
     })
@@ -736,6 +1013,10 @@ function init() {
   updateSessionBadge();
   applySettingsEditability();
   void loadAuthContextAndSettings();
+  if (state.currentProcessId) setComplianceStatus('Processo ativo detectado para consulta de conformidade.');
 }
 
 init();
+window.loadComplianceByProcess = loadComplianceByProcess;
+window.setActiveProcessId = setActiveProcessId;
+window.loadDossierByProcess = loadDossierByProcess;

@@ -458,3 +458,4 @@ Registro factual em 2026-03-30:
 | Onda | Escopo | Status | Nota | Evidência |
 |---|---|---|---|---|
 | ONDA 4 | Persistência operacional | CONCLUÍDA | 10/10 | Evidências registradas |
+| ONDA 5 | Prova de conformidade | CONCLUÍDA | 10/10 | Evidências registradas |

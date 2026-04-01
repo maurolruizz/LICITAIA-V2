@@ -35,3 +35,5 @@ export { executeEtpModule } from './domain/etp';
 export { executeTrModule } from './domain/tr';
 export { executePricingModule } from './domain/pricing';
 export * from './ai-assistive';
+export * from './compliance-ui';
+export * from './dossier-ui';

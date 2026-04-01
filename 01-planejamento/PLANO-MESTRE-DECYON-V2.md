@@ -1642,3 +1642,28 @@ Garantias obtidas:
 - isolamento multi-tenant validado
 - rastreabilidade completa
 - ausência de bypass
+
+---
+
+## ONDA 5 — CONCLUÍDA
+
+Status: **100% concluída**
+
+Resumo:
+- Contratos formais de evidência, relatório e dossiê institucional consolidados no backend.
+- Agregação de evidências a partir de fontes canônicas (`processes`, `flow_sessions`, `flow_session_revisions`, `audit_logs`) com rastreabilidade explícita por `sourceRefs`.
+- Composição prudente do `ComplianceReport` com `verdict`, `summary`, `validations`, `blockings`, `automaticReactions`, `timeline`, `score` explicável e `documents`.
+- Materialização da Prova de Conformidade em UX institucional e criação do Dossiê Exportável derivado do relatório canônico.
+
+Decisões críticas:
+- prova de conformidade derivada apenas de fatos canônicos
+- backend compõe; frontend apresenta
+- score explicável sem mascarar impeditivos
+- UX institucional e não cosmética
+- dossiê exportável derivado do ComplianceReport
+
+Garantias obtidas:
+- cliente consegue visualizar o motor de conformidade
+- relatório e score são explicáveis e rastreáveis
+- dossiê institucional preserva vínculo com evidências
+- frontend não possui lógica decisória de conformidade
