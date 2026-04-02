@@ -460,6 +460,22 @@ Registro factual em 2026-03-30:
 | ONDA 4 | Persistência operacional | CONCLUÍDA | 10/10 | Evidências registradas |
 | ONDA 5 | Prova de conformidade | CONCLUÍDA | 10/10 | Evidências registradas |
 
+## 26-A. Registro operacional — ETAPA A / Review real do motor
+
+Registro factual em 2026-04-02:
+
+| Campo | Conteúdo |
+|---|---|
+| **Etapa** | ETAPA A (Frentes 1 e 2) |
+| **Status** | **CONCLUÍDA — 10/10** |
+| **Consolidação técnica** | `TRIGGER_REVIEW` integrado ao motor real, sem `SUCCESS` hardcoded e sem fallback silencioso |
+| **Contrato de erro** | `FLOW_REVIEW_ERROR` restrito para erro técnico de execução do review |
+| **Política de hash** | hash fora do adaptador, com separação de responsabilidade mantida |
+| **Arquivos alterados (núcleo ETAPA A)** | `flow-session.service.ts`; `adapters/snapshot-to-motor-input.ts`; `adapters/motor-result-to-review-result.ts`; contratos associados |
+| **Testes criados** | `adapters/snapshot-to-motor-input.test.ts`; `adapters/motor-result-to-review-result.test.ts`; `flow-session.service.trigger-review.integration.test.ts` |
+| **Validação de execução** | unitários dos adaptadores em verde (5/5 e 9/9) e integração `TRIGGER_REVIEW` em verde (4/4) |
+| **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-A-REVIEW-REAL.md` |
+
 ## 26. Registro operacional — resposta formal à auditoria hostil (HEAD atual)
 
 Registro factual em 2026-04-01:

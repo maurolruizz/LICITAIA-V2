@@ -126,6 +126,7 @@ export async function executeProcessAction(params: {
   updates: FlowFieldUpdate[];
   ipAddress: string | null;
   userAgent: string | null;
+  correlationId?: string;
 }) {
   const process = await runInTransaction(params.tenantId, async (client) =>
     findById(client, params.tenantId, params.processId),

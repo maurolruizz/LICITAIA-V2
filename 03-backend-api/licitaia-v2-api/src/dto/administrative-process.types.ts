@@ -12,6 +12,7 @@ export interface AdministrativeProcessContext {
   payload: Record<string, unknown>;
   timestamp?: string;
   correlationId?: string;
+  execution?: { source: 'standard_execution' | 'preflight' };
 }
 
 export interface AdministrativeProcessResult {

@@ -98,7 +98,16 @@ export function mapRevisionToEvidences(revision: FlowSessionRevisionRecord): Com
   const sourceRefs = [`flow_revision:${revision.id}`, `flow_revision_number:${revision.revision}`];
 
   if (actionNorm === 'TRIGGER_REVIEW') {
-    const finalStatus = typeof snapshot['finalStatus'] === 'string' ? snapshot['finalStatus'] : null;
+    // Alinhamento com o shape real persistido pelo FlowController:
+    // o resultado do review é persistido em `snapshot.reviewResult.finalStatus` (não em `snapshot.finalStatus`).
+    // Mantemos fallback para `snapshot.finalStatus` para retrocompatibilidade com snapshots antigos/provas.
+    const reviewResult = ensureObject(snapshot['reviewResult']);
+    const finalStatus =
+      typeof reviewResult['finalStatus'] === 'string'
+        ? (reviewResult['finalStatus'] as string)
+        : typeof snapshot['finalStatus'] === 'string'
+          ? (snapshot['finalStatus'] as string)
+          : null;
     const summarySuffix =
       finalStatus && finalStatus.trim() !== ''
         ? ` Resultado registrado: ${finalStatus}.`

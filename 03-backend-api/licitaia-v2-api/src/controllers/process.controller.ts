@@ -363,6 +363,7 @@ export async function flowCommandController(req: Request, res: Response): Promis
       updates: Array.isArray(body['updates']) ? (body['updates'] as never[]) : [],
       ipAddress: typeof req.ip === 'string' ? req.ip : null,
       userAgent: typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : null,
+      correlationId: typeof res.locals['requestId'] === 'string' ? res.locals['requestId'] : undefined,
     });
     res.status(200).json(
       withInstitutionalMeta(res, {
@@ -399,7 +400,14 @@ export async function flowCommandController(req: Request, res: Response): Promis
       return;
     }
     const code = error instanceof Error ? error.message : 'FLOW_COMMAND_ERROR';
-    const status = code === 'FLOW_SESSION_NOT_FOUND' ? 404 : code === 'FLOW_ACTION_NOT_SUPPORTED' ? 400 : 409;
+    const status =
+      code === 'FLOW_SESSION_NOT_FOUND'
+        ? 404
+        : code === 'FLOW_ACTION_NOT_SUPPORTED'
+          ? 400
+          : code === 'FLOW_REVIEW_ERROR'
+            ? 500
+            : 409;
     res.status(status).json(
       withInstitutionalMeta(res, {
         success: false,
@@ -537,6 +545,7 @@ export async function executeProcessActionController(req: Request, res: Response
       updates: Array.isArray(body['updates']) ? (body['updates'] as never[]) : [],
       ipAddress: typeof req.ip === 'string' ? req.ip : null,
       userAgent: typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : null,
+      correlationId: typeof res.locals['requestId'] === 'string' ? res.locals['requestId'] : undefined,
     });
     res.status(200).json(withInstitutionalMeta(res, { success: true, data: { processId, state } }));
   } catch (error) {

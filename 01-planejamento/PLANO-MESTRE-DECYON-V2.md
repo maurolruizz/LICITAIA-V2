@@ -1667,3 +1667,25 @@ Garantias obtidas:
 - relatório e score são explicáveis e rastreáveis
 - dossiê institucional preserva vínculo com evidências
 - frontend não possui lógica decisória de conformidade
+
+---
+
+11.36 REGISTRO NORMATIVO — ETAPA A (REVIEW REAL) — ENCERRAMENTO FORMAL
+
+Registrado em: 2026-04-02  
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-A-REVIEW-REAL.md`
+
+Status normativo:
+- **ETAPA A — CONCLUÍDA (10/10)**.
+
+Resumo técnico consolidado:
+1) integração real do motor administrativo na ação `TRIGGER_REVIEW` (remoção de retorno `SUCCESS` hardcoded);
+2) implementação de adaptadores puros de entrada/saída para acoplamento controlado do snapshot com o motor;
+3) contrato de erro de review consolidado com `FLOW_REVIEW_ERROR` restrito para falha técnica, sem confundir com bloqueio normativo;
+4) política de hash corrigida: cálculo fora do adaptador, com separação de responsabilidade preservada;
+5) testes completos de ETAPA A aprovados (unitário + integração), cobrindo sucesso, falha normativa, erro técnico e regressão sem fallback silencioso.
+
+Regra de fechamento:
+- este registro formaliza o encerramento integral da ETAPA A no escopo das Frentes 1 e 2 para o fluxo de review real;
+- encerramento condicionado a evidência reexecutável e rastreabilidade Git no mesmo ciclo documental.

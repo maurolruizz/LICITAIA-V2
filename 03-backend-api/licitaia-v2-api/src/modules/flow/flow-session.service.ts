@@ -32,6 +32,10 @@ import {
   updateWithRevisionCheck,
 } from './flow-session.repository';
 import { insertLog } from '../audit/audit.repository';
+import { getRunAdministrativeProcess } from '../../lib/frontend-core-loader';
+import { snapshotToMotorInput } from './adapters/snapshot-to-motor-input';
+import { motorResultToReviewResult } from './adapters/motor-result-to-review-result';
+import type { OperationalStateContract } from './adapters/review-adapter.types';
 
 export class FlowOperationError extends Error {
   public readonly code: string;
@@ -120,95 +124,148 @@ export async function executeFlowAction(params: {
   updates: FlowFieldUpdate[];
   ipAddress: string | null;
   userAgent: string | null;
+  correlationId?: string;
 }): Promise<Record<string, unknown>> {
-  return await runInTransaction(params.tenantId, async (client) => {
-    const current = await findByProcessId(client, params.tenantId, params.processId);
-    if (!current) throw new FlowOperationError('FLOW_SESSION_NOT_FOUND');
+  try {
+    return await runInTransaction(params.tenantId, async (client) => {
+      const current = await findByProcessId(client, params.tenantId, params.processId);
+      if (!current) throw new FlowOperationError('FLOW_SESSION_NOT_FOUND');
 
-    const controller = new FlowController(params.processId, current.snapshot);
+      const controller = new FlowController(params.processId, current.snapshot);
 
-    let nextStateUnknown: unknown;
-    if (params.action === 'SAVE_CURRENT_STEP') {
-      nextStateUnknown = controller.saveCurrentStep(params.guard, params.updates);
-    } else if (params.action === 'ADVANCE_TO_NEXT_STEP') {
-      nextStateUnknown = controller.advanceStep(params.guard);
-    } else if (params.action === 'RETURN_TO_PREVIOUS_STEP') {
-      nextStateUnknown = controller.returnToPreviousStep(params.guard);
-    } else if (params.action === 'TRIGGER_REVIEW') {
-      nextStateUnknown = await controller.triggerReview(params.guard, async () => {
-        const latest = controller.getState();
-        return {
-          finalStatus: 'SUCCESS',
-          validations: [],
-          executedModules: ['DFD', 'ETP', 'TR', 'PRICING'],
-          reviewSnapshotHash: reviewSnapshotHashFromState(latest),
-        };
+      let nextStateUnknown: unknown;
+      if (params.action === 'SAVE_CURRENT_STEP') {
+        nextStateUnknown = controller.saveCurrentStep(params.guard, params.updates);
+      } else if (params.action === 'ADVANCE_TO_NEXT_STEP') {
+        nextStateUnknown = controller.advanceStep(params.guard);
+      } else if (params.action === 'RETURN_TO_PREVIOUS_STEP') {
+        nextStateUnknown = controller.returnToPreviousStep(params.guard);
+      } else if (params.action === 'TRIGGER_REVIEW') {
+        nextStateUnknown = await controller.triggerReview(params.guard, async () => {
+          const latest = controller.getState();
+          const reviewSnapshotHash = reviewSnapshotHashFromState(latest);
+          try {
+            const motorInput = snapshotToMotorInput(latest as OperationalStateContract, {
+              processId: params.processId,
+              tenantId: params.tenantId,
+              userId: params.userId,
+              ...(params.correlationId ? { correlationId: params.correlationId } : {}),
+            });
+            const runAdministrativeProcess = getRunAdministrativeProcess();
+            const motorResult = await runAdministrativeProcess(motorInput);
+            const mapped = motorResultToReviewResult(motorResult);
+            const { finalStatus, haltedDetail, validations, executedModules } = mapped;
+
+            // Regra arquitetural: hash do review vem do snapshot do FlowController no momento do review.
+            return {
+              finalStatus,
+              haltedDetail,
+              validations: [...validations],
+              executedModules: [...executedModules],
+              reviewSnapshotHash,
+            };
+          } catch {
+            // FLOW_REVIEW_ERROR é reservado exclusivamente a falhas técnicas da execução real do review
+            // (snapshotToMotorInput/getRunAdministrativeProcess/runAdministrativeProcess/motorResultToReviewResult).
+            throw new FlowOperationError('FLOW_REVIEW_ERROR');
+          }
+        });
+      } else {
+        throw new FlowOperationError('FLOW_ACTION_NOT_SUPPORTED');
+      }
+
+      const nextState = normalizeSnapshot(ensureObject(nextStateUnknown));
+      const nextRevision =
+        typeof nextState['revision'] === 'number'
+          ? nextState['revision']
+          : params.guard.expectedRevision + 1;
+      const nextRenderToken = generateRenderToken(nextState, nextRevision);
+      nextState['renderToken'] = nextRenderToken;
+
+      const updated = await updateWithRevisionCheck(client, {
+        id: current.id,
+        tenantId: params.tenantId,
+        expectedRevision: params.guard.expectedRevision,
+        expectedRenderToken: params.guard.expectedRenderToken,
+        snapshot: nextState,
+        revision: nextRevision,
+        renderToken: nextRenderToken,
+        actorUserId: params.userId,
       });
-    } else {
-      throw new FlowOperationError('FLOW_ACTION_NOT_SUPPORTED');
-    }
 
-    const nextState = normalizeSnapshot(ensureObject(nextStateUnknown));
-    const nextRevision =
-      typeof nextState['revision'] === 'number'
-        ? nextState['revision']
-        : params.guard.expectedRevision + 1;
-    const nextRenderToken = generateRenderToken(nextState, nextRevision);
-    nextState['renderToken'] = nextRenderToken;
+      if (!updated) {
+        throw new FlowOperationError('STALE_STATE');
+      }
 
-    const updated = await updateWithRevisionCheck(client, {
-      id: current.id,
-      tenantId: params.tenantId,
-      expectedRevision: params.guard.expectedRevision,
-      expectedRenderToken: params.guard.expectedRenderToken,
-      snapshot: nextState,
-      revision: nextRevision,
-      renderToken: nextRenderToken,
-      actorUserId: params.userId,
-    });
+      const revision = await insertRevision(client, {
+        tenantId: params.tenantId,
+        flowSessionId: updated.id,
+        processId: params.processId,
+        revision: updated.revision,
+        renderToken: updated.renderToken,
+        snapshot: updated.snapshot,
+        action: params.action,
+        actorUserId: params.userId,
+      });
 
-    if (!updated) {
-      throw new FlowOperationError('STALE_STATE');
-    }
-
-    const revision = await insertRevision(client, {
-      tenantId: params.tenantId,
-      flowSessionId: updated.id,
-      processId: params.processId,
-      revision: updated.revision,
-      renderToken: updated.renderToken,
-      snapshot: updated.snapshot,
-      action: params.action,
-      actorUserId: params.userId,
-    });
-
-    await insertLog(client, {
-      tenantId: params.tenantId,
-      userId: params.userId,
-      action: 'FLOW_ACTION_EXECUTED',
-      resourceType: 'flow_session',
-      resourceId: updated.id,
-      metadata: {
-        event_type: 'FLOW_ACTION_EXECUTED',
-        process_id: params.processId,
-        flow_session_id: updated.id,
-        tenant_id: params.tenantId,
-        user_id: params.userId,
-        previous_revision: current.revision,
-        new_revision: updated.revision,
-        action_type: params.action,
-        affected_module: 'FLOW_CONTROLLER',
-        timestamp: revision.createdAt,
-        payload: {
-          previous_render_token: current.renderToken,
-          new_render_token: updated.renderToken,
-          flow_revision_record_id: revision.id,
+      await insertLog(client, {
+        tenantId: params.tenantId,
+        userId: params.userId,
+        action: 'FLOW_ACTION_EXECUTED',
+        resourceType: 'flow_session',
+        resourceId: updated.id,
+        metadata: {
+          event_type: 'FLOW_ACTION_EXECUTED',
+          process_id: params.processId,
+          flow_session_id: updated.id,
+          tenant_id: params.tenantId,
+          user_id: params.userId,
+          previous_revision: current.revision,
+          new_revision: updated.revision,
+          action_type: params.action,
+          affected_module: 'FLOW_CONTROLLER',
+          timestamp: revision.createdAt,
+          payload: {
+            previous_render_token: current.renderToken,
+            new_render_token: updated.renderToken,
+            flow_revision_record_id: revision.id,
+          },
         },
-      },
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-    });
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+      });
 
-    return updated.snapshot;
-  });
+      return updated.snapshot;
+    });
+  } catch (error) {
+    if (
+      params.action === 'TRIGGER_REVIEW' &&
+      error instanceof FlowOperationError &&
+      error.code === 'FLOW_REVIEW_ERROR'
+    ) {
+      await runInTransaction(params.tenantId, async (client) => {
+        const current = await findByProcessId(client, params.tenantId, params.processId);
+        await insertLog(client, {
+          tenantId: params.tenantId,
+          userId: params.userId,
+          action: 'FLOW_REVIEW_ERROR',
+          resourceType: 'flow_session',
+          resourceId: current?.id ?? null,
+          metadata: {
+            event_type: 'FLOW_REVIEW_ERROR',
+            process_id: params.processId,
+            flow_session_id: current?.id ?? null,
+            tenant_id: params.tenantId,
+            user_id: params.userId,
+            action_type: params.action,
+            affected_module: 'FLOW_CONTROLLER',
+            error: { message: error.message, name: error.name },
+          },
+          ipAddress: params.ipAddress,
+          userAgent: params.userAgent,
+        });
+      });
+    }
+    throw error;
+  }
 }
