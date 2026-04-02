@@ -74,7 +74,23 @@ Saida obrigatoria registrada pela prova:
 5. Atualizacoes foram executadas na mesma etapa?
    - SIM
 
-## 6. Veredito
+## 6. Riscos residuais
+
+1. Rate limit atual é in-memory:
+   - em ambiente com múltiplas instâncias sem store compartilhado, o limite é aplicado por instância;
+   - a mitigação estrutural futura prevista é store compartilhado (ex.: Redis), sem necessidade de refatoração destrutiva porque a abstração `RateLimitStore` já foi criada.
+
+2. `TRUST_PROXY_HOPS` depende da topologia real:
+   - quando houver proxy reverso legítimo, o valor precisa refletir corretamente a topologia real para evitar falsa confiança ou perda do IP real;
+   - qualquer mudança de infraestrutura deve revisar explicitamente essa configuração.
+
+3. Cenários futuros com CDN/proxy encadeado:
+   - se houver CDN ou múltiplos proxies legítimos, a política de confiança deve evoluir com observabilidade adicional e eventual allowlist de rede;
+   - isso não invalida a ETAPA D no escopo atual local/fechado.
+
+Os riscos residuais acima não invalidam a ETAPA D no escopo atual; apenas delimitam o comportamento esperado para ambientes distribuídos e infraestruturas futuras.
+
+## 7. Veredito
 
 - Etapa D no escopo de hardening HTTP: **APROVADA (10/10)**
 - Prova executavel real: **DISPONIVEL E REEXECUTAVEL**
