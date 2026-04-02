@@ -504,3 +504,19 @@ Limite formal desta rodada:
 - a evidência consolidada desta rodada é **estrutural de HEAD** (code-level);
 - **prova runtime E2E completa** (ambiente vivo com autenticação, banco e simulação operacional de falhas) permanece como etapa residual para reauditoria externa controlada;
 - esta limitação é documental e explicitamente reconhecida, sem mascaramento.
+
+## 27. Registro operacional — ETAPA B / Blindagem estrutural FORCE RLS (tabelas operacionais críticas)
+
+Registro factual em 2026-04-02:
+
+| Campo | Conteúdo |
+|---|---|
+| **Etapa** | ETAPA B (Frente 3) |
+| **Status** | **CONCLUÍDA — 10/10** |
+| **Risco crítico tratado** | ausência de `FORCE ROW LEVEL SECURITY` em `processes`, `flow_sessions`, `flow_session_revisions` |
+| **Consolidação técnica** | migration `012_etapa_b_force_rls_process_flow_tables.sql` aplicada com `ENABLE RLS + FORCE RLS` nas três tabelas |
+| **Rollback formal** | `05-banco-de-dados/migrations/rollback/012_etapa_b_force_rls_process_flow_tables.down.sql` |
+| **Prova executável real** | `03-backend-api/licitaia-v2-api/src/proof/etapa-b-force-rls-multitenant-validation.ts` (`npm run proof:etapa-b`) |
+| **Evidência de catálogo** | `relrowsecurity=true` e `relforcerowsecurity=true` nas três tabelas alvo |
+| **Compatibilidade de contexto** | prova executada com `withTenantContext`, sem regressão funcional no contexto de tenant |
+| **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-B-FORCE-RLS-2026-04-02.md` |

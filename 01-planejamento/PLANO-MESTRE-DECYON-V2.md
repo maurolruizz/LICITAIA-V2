@@ -1689,3 +1689,34 @@ Resumo técnico consolidado:
 Regra de fechamento:
 - este registro formaliza o encerramento integral da ETAPA A no escopo das Frentes 1 e 2 para o fluxo de review real;
 - encerramento condicionado a evidência reexecutável e rastreabilidade Git no mesmo ciclo documental.
+
+---
+
+11.37 REGISTRO NORMATIVO — ETAPA B (FORCE RLS ESTRUTURAL EM TABELAS OPERACIONAIS CRITICAS)
+
+Registrado em: 2026-04-02  
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-B-FORCE-RLS-2026-04-02.md`
+
+Objetivo do registro:
+- eliminar risco crítico de isolamento multi-tenant incompleto por ausência de `FORCE ROW LEVEL SECURITY` nas tabelas operacionais da condução;
+- elevar a blindagem estrutural para depender do banco (e não apenas da aplicação).
+
+Consolidações estruturais:
+1) migration `012_etapa_b_force_rls_process_flow_tables.sql` aplicada para:
+   - `processes`
+   - `flow_sessions`
+   - `flow_session_revisions`
+2) rollback formal obrigatório criado em:
+   - `05-banco-de-dados/migrations/rollback/012_etapa_b_force_rls_process_flow_tables.down.sql`
+3) prova executável real criada:
+   - `03-backend-api/licitaia-v2-api/src/proof/etapa-b-force-rls-multitenant-validation.ts`
+4) validação em banco real do catálogo (`relrowsecurity=true`, `relforcerowsecurity=true`) nas três tabelas alvo;
+5) isolamento hostil comprovado com role não-superuser e sem `BYPASSRLS` (`licitaia_app`), incluindo:
+   - leitura cross-tenant bloqueada;
+   - update/delete cross-tenant bloqueados;
+   - ausência de acesso amplo sem tenant context.
+
+Regra de status:
+- este registro declara o fechamento da ETAPA B no escopo de blindagem estrutural FORCE RLS das tabelas operacionais críticas;
+- a conclusão depende de evidência reexecutável, rastreabilidade Git e checkpoint normativo no mesmo ciclo.
