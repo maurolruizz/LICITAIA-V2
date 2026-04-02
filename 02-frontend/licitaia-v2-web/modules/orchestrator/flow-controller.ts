@@ -49,6 +49,10 @@ export class FlowStateStaleError extends Error {
 export class FlowController {
   private state: OperationalStateContract;
   private stepFieldsByStep: Record<FlowStep, StepFieldState[]>;
+  private static readonly REGIME_CRITICAL_FIELDS = new Set<StepFieldId>([
+    'REG_LEGAL_REGIME',
+    'REG_PROCUREMENT_STRATEGY',
+  ]);
 
   constructor(processId: string, seedState?: OperationalStateContract) {
     if (seedState) {
@@ -77,7 +81,7 @@ export class FlowController {
     const changed = this.applyFieldUpdates(fields, updates);
     if (!changed) return this.getState();
 
-    const invalidated = this.invalidateDownstream(targetStep, 'INVALIDATION_EXPLICIT_SEGMENT_RESET');
+    const invalidated = this.invalidateDownstream(targetStep, this.resolveInvalidationReasonForStep(targetStep));
     this.bumpRevisionAndHistory('STEP_SAVED', targetStep, {
       targetStep,
       changedFields: updates.map((u) => u.fieldId),
@@ -222,11 +226,15 @@ export class FlowController {
   }
 
   private assertRegimeFreezeViolation(step: FlowStep, fieldIds: StepFieldId[]): void {
-    const regimeFields = new Set<StepFieldId>(['REG_LEGAL_REGIME', 'REG_PROCUREMENT_STRATEGY']);
-    const regimeFrozen = getStepIndex(this.state.currentStep) > getStepIndex('REGIME');
+    const regimeFrozen = this.isRegimeEffectivelyFrozen();
     if (!regimeFrozen || step !== 'REGIME') return;
-    const attempted = fieldIds.find((id) => regimeFields.has(id));
+    const attempted = fieldIds.find((id) => FlowController.REGIME_CRITICAL_FIELDS.has(id));
     if (!attempted) return;
+    this.appendHistory('REGIME_FREEZE_VIOLATION', 'REGIME', {
+      attemptedField: attempted,
+      currentStep: this.state.currentStep,
+      revision: this.state.revision,
+    });
     this.state.activeBlockings.push(
       this.createFlowBlocking('FLOW_REGIME_FROZEN', 'REGIME', {
         kind: 'FLOW_REGIME_FROZEN',
@@ -235,6 +243,23 @@ export class FlowController {
       })
     );
     throw new Error('FLOW_REGIME_FROZEN');
+  }
+
+  private isRegimeEffectivelyFrozen(): boolean {
+    const currentBeyondRegime = getStepIndex(this.state.currentStep) > getStepIndex('REGIME');
+    if (currentBeyondRegime) return true;
+    // Regime permanece congelado apos consolidacao do fluxo downstream,
+    // mesmo que o operador retorne para REGIME por navegacao.
+    return FLOW_STEP_ORDER
+      .slice(getStepIndex('REGIME') + 1)
+      .some((step) => this.state.stepStatusMap[step] !== 'LOCKED');
+  }
+
+  private resolveInvalidationReasonForStep(step: FlowStep): FlowInvalidationReasonCode {
+    if (step === 'CONTEXT' || step === 'REGIME') {
+      return 'INVALIDATION_REGIME_OR_CONTEXT_REOPEN';
+    }
+    return 'INVALIDATION_EXPLICIT_SEGMENT_RESET';
   }
 
   private applyFieldUpdates(

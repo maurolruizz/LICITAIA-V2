@@ -48,6 +48,72 @@ describe('FlowController', () => {
     const state = controller.getState();
     assert.equal(state.stepStatusMap.REGIME, 'INVALIDATED');
     assert.ok(state.activeBlockings.some((blocking) => blocking.code === 'FLOW_INVALIDATED_DOWNSTREAM'));
+    const invalidationCodes = state.activeBlockings
+      .filter((blocking) => blocking.code === 'FLOW_INVALIDATED_DOWNSTREAM')
+      .map((blocking) =>
+        blocking.details.kind === 'FLOW_INVALIDATED_DOWNSTREAM' ? blocking.details.reasonCode : null
+      );
+    assert.ok(invalidationCodes.includes('INVALIDATION_EXPLICIT_SEGMENT_RESET'));
+  });
+
+  it('uses regime/context reopen reason when invalidating after context mutation', () => {
+    const controller = new FlowController('PROC_INVALIDATION_CONTEXT_REOPEN');
+    controller.saveCurrentStep(guardOf(controller), [
+      { fieldId: 'INIT_CONFIRM', value: { valueType: 'BOOLEAN', value: true }, isValid: true },
+    ]);
+    controller.advanceStep(guardOf(controller));
+    controller.saveCurrentStep(guardOf(controller), [
+      { fieldId: 'CTX_TENANT_SLUG', value: { valueType: 'STRING', value: 'tenant-x' }, isValid: true },
+      { fieldId: 'CTX_OPERATOR_NOTE', value: { valueType: 'STRING', value: 'note' }, isValid: true },
+    ]);
+    controller.advanceStep(guardOf(controller));
+    controller.saveCurrentStep(guardOf(controller), [
+      { fieldId: 'REG_LEGAL_REGIME', value: { valueType: 'STRING', value: 'LICITACAO' }, isValid: true },
+      { fieldId: 'REG_PROCUREMENT_STRATEGY', value: { valueType: 'STRING', value: 'PREGAO' }, isValid: true },
+    ]);
+    controller.advanceStep(guardOf(controller));
+    controller.returnToPreviousStep(guardOf(controller));
+    controller.returnToPreviousStep(guardOf(controller));
+    controller.saveCurrentStep(guardOf(controller), [
+      { fieldId: 'CTX_OPERATOR_NOTE', value: { valueType: 'STRING', value: 'note-updated' }, isValid: true },
+    ]);
+    const state = controller.getState();
+    const reasons = state.activeBlockings
+      .filter((blocking) => blocking.code === 'FLOW_INVALIDATED_DOWNSTREAM')
+      .map((blocking) =>
+        blocking.details.kind === 'FLOW_INVALIDATED_DOWNSTREAM' ? blocking.details.reasonCode : null
+      );
+    assert.ok(reasons.includes('INVALIDATION_REGIME_OR_CONTEXT_REOPEN'));
+  });
+
+  it('blocks critical regime mutation after regime consolidation even after returning to REGIME', () => {
+    const controller = new FlowController('PROC_REGIME_FREEZE_HARD');
+    controller.saveCurrentStep(guardOf(controller), [
+      { fieldId: 'INIT_CONFIRM', value: { valueType: 'BOOLEAN', value: true }, isValid: true },
+    ]);
+    controller.advanceStep(guardOf(controller));
+    controller.saveCurrentStep(guardOf(controller), [
+      { fieldId: 'CTX_TENANT_SLUG', value: { valueType: 'STRING', value: 'tenant-a' }, isValid: true },
+      { fieldId: 'CTX_OPERATOR_NOTE', value: { valueType: 'STRING', value: 'ok' }, isValid: true },
+    ]);
+    controller.advanceStep(guardOf(controller));
+    controller.saveCurrentStep(guardOf(controller), [
+      { fieldId: 'REG_LEGAL_REGIME', value: { valueType: 'STRING', value: 'LICITACAO' }, isValid: true },
+      { fieldId: 'REG_PROCUREMENT_STRATEGY', value: { valueType: 'STRING', value: 'PREGAO' }, isValid: true },
+    ]);
+    controller.advanceStep(guardOf(controller));
+    controller.returnToPreviousStep(guardOf(controller));
+    assert.equal(controller.getState().currentStep, 'REGIME');
+
+    assert.throws(() =>
+      controller.saveCurrentStep(guardOf(controller), [
+        { fieldId: 'REG_LEGAL_REGIME', value: { valueType: 'STRING', value: 'DISPENSA' }, isValid: true },
+      ])
+    );
+
+    const state = controller.getState();
+    assert.ok(state.activeBlockings.some((blocking) => blocking.code === 'FLOW_REGIME_FROZEN'));
+    assert.ok(state.immutableHistory.some((event) => event.type === 'REGIME_FREEZE_VIOLATION'));
   });
 
   it('keeps output blocked until valid review result', async () => {

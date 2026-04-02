@@ -265,6 +265,7 @@ export interface ImmutableHistoryItem {
     | 'STEP_ADVANCED'
     | 'STEP_RETURNED'
     | 'STEP_INVALIDATED'
+    | 'REGIME_FREEZE_VIOLATION'
     | 'REVIEW_EXECUTED'
     | 'OUTPUT_EXPOSED';
   step: FlowStep;

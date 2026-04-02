@@ -1720,3 +1720,31 @@ Consolidações estruturais:
 Regra de status:
 - este registro declara o fechamento da ETAPA B no escopo de blindagem estrutural FORCE RLS das tabelas operacionais críticas;
 - a conclusão depende de evidência reexecutável, rastreabilidade Git e checkpoint normativo no mesmo ciclo.
+
+---
+
+11.38 REGISTRO NORMATIVO — ETAPA C (FREEZE EFETIVO DE REGIME NO FLOWCONTROLLER)
+
+Registrado em: 2026-04-02  
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-C-FREEZE-REGIME-2026-04-02.md`
+
+Objetivo do registro:
+- eliminar a brecha de mutação tardia de regime após consolidação do passo `REGIME`;
+- garantir bloqueio explícito de campos críticos de regime, sem fallback silencioso;
+- assegurar invalidação downstream determinística com razão auditável quando houver reabertura de contexto/regime.
+
+Consolidações estruturais:
+1) endurecimento do freeze no `FlowController` para permanecer ativo após consolidação do regime, inclusive quando houver retorno de navegação ao passo `REGIME`;
+2) bloqueio explícito de tentativa inválida com `FLOW_REGIME_FROZEN` e registro de evento imutável `REGIME_FREEZE_VIOLATION`;
+3) classificação determinística de invalidação downstream:
+   - `INVALIDATION_REGIME_OR_CONTEXT_REOPEN` para mutações em `CONTEXT`/`REGIME`;
+   - `INVALIDATION_EXPLICIT_SEGMENT_RESET` para demais passos;
+4) cobertura de prova executável adicionada para:
+   - bloqueio de mutação crítica após consolidação;
+   - auditoria de violação de freeze;
+   - razão de invalidação por reabertura de contexto.
+
+Regra de status:
+- este registro declara o fechamento da ETAPA C no escopo de freeze efetivo de regime no fluxo de condução;
+- a conclusão depende de evidência reexecutável, rastreabilidade Git e checkpoint normativo no mesmo ciclo.

@@ -520,3 +520,18 @@ Registro factual em 2026-04-02:
 | **Evidência de catálogo** | `relrowsecurity=true` e `relforcerowsecurity=true` nas três tabelas alvo |
 | **Compatibilidade de contexto** | prova executada com `withTenantContext`, sem regressão funcional no contexto de tenant |
 | **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-B-FORCE-RLS-2026-04-02.md` |
+
+## 28. Registro operacional — ETAPA C / Freeze efetivo de regime no fluxo de condução
+
+Registro factual em 2026-04-02:
+
+| Campo | Conteúdo |
+|---|---|
+| **Etapa** | ETAPA C (Frente 4) |
+| **Status** | **CONCLUÍDA — 10/10** |
+| **Risco crítico tratado** | mutação tardia de campos de regime após consolidação do passo `REGIME` |
+| **Consolidação técnica** | freeze efetivo de `REG_LEGAL_REGIME` e `REG_PROCUREMENT_STRATEGY` mesmo após retorno ao passo `REGIME`; bloqueio explícito via `FLOW_REGIME_FROZEN`; registro imutável de `REGIME_FREEZE_VIOLATION` |
+| **Invalidação downstream** | classificação determinística: `INVALIDATION_REGIME_OR_CONTEXT_REOPEN` para mutações de `CONTEXT`/`REGIME`; `INVALIDATION_EXPLICIT_SEGMENT_RESET` para demais passos |
+| **Prova executável real** | `02-frontend/licitaia-v2-web/modules/orchestrator/flow-controller.test.ts` (9/9 em verde via `npx vitest modules/orchestrator/flow-controller.test.ts`) |
+| **Sem fallback silencioso** | tentativa inválida gera violação explícita, blocking hard e erro `FLOW_REGIME_FROZEN` |
+| **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-C-FREEZE-REGIME-2026-04-02.md` |
