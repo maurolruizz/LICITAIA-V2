@@ -1,10 +1,12 @@
 import type { NextFunction, Request, Response } from 'express';
 import { buildInstitutionalMeta } from '../lib/response-meta';
+import { resolveClientIp } from '../lib/client-ip';
 
 type RateLimitOptions = {
   windowMs: number;
   maxRequests: number;
   keyPrefix?: string;
+  store?: RateLimitStore;
 };
 
 type CounterEntry = {
@@ -12,31 +14,53 @@ type CounterEntry = {
   resetAt: number;
 };
 
-const counters = new Map<string, CounterEntry>();
+type RateLimitStore = {
+  get(key: string): CounterEntry | undefined;
+  set(key: string, value: CounterEntry): void;
+};
 
-function getClientIdentifier(req: Request): string {
-  const forwardedFor = req.headers['x-forwarded-for'];
-  if (typeof forwardedFor === 'string' && forwardedFor.trim() !== '') {
-    return forwardedFor.split(',')[0]?.trim() || 'unknown-forwarded';
+class InMemoryRateLimitStore implements RateLimitStore {
+  private readonly counters = new Map<string, CounterEntry>();
+
+  get(key: string): CounterEntry | undefined {
+    return this.counters.get(key);
   }
-  return req.ip || 'unknown-ip';
+
+  set(key: string, value: CounterEntry): void {
+    this.counters.set(key, value);
+  }
 }
+
+const defaultStore = new InMemoryRateLimitStore();
 
 export function createRateLimitMiddleware(options: RateLimitOptions) {
   const keyPrefix = options.keyPrefix ?? 'rate-limit';
+  const store = options.store ?? defaultStore;
 
   return function rateLimitMiddleware(
     req: Request,
     res: Response,
     next: NextFunction,
   ): void {
+    const clientIp = resolveClientIp(req);
+    if (!clientIp) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: 'CLIENT_IP_RESOLUTION_FAILED',
+          message: 'Nao foi possivel determinar o IP de origem da requisicao.',
+        },
+        meta: buildInstitutionalMeta(res),
+      });
+      return;
+    }
+
     const now = Date.now();
-    const clientId = getClientIdentifier(req);
-    const key = `${keyPrefix}:${clientId}`;
-    const current = counters.get(key);
+    const key = `${keyPrefix}:${clientIp}`;
+    const current = store.get(key);
 
     if (!current || current.resetAt <= now) {
-      counters.set(key, {
+      store.set(key, {
         count: 1,
         resetAt: now + options.windowMs,
       });
@@ -62,7 +86,7 @@ export function createRateLimitMiddleware(options: RateLimitOptions) {
     }
 
     current.count += 1;
-    counters.set(key, current);
+    store.set(key, current);
     next();
   };
 }

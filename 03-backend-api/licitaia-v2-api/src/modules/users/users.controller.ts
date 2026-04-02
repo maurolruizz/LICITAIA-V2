@@ -14,13 +14,10 @@ import { buildInstitutionalMeta } from '../../lib/response-meta';
 import { logger } from '../../middleware/logger';
 import type { AuthenticatedContext } from '../auth/auth.types';
 import type { CreateUserBody, PatchUserBody } from './users.types';
+import { resolveClientIp } from '../../lib/client-ip';
 
 function getIp(req: Request): string | null {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (typeof forwarded === 'string') {
-    return forwarded.split(',')[0]?.trim() ?? null;
-  }
-  return req.socket?.remoteAddress ?? null;
+  return resolveClientIp(req);
 }
 
 function getUserAgent(req: Request): string | null {

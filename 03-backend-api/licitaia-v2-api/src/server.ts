@@ -51,9 +51,16 @@ const processRateLimitMiddleware = createRateLimitMiddleware({
   maxRequests: 120,
   keyPrefix: 'process',
 });
+const usersRateLimitMiddleware = createRateLimitMiddleware({
+  windowMs: 10_000,
+  maxRequests: 5,
+  keyPrefix: 'users',
+});
 
 // FASE 44 — Remove o header "X-Powered-By: Express" da superfície HTTP.
 app.disable('x-powered-by');
+// ETAPA D — trust proxy explícito e fechado por padrão (0 = não confiar).
+app.set('trust proxy', config.trustProxyHops);
 
 // --- Middlewares de borda ---
 app.use(corsMiddleware);
@@ -90,7 +97,7 @@ app.use((req, res, next) => {
 app.use('/health', healthRouter);
 app.use('/diagnostics', diagnosticsRouter);
 app.use('/api/auth', authRateLimitMiddleware, authRouter);
-app.use('/api/users', usersRouter);
+app.use('/api/users', usersRateLimitMiddleware, usersRouter);
 app.use('/api/institutional-settings', institutionalSettingsRouter);
 app.use('/api/process', processRateLimitMiddleware, processRouter);
 // FI5: endpoint seguro de histórico preferencial: /api/process/executions

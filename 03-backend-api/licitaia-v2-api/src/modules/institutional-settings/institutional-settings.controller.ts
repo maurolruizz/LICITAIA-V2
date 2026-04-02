@@ -7,13 +7,10 @@ import {
   InstitutionalSettingsError,
   updateInstitutionalSettings,
 } from './institutional-settings.service';
+import { resolveClientIp } from '../../lib/client-ip';
 
 function getIp(req: Request): string | null {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (typeof forwarded === 'string') {
-    return forwarded.split(',')[0]?.trim() ?? null;
-  }
-  return req.socket?.remoteAddress ?? null;
+  return resolveClientIp(req);
 }
 
 function getUserAgent(req: Request): string | null {

@@ -1749,3 +1749,39 @@ Consolidações estruturais:
 Regra de status:
 - este registro declara o fechamento da ETAPA C no escopo de freeze efetivo de regime no fluxo de condução;
 - a conclusão depende de evidência reexecutável, rastreabilidade Git e checkpoint normativo no mesmo ciclo.
+
+---
+
+11.39 REGISTRO NORMATIVO — ETAPA D (HARDENING HTTP: ANTI-SPOOF DE IP + RATE LIMIT EM /api/users)
+
+Registrado em: 2026-04-02  
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-D-HARDENING-2026-04-02.md`
+
+Objetivo do registro:
+- eliminar risco de spoof de IP por confiança indevida em `X-Forwarded-For`;
+- endurecer controle de abuso de endpoint administrativo em `/api/users`;
+- consolidar prova executável real e reexecutável do cenário hostil.
+
+Consolidações estruturais:
+1) resolução de IP centralizada em `src/lib/client-ip.ts` com política determinística:
+   - base segura em `req.socket.remoteAddress`;
+   - `X-Forwarded-For` só considerado com `trust proxy` explicitamente habilitado;
+   - validação de IP antes de uso.
+2) `trust proxy` explicitamente configurado em `server.ts` via `config.trustProxyHops`:
+   - padrão fechado (`0`) para não confiar em proxy por omissão;
+   - sem uso de configuração aberta `true`.
+3) hardening do rate limit:
+   - chave por IP resolvido de forma segura;
+   - resposta explícita em falha de resolução de IP (`CLIENT_IP_RESOLUTION_FAILED`);
+   - estrutura desacoplada por `RateLimitStore` (in-memory atual, pronta para troca por Redis sem refatoração estrutural).
+4) ativação de rate limit efetivo em `/api/users` com bloqueio `HTTP 429`.
+5) eliminação de captura de IP duplicada e insegura em controllers críticos (auth/users/institutional-settings), migrando para resolvedor central.
+6) prova executável real criada em:
+   - `03-backend-api/licitaia-v2-api/src/proof/etapa-d-http-hardening-validation.ts`
+   - script oficial: `npm run proof:etapa-d`.
+
+Critérios de evidência desta etapa:
+- spoof de `X-Forwarded-For` bloqueado;
+- abuso de `/api/users` bloqueado por rate limit com `429`;
+- fluxo normal preservado sem regressão.

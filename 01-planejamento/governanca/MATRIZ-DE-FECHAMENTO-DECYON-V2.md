@@ -535,3 +535,20 @@ Registro factual em 2026-04-02:
 | **Prova executável real** | `03-backend-api/licitaia-v2-api/src/proof/etapa-c-freeze-regime-validation.ts` via `npm run proof:etapa-c` com saída obrigatória `[ETAPA_C_FREEZE_OK]` + evidência de `process_id` e `REGIME_FREEZE_VIOLATION`; cobertura unitária complementar em `flow-controller.test.ts` |
 | **Sem fallback silencioso** | tentativa inválida gera violação explícita, blocking hard e erro `FLOW_REGIME_FROZEN` |
 | **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-C-FREEZE-REGIME-2026-04-02.md` |
+
+## 29. Registro operacional — ETAPA D / Hardening HTTP (anti-spoof de IP + rate limit em `/api/users`)
+
+Registro factual em 2026-04-02:
+
+| Campo | Conteúdo |
+|---|---|
+| **Etapa** | ETAPA D (Frente 5) |
+| **Status** | **CONCLUÍDA — 10/10** |
+| **Risco crítico tratado** | spoof de IP por uso direto de `X-Forwarded-For` + ausência de limite efetivo em endpoint administrativo `/api/users` |
+| **Consolidação técnica** | resolução central de IP em `src/lib/client-ip.ts` com base em `req.socket.remoteAddress`, validação de IP e consideração de `X-Forwarded-For` apenas com `trust proxy` explícito |
+| **Trust proxy** | configuração explícita em `server.ts` via `config.trustProxyHops` (padrão `0`, fechado) |
+| **Rate limit /api/users** | middleware dedicado com chave por IP seguro, bloqueio `HTTP 429` e sem bypass por header spoofado |
+| **Preparação para Redis** | `createRateLimitMiddleware` desacoplado via `RateLimitStore` (in-memory atual, substituível por backend distribuído sem refatoração estrutural) |
+| **Prova executável real** | `03-backend-api/licitaia-v2-api/src/proof/etapa-d-http-hardening-validation.ts` via `npm run proof:etapa-d` |
+| **Evidência obrigatória da prova** | saída com `[ETAPA_D_HARDENING_OK]`, `[ETAPA_D_EVIDENCE] spoof_blocked=OK`, `[ETAPA_D_EVIDENCE] rate_limit=OK` |
+| **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-D-HARDENING-2026-04-02.md` |

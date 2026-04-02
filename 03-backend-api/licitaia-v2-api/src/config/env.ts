@@ -145,6 +145,16 @@ function parsePositiveInt(raw: string | undefined, name: string, fallback: numbe
   return n;
 }
 
+function resolveTrustProxyHops(raw: string | undefined): number {
+  if (raw === undefined || raw.trim() === '') {
+    return 0;
+  }
+  if (!/^\d+$/.test(raw.trim())) {
+    throw new Error(`${BOOT_FAIL} TRUST_PROXY_HOPS deve ser um inteiro >= 0.`);
+  }
+  return parseInt(raw.trim(), 10);
+}
+
 function buildValidatedConfig(): {
   port: number;
   environment: AppEnvironment;
@@ -156,6 +166,7 @@ function buildValidatedConfig(): {
   jwtSecret: string;
   jwtAccessExpiresSecs: number;
   jwtRefreshExpiresDays: number;
+  trustProxyHops: number;
 } {
   const environment = parseEnvironment(process.env['NODE_ENV']);
   const port = parsePort(process.env['PORT']);
@@ -172,6 +183,7 @@ function buildValidatedConfig(): {
     'JWT_REFRESH_EXPIRES_DAYS',
     DEFAULT_JWT_REFRESH_DAYS,
   );
+  const trustProxyHops = resolveTrustProxyHops(process.env['TRUST_PROXY_HOPS']);
 
   return {
     port,
@@ -184,6 +196,7 @@ function buildValidatedConfig(): {
     jwtSecret,
     jwtAccessExpiresSecs,
     jwtRefreshExpiresDays,
+    trustProxyHops,
   } as const;
 }
 

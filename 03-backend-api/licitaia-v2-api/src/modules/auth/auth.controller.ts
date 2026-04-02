@@ -16,13 +16,10 @@ import { buildInstitutionalMeta } from '../../lib/response-meta';
 import { logger } from '../../middleware/logger';
 import type { LoginRequestBody, RefreshRequestBody, LogoutRequestBody } from './auth.types';
 import type { AuthenticatedContext } from './auth.types';
+import { resolveClientIp } from '../../lib/client-ip';
 
 function getIp(req: Request): string | null {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (typeof forwarded === 'string') {
-    return forwarded.split(',')[0]?.trim() ?? null;
-  }
-  return req.socket?.remoteAddress ?? null;
+  return resolveClientIp(req);
 }
 
 function getUserAgent(req: Request): string | null {
