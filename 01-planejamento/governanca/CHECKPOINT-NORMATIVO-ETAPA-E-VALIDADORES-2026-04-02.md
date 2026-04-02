@@ -50,3 +50,19 @@ Runner: `npx ts-node src/phase35/runner.ts` — 7/7 cenários conforme matriz ca
 ## 8. Status
 
 Encerrada no escopo desta entrega: validação estrutural de base legal centralizada; cross-module com código canônico; prova reexecutável e governança atualizada.
+
+## 9. Riscos residuais
+
+### 9.1 Duplicidade conceitual ainda existente no motor documental
+
+O fluxo de `administrative-document-consistency` ainda utiliza `LEGAL_BASIS_REQUIRED_KEYWORDS` noutro caminho do sistema. A ETAPA E alinhou o motor principal e o snapshot de regime ao critério estrutural verificável (`hasVerifiableNormativeStructure`); contudo, a convergência total para uma política única em todos os caminhos ainda não foi concluída. Isto **não invalida** a ETAPA E no âmbito homologado, mas deve ser tratado num ciclo posterior para eliminar duplicidade conceitual entre validação de documentos e núcleo administrativo.
+
+### 9.2 Casos limite de redação normativa
+
+Referências normativas redigidas de forma atípica — só por extenso, ou fora dos padrões regex atuais em `legal-basis-structure.util.ts` — podem exigir extensão controlada do utilitário. A política vigente é deliberadamente determinística e conservadora. Qualquer ampliação futura deve preservar auditabilidade e evitar heurística frouxa.
+
+### 9.3 Delimitação do escopo atual
+
+A ETAPA E encerra o endurecimento estrutural da base legal e a canonicidade do bloqueio cross-module no núcleo atual. Não declara cobertura infinita de todas as variações linguísticas possíveis. Isto **não invalida** a etapa no âmbito homologado.
+
+**Conclusão:** os riscos residuais acima não invalidam a ETAPA E no escopo atual; apenas delimitam pontos de convergência e de expansão controlada futura.
