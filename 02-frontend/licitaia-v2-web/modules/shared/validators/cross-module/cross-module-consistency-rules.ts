@@ -161,12 +161,14 @@ export function applyConsistencyRule(
   if (currEmpty && !prevEmpty) {
     items.push(
       createValidationItem(
-        `${ruleId}_OBJECT_MISSING`,
+        'CROSS_MODULE_INCONSISTENCY',
         `Objeto do módulo ${currentModuleId} está vazio enquanto ${prevLabel} do módulo ${previousModuleId} possui conteúdo. Inconsistência estrutural.`,
         ValidationSeverity.BLOCK,
         {
           field: MODULE_DESCRIPTION_KEYS[currentModuleId].main[0],
           details: {
+            canonicalCode: 'CROSS_MODULE_INCONSISTENCY',
+            specificRule: `${ruleId}_OBJECT_MISSING`,
             pair,
             previousModuleId,
             currentModuleId,
@@ -193,11 +195,13 @@ export function applyConsistencyRule(
   if (!hasMinimumTermOverlap(prevStr, currStr)) {
     items.push(
       createValidationItem(
-        `${ruleId}_NO_OVERLAP`,
+        'CROSS_MODULE_INCONSISTENCY',
         `Pouca correspondência lexical entre ${prevLabel} (${previousModuleId}) e ${currLabel} (${currentModuleId}). Revisar coerência.`,
         ValidationSeverity.BLOCK,
         {
           details: {
+            canonicalCode: 'CROSS_MODULE_INCONSISTENCY',
+            specificRule: `${ruleId}_NO_OVERLAP`,
             pair,
             previousModuleId,
             currentModuleId,

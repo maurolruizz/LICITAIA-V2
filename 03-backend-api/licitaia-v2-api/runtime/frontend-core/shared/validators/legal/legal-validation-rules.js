@@ -5,12 +5,13 @@ exports.getModuleLegalConfig = getModuleLegalConfig;
 exports.getLegalText = getLegalText;
 exports.evaluateLegalObjectGenericity = evaluateLegalObjectGenericity;
 exports.evaluateLegalJustificationStrength = evaluateLegalJustificationStrength;
+exports.collectDirectRegimeLegalAggregate = collectDirectRegimeLegalAggregate;
 exports.evaluateRegimeLegalBasisCompliance = evaluateRegimeLegalBasisCompliance;
 exports.evaluateLegalObjectJustificationCoherence = evaluateLegalObjectJustificationCoherence;
 const validation_severity_enum_1 = require("../../../core/enums/validation-severity.enum");
 const validation_result_factory_1 = require("../../../core/factories/validation-result.factory");
 const cross_module_consistency_rules_1 = require("../cross-module/cross-module-consistency-rules");
-const administrative_document_consistency_types_1 = require("../../../domain/shared/administrative-document-consistency.types");
+const legal_basis_structure_util_1 = require("./legal-basis-structure.util");
 const MIN_OBJECT_LENGTH_WARNING = 20;
 const MIN_OBJECT_LENGTH_INFO = 10;
 const MIN_JUSTIFICATION_LENGTH_WARNING = 40;
@@ -140,7 +141,46 @@ function evaluateLegalJustificationStrength(moduleId, payload) {
     return items;
 }
 /**
- * ETAPA A — Dispensa/inexigibilidade exigem menção explícita a base legal nos textos de justificativa.
+ * Coleta texto agregado para verificação de base legal em regimes diretos (DFD→PRICING).
+ * Inclui justificativas do módulo, base legal declarada e trechos relevantes da estratégia.
+ */
+function collectDirectRegimeLegalAggregate(moduleId, mergedData, processSnapshot) {
+    const parts = [];
+    const push = (v) => {
+        const t = getLegalText(v);
+        if (t)
+            parts.push(t);
+    };
+    const cfg = getModuleLegalConfig(moduleId);
+    if (cfg) {
+        for (const f of cfg.justificationFields) {
+            push(mergedData[f.field]);
+        }
+    }
+    push(mergedData['legalBasis']);
+    push(processSnapshot['legalBasis']);
+    const mergePs = (src) => {
+        const ps = src['procurementStrategy'];
+        if (ps && typeof ps === 'object' && !Array.isArray(ps)) {
+            const p = ps;
+            push(p['legalBasis']);
+            push(p['contractingJustification']);
+        }
+    };
+    mergePs(mergedData);
+    mergePs(processSnapshot);
+    const mergeAj = (src) => {
+        const aj = src['administrativeJustification'];
+        if (aj && typeof aj === 'object' && !Array.isArray(aj)) {
+            push(aj['legalBasis']);
+        }
+    };
+    mergeAj(mergedData);
+    mergeAj(processSnapshot);
+    return parts.join(' ').toLowerCase();
+}
+/**
+ * Dispensa/inexigibilidade exigem citação normativa verificável (estrutural), não termos genéricos isolados.
  */
 function evaluateRegimeLegalBasisCompliance(moduleId, processSnapshot, mergedData) {
     const regimeRaw = processSnapshot['legalRegime'];
@@ -151,23 +191,16 @@ function evaluateRegimeLegalBasisCompliance(moduleId, processSnapshot, mergedDat
     const cfg = getModuleLegalConfig(moduleId);
     if (!cfg)
         return [];
-    const justificationTexts = [];
-    for (const fieldCfg of cfg.justificationFields) {
-        const t = getLegalText(mergedData[fieldCfg.field]);
-        if (t)
-            justificationTexts.push(t);
-    }
-    const combined = justificationTexts.join(' ').toLowerCase();
-    if (!combined.trim()) {
+    const aggregate = collectDirectRegimeLegalAggregate(moduleId, mergedData, processSnapshot);
+    if (!aggregate.trim()) {
         return [];
     }
-    const hasBasis = administrative_document_consistency_types_1.LEGAL_BASIS_REQUIRED_KEYWORDS.some((kw) => combined.includes(kw.toLowerCase()));
-    if (hasBasis) {
+    if ((0, legal_basis_structure_util_1.hasVerifiableNormativeStructure)(aggregate)) {
         return [];
     }
     return [
-        (0, validation_result_factory_1.createValidationItem)('LEGAL_BASIS_REQUIRED_FOR_DIRECT_REGIME', `Regime ${regime} exige menção explícita à base legal (dispensa/inexigibilidade/art. 75/Lei 14.133) na justificativa do módulo ${moduleId}.`, validation_severity_enum_1.ValidationSeverity.BLOCK, {
-            details: { moduleId, regime },
+        (0, validation_result_factory_1.createValidationItem)('INVALID_LEGAL_BASIS_STRUCTURE', `Regime ${regime} exige referência normativa concreta (artigo, lei ou ato numerado) nas justificativas/base legal do módulo ${moduleId}; termos genéricos como "dispensa" não bastam.`, validation_severity_enum_1.ValidationSeverity.BLOCK, {
+            details: { moduleId, regime, rule: 'STRUCTURAL_LEGAL_BASIS' },
         }),
     ];
 }

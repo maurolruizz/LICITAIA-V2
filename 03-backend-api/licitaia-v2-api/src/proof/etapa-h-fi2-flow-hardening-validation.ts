@@ -89,7 +89,8 @@ async function main(): Promise<void> {
     // 5) halted por validacao juridica/estrutural
     legal_validation_block:
       legalBlock.finalStatus === 'HALTED_BY_VALIDATION' &&
-      codes(legalBlock).includes('LEGAL_BASIS_REQUIRED_FOR_DIRECT_REGIME'),
+      (codes(legalBlock).includes('REGIME_FUNDAMENTO_MINIMO_AUSENTE') ||
+        codes(legalBlock).includes('INVALID_LEGAL_BASIS_STRUCTURE')),
 
     // 6) halted por dependencia
     dependency_halt_semantic:

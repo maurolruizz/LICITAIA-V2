@@ -158,7 +158,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
 
   {
     id: 'S2_DISPENSA_SERVICO_CONTINUO_MULTIPLOS_ITENS_EXECUCAO_CONTINUA',
-    name: 'Dispensa + serviço contínuo + múltiplos itens + execução contínua (pipeline completo; NO_OVERLAP é WARNING)',
+    name: 'Dispensa + serviço contínuo + múltiplos itens + execução contínua (pipeline completo; TR×PRICING coerentes)',
     dimensions: {
       legalRegime: 'DISPENSA',
       objectType: 'SERVICO_CONTINUO',
@@ -171,12 +171,11 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
     expectedObserved: {
       shouldHalt: false,
       expectedFinalStatus: 'SUCCESS',
-      mustIncludeValidationCodes: ['CROSS_MODULE_TR_PRICING_NO_OVERLAP'],
     },
     normative: {
       status: 'SOLID',
       note:
-        'Pipeline completo sob dispensa multi-item; TR×PRICING sem overlap textual gera WARNING (ETAPA A), sem interromper o fluxo.',
+        'Pipeline completo sob dispensa multi-item; descrições TR×PRICING alinhadas lexicalmente para coerência mínima obrigatória.',
     },
     buildContext: () => {
       const payload = {
@@ -226,11 +225,11 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
         ],
         pricingJustification:
           'Estimativa fundamentada na dispensa (art. 75 Lei 14.133/2021) e em pesquisa de mercado para serviços de manutenção de impressoras.',
-        // TR×PRICING: objeto técnico fala em impressoras; referência de preço usa vocabulário de pesquisa de mercado (WARNING NO_OVERLAP esperado).
+        // TR×PRICING: manter termos em comum (impressoras / manutenção) para coerência estrutural mínima.
         referenceItemsDescription:
-          'Consultoria de mercado e levantamento de preços por amostragem estatística (referência metodológica do orçamento).',
+          'Manutenção preventiva e corretiva de impressoras: pesquisa de preços em três fornecedores para serviços correlatos ao termo de referência.',
         pricingSourceDescription:
-          'Pesquisa em três casas especializadas em levantamento de preços e amostragem para contratações correlatas.',
+          'Pesquisa em três fornecedores especializados em manutenção de equipamentos de impressão.',
         estimatedUnitValue: 1500,
         estimatedTotalValue: 1500 * 13,
         administrativeJustification: {
@@ -427,7 +426,7 @@ export const CANONICAL_SCENARIOS: CanonicalScenario[] = [
     expectedObserved: {
       shouldHalt: true,
       expectedFinalStatus: 'HALTED_BY_VALIDATION',
-      mustIncludeValidationCodes: ['LEGAL_BASIS_REQUIRED_FOR_DIRECT_REGIME'],
+      mustIncludeValidationCodes: ['REGIME_FUNDAMENTO_MINIMO_AUSENTE'],
     },
     normative: {
       status: 'SOLID',

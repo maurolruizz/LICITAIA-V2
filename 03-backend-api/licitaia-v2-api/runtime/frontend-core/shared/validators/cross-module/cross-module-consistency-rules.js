@@ -147,9 +147,11 @@ function applyConsistencyRule(pair, previousDescription, currentDescription, pre
     const prevEmpty = prevStr === '';
     const currEmpty = currStr === '';
     if (currEmpty && !prevEmpty) {
-        items.push((0, validation_result_factory_1.createValidationItem)(`${ruleId}_OBJECT_MISSING`, `Objeto do módulo ${currentModuleId} está vazio enquanto ${prevLabel} do módulo ${previousModuleId} possui conteúdo. Inconsistência estrutural.`, validation_severity_enum_1.ValidationSeverity.BLOCK, {
+        items.push((0, validation_result_factory_1.createValidationItem)('CROSS_MODULE_INCONSISTENCY', `Objeto do módulo ${currentModuleId} está vazio enquanto ${prevLabel} do módulo ${previousModuleId} possui conteúdo. Inconsistência estrutural.`, validation_severity_enum_1.ValidationSeverity.BLOCK, {
             field: exports.MODULE_DESCRIPTION_KEYS[currentModuleId].main[0],
             details: {
+                canonicalCode: 'CROSS_MODULE_INCONSISTENCY',
+                specificRule: `${ruleId}_OBJECT_MISSING`,
                 pair,
                 previousModuleId,
                 currentModuleId,
@@ -163,8 +165,10 @@ function applyConsistencyRule(pair, previousDescription, currentDescription, pre
         return items;
     }
     if (!hasMinimumTermOverlap(prevStr, currStr)) {
-        items.push((0, validation_result_factory_1.createValidationItem)(`${ruleId}_NO_OVERLAP`, `Pouca correspondência lexical entre ${prevLabel} (${previousModuleId}) e ${currLabel} (${currentModuleId}). Revisar coerência.`, validation_severity_enum_1.ValidationSeverity.BLOCK, {
+        items.push((0, validation_result_factory_1.createValidationItem)('CROSS_MODULE_INCONSISTENCY', `Pouca correspondência lexical entre ${prevLabel} (${previousModuleId}) e ${currLabel} (${currentModuleId}). Revisar coerência.`, validation_severity_enum_1.ValidationSeverity.BLOCK, {
             details: {
+                canonicalCode: 'CROSS_MODULE_INCONSISTENCY',
+                specificRule: `${ruleId}_NO_OVERLAP`,
                 pair,
                 previousModuleId,
                 currentModuleId,

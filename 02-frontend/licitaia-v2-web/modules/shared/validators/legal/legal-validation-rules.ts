@@ -6,7 +6,7 @@ import {
   hasMinimumTermOverlap,
   tokenizeForComparison,
 } from '../cross-module/cross-module-consistency-rules';
-import { LEGAL_BASIS_REQUIRED_KEYWORDS } from '../../../domain/shared/administrative-document-consistency.types';
+import { hasVerifiableNormativeStructure } from './legal-basis-structure.util';
 
 const MIN_OBJECT_LENGTH_WARNING = 20;
 const MIN_OBJECT_LENGTH_INFO = 10;
@@ -187,7 +187,55 @@ export function evaluateLegalJustificationStrength(
 }
 
 /**
- * ETAPA A — Dispensa/inexigibilidade exigem menção explícita a base legal nos textos de justificativa.
+ * Coleta texto agregado para verificação de base legal em regimes diretos (DFD→PRICING).
+ * Inclui justificativas do módulo, base legal declarada e trechos relevantes da estratégia.
+ */
+export function collectDirectRegimeLegalAggregate(
+  moduleId: ModuleId,
+  mergedData: Record<string, unknown>,
+  processSnapshot: Record<string, unknown>
+): string {
+  const parts: string[] = [];
+  const push = (v: unknown) => {
+    const t = getLegalText(v);
+    if (t) parts.push(t);
+  };
+
+  const cfg = getModuleLegalConfig(moduleId);
+  if (cfg) {
+    for (const f of cfg.justificationFields) {
+      push(mergedData[f.field]);
+    }
+  }
+
+  push(mergedData['legalBasis']);
+  push(processSnapshot['legalBasis']);
+
+  const mergePs = (src: Record<string, unknown>) => {
+    const ps = src['procurementStrategy'];
+    if (ps && typeof ps === 'object' && !Array.isArray(ps)) {
+      const p = ps as Record<string, unknown>;
+      push(p['legalBasis']);
+      push(p['contractingJustification']);
+    }
+  };
+  mergePs(mergedData);
+  mergePs(processSnapshot);
+
+  const mergeAj = (src: Record<string, unknown>) => {
+    const aj = src['administrativeJustification'];
+    if (aj && typeof aj === 'object' && !Array.isArray(aj)) {
+      push((aj as Record<string, unknown>)['legalBasis']);
+    }
+  };
+  mergeAj(mergedData);
+  mergeAj(processSnapshot);
+
+  return parts.join(' ').toLowerCase();
+}
+
+/**
+ * Dispensa/inexigibilidade exigem citação normativa verificável (estrutural), não termos genéricos isolados.
  */
 export function evaluateRegimeLegalBasisCompliance(
   moduleId: ModuleId,
@@ -204,30 +252,22 @@ export function evaluateRegimeLegalBasisCompliance(
   const cfg = getModuleLegalConfig(moduleId);
   if (!cfg) return [];
 
-  const justificationTexts: string[] = [];
-  for (const fieldCfg of cfg.justificationFields) {
-    const t = getLegalText(mergedData[fieldCfg.field]);
-    if (t) justificationTexts.push(t);
-  }
-  const combined = justificationTexts.join(' ').toLowerCase();
-  if (!combined.trim()) {
+  const aggregate = collectDirectRegimeLegalAggregate(moduleId, mergedData, processSnapshot);
+  if (!aggregate.trim()) {
     return [];
   }
 
-  const hasBasis = (LEGAL_BASIS_REQUIRED_KEYWORDS as readonly string[]).some((kw) =>
-    combined.includes(kw.toLowerCase())
-  );
-  if (hasBasis) {
+  if (hasVerifiableNormativeStructure(aggregate)) {
     return [];
   }
 
   return [
     createValidationItem(
-      'LEGAL_BASIS_REQUIRED_FOR_DIRECT_REGIME',
-      `Regime ${regime} exige menção explícita à base legal (dispensa/inexigibilidade/art. 75/Lei 14.133) na justificativa do módulo ${moduleId}.`,
+      'INVALID_LEGAL_BASIS_STRUCTURE',
+      `Regime ${regime} exige referência normativa concreta (artigo, lei ou ato numerado) nas justificativas/base legal do módulo ${moduleId}; termos genéricos como "dispensa" não bastam.`,
       ValidationSeverity.BLOCK,
       {
-        details: { moduleId, regime },
+        details: { moduleId, regime, rule: 'STRUCTURAL_LEGAL_BASIS' },
       }
     ),
   ];

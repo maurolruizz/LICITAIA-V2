@@ -1785,3 +1785,29 @@ Critérios de evidência desta etapa:
 - spoof de `X-Forwarded-For` bloqueado;
 - abuso de `/api/users` bloqueado por rate limit com `429`;
 - fluxo normal preservado sem regressão.
+
+---
+
+11.40 REGISTRO NORMATIVO — ETAPA E (VALIDADORES: BASE LEGAL ESTRUTURAL + COERÊNCIA CROSS-MODULE)
+
+Registrado em: 2026-04-02  
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-E-VALIDADORES-2026-04-02.md`
+
+Objetivo do registro:
+- exigir referência normativa **estruturalmente verificável** (artigo, lei, ato numerado), rejeitando termos genéricos isolados;
+- unificar a verificação entre **motor de regime** e **validação jurídica** do pipeline (mesma função determinística);
+- padronizar bloqueios **cross-module** com código canônico `CROSS_MODULE_INCONSISTENCY` e regra específica em `details`;
+- manter prova executável no backend: `npm run proof:etapa-e`.
+
+Consolidações estruturais:
+1) utilitário central `legal-basis-structure.util.ts` com padrões normativos auditáveis;
+2) `hasMinimumLegalBasisSupport` (regime) alinhado a `hasVerifiableNormativeStructure`;
+3) `evaluateRegimeLegalBasisCompliance` passa a emitir `INVALID_LEGAL_BASIS_STRUCTURE` quando o agregado textual não contém citação verificável;
+4) `validateLegalBasis` com códigos `MISSING_LEGAL_REFERENCE` / `INVALID_LEGAL_BASIS_STRUCTURE`;
+5) validação cruzada DFD↔ETP↔TR↔PRICING: itens de bloqueio com `CROSS_MODULE_INCONSISTENCY`;
+6) cenários canônicos Fase 35 ajustados (S2 coerente TR×PRICING; S5 com código de bloqueio `REGIME_FUNDAMENTO_MINIMO_AUSENTE`).
+
+Critérios de evidência desta etapa:
+- prova `proof:etapa-e` verde com tags `[ETAPA_E_VALIDATORS_OK]` e evidências declaradas;
+- runner Fase 35 (7/7) sem regressão.

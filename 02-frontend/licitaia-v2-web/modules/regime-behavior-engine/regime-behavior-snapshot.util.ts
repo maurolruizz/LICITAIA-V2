@@ -3,7 +3,7 @@
  * Não substitui validators; apenas lê campos para política normativa.
  */
 
-import { LEGAL_BASIS_REQUIRED_KEYWORDS } from '../domain/shared/administrative-document-consistency.types';
+import { hasVerifiableNormativeStructure } from '../shared/validators/legal/legal-basis-structure.util';
 
 const LICITATION_MODALITIES = new Set([
   'PREGAO',
@@ -90,17 +90,18 @@ function collectJustificationTextsForBasis(snapshot: Record<string, unknown>): s
 const MIN_AGGREGATE_LENGTH_FOR_LEGAL_BASIS_KEYWORD_PATH = 40;
 
 /**
- * Fundamento mínimo para regimes diretos: (1) base legal declarada em campo estruturado OU
- * (2) keywords normativas em textos agregados com comprimento mínimo.
- * Keywords não são critério isolado — exigem lastro de texto ou campo objetivo.
+ * Fundamento mínimo para regimes diretos: citação normativa estruturalmente verificável
+ * (artigo, lei, decreto/portaria numerados), alinhada ao validador jurídico central.
  */
 export function hasMinimumLegalBasisSupport(snapshot: Record<string, unknown>): boolean {
   const ps = asRecord(snapshot['procurementStrategy']);
-  if (ps && getText(ps['legalBasis']).length >= 8) {
+  const psLb = ps ? getText(ps['legalBasis']) : '';
+  if (psLb.length >= 8 && hasVerifiableNormativeStructure(psLb)) {
     return true;
   }
   const aj = asRecord(snapshot['administrativeJustification']);
-  if (aj && getText(aj['legalBasis']).length >= 8) {
+  const ajLb = aj ? getText(aj['legalBasis']) : '';
+  if (ajLb.length >= 8 && hasVerifiableNormativeStructure(ajLb)) {
     return true;
   }
   const combined = collectJustificationTextsForBasis(snapshot);
@@ -108,9 +109,7 @@ export function hasMinimumLegalBasisSupport(snapshot: Record<string, unknown>): 
   if (trimmed.length < MIN_AGGREGATE_LENGTH_FOR_LEGAL_BASIS_KEYWORD_PATH) {
     return false;
   }
-  return (LEGAL_BASIS_REQUIRED_KEYWORDS as readonly string[]).some((kw) =>
-    trimmed.includes(kw.toLowerCase())
-  );
+  return hasVerifiableNormativeStructure(trimmed);
 }
 
 const MIN_STRATEGY_TEXT_FOR_INVIABILITY_KEYWORD_PATH = 28;

@@ -430,7 +430,7 @@ Registro factual em 2026-03-30:
 | **Evidencias principais** | testes 15/15 em verde; eliminacao do erro `Modulo nao registrado: DFD`; validacao de comportamento; snapshot imutavel; prova de nao duplicacao do motor; regressao zero da entrega |
 | **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ONDA-3-FLOWCONTROLLER-BASE-2026-03-30.md` |
 | **Limite explicito de escopo** | Este encerramento formaliza a base tecnica da Onda 3 e **nao** declara encerramento integral da Onda 3 como objetivo final de produto |
-| **Registro de item externo** | Divergencia `S5_DISPENSA_SEM_BASE_LEGAL_WARNING` (runner canonico Fase 35) classificada como externa ao escopo desta entrega |
+| **Registro de item externo** | (resolvido em 2026-04-02) expectativa do runner Fase 35 para S5 alinhada a `REGIME_FUNDAMENTO_MINIMO_AUSENTE`; ver Secção 30 |
 
 Observacao normativa de validade:
 
@@ -552,3 +552,18 @@ Registro factual em 2026-04-02:
 | **Prova executável real** | `03-backend-api/licitaia-v2-api/src/proof/etapa-d-http-hardening-validation.ts` via `npm run proof:etapa-d` |
 | **Evidência obrigatória da prova** | saída com `[ETAPA_D_HARDENING_OK]`, `[ETAPA_D_EVIDENCE] spoof_blocked=OK`, `[ETAPA_D_EVIDENCE] rate_limit=OK` |
 | **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-D-HARDENING-2026-04-02.md` |
+
+## 30. Registro operacional — ETAPA E / Validadores (base legal estrutural + coerência cross-module)
+
+Registro factual em 2026-04-02:
+
+| Campo | Conteúdo |
+|---|---|
+| **Etapa** | ETAPA E (validação do núcleo — alinhada à Frente 1/2 do motor) |
+| **Status** | **CONCLUÍDA — 10/10** |
+| **Risco tratado** | aceitação de base legal genérica; inconsistências entre módulos sem código canônico |
+| **Consolidação técnica** | utilitário `legal-basis-structure.util.ts`; alinhamento regime ↔ agregado textual; bloqueios cross-module com `CROSS_MODULE_INCONSISTENCY` |
+| **Prova executável real** | `03-backend-api/licitaia-v2-api/src/proof/etapa-e-validators-validation.ts` via `npm run proof:etapa-e` |
+| **Evidência obrigatória da prova** | `[ETAPA_E_VALIDATORS_OK]`, `[ETAPA_E_EVIDENCE] legal_basis_validation=OK`, `[ETAPA_E_EVIDENCE] cross_module_validation=OK` |
+| **Regressão canônica** | Fase 35 runner 7/7 após ajuste de cenários S2/S5 |
+| **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-E-VALIDADORES-2026-04-02.md` |
