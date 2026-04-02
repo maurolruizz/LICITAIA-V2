@@ -18,6 +18,9 @@ class FlowStateStaleError extends Error {
 }
 exports.FlowStateStaleError = FlowStateStaleError;
 class FlowController {
+    static isRegimeCriticalField(fieldId) {
+        return FlowController.REGIME_CRITICAL_FIELDS.has(fieldId);
+    }
     constructor(processId, seedState) {
         if (seedState) {
             this.state = clone(seedState);
@@ -41,7 +44,7 @@ class FlowController {
         const changed = this.applyFieldUpdates(fields, updates);
         if (!changed)
             return this.getState();
-        const invalidated = this.invalidateDownstream(targetStep, 'INVALIDATION_EXPLICIT_SEGMENT_RESET');
+        const invalidated = this.invalidateDownstream(targetStep, this.resolveInvalidationReasonForStep(targetStep));
         this.bumpRevisionAndHistory('STEP_SAVED', targetStep, {
             targetStep,
             changedFields: updates.map((u) => u.fieldId),
@@ -167,19 +170,39 @@ class FlowController {
         throw new FlowStateStaleError('STATE_STALE');
     }
     assertRegimeFreezeViolation(step, fieldIds) {
-        const regimeFields = new Set(['REG_LEGAL_REGIME', 'REG_PROCUREMENT_STRATEGY']);
-        const regimeFrozen = (0, flow_step_definitions_1.getStepIndex)(this.state.currentStep) > (0, flow_step_definitions_1.getStepIndex)('REGIME');
+        const regimeFrozen = this.isRegimeEffectivelyFrozen();
         if (!regimeFrozen || step !== 'REGIME')
             return;
-        const attempted = fieldIds.find((id) => regimeFields.has(id));
+        const attempted = fieldIds.find((id) => FlowController.isRegimeCriticalField(id));
         if (!attempted)
             return;
+        this.appendHistory('REGIME_FREEZE_VIOLATION', 'REGIME', {
+            attemptedField: attempted,
+            currentStep: this.state.currentStep,
+            revision: this.state.revision,
+        });
         this.state.activeBlockings.push(this.createFlowBlocking('FLOW_REGIME_FROZEN', 'REGIME', {
             kind: 'FLOW_REGIME_FROZEN',
             frozenAfterStep: this.state.currentStep,
             attemptedField: attempted,
         }));
         throw new Error('FLOW_REGIME_FROZEN');
+    }
+    isRegimeEffectivelyFrozen() {
+        const currentBeyondRegime = (0, flow_step_definitions_1.getStepIndex)(this.state.currentStep) > (0, flow_step_definitions_1.getStepIndex)('REGIME');
+        if (currentBeyondRegime)
+            return true;
+        // Regime permanece congelado apos consolidacao do fluxo downstream,
+        // mesmo que o operador retorne para REGIME por navegacao.
+        return flow_controller_types_1.FLOW_STEP_ORDER
+            .slice((0, flow_step_definitions_1.getStepIndex)('REGIME') + 1)
+            .some((step) => this.state.stepStatusMap[step] !== 'LOCKED');
+    }
+    resolveInvalidationReasonForStep(step) {
+        if (step === 'CONTEXT' || step === 'REGIME') {
+            return 'INVALIDATION_REGIME_OR_CONTEXT_REOPEN';
+        }
+        return 'INVALIDATION_EXPLICIT_SEGMENT_RESET';
     }
     applyFieldUpdates(fields, updates) {
         let changed = false;
@@ -546,3 +569,7 @@ class FlowController {
     }
 }
 exports.FlowController = FlowController;
+FlowController.REGIME_CRITICAL_FIELDS = new Set([
+    'REG_LEGAL_REGIME',
+    'REG_PROCUREMENT_STRATEGY',
+]);

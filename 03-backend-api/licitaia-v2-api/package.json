@@ -11,7 +11,8 @@
     "proof:h-fi6": "ts-node src/proof/etapa-h-fi6-readiness-controlled-environment.ts",
     "proof:h-fi7": "ts-node src/proof/etapa-h-fi7-institutional-demo-readiness.ts",
     "proof:h-fi8": "ts-node src/proof/etapa-h-fi8-tenant-hostile-rls-validation.ts",
-    "proof:etapa-b": "ts-node src/proof/etapa-b-force-rls-multitenant-validation.ts"
+    "proof:etapa-b": "ts-node src/proof/etapa-b-force-rls-multitenant-validation.ts",
+    "proof:etapa-c": "ts-node src/proof/etapa-c-freeze-regime-validation.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

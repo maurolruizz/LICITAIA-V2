@@ -53,6 +53,11 @@ export class FlowController {
     'REG_LEGAL_REGIME',
     'REG_PROCUREMENT_STRATEGY',
   ]);
+  private static isRegimeCriticalField(
+    fieldId: StepFieldId
+  ): fieldId is 'REG_LEGAL_REGIME' | 'REG_PROCUREMENT_STRATEGY' {
+    return FlowController.REGIME_CRITICAL_FIELDS.has(fieldId);
+  }
 
   constructor(processId: string, seedState?: OperationalStateContract) {
     if (seedState) {
@@ -228,7 +233,7 @@ export class FlowController {
   private assertRegimeFreezeViolation(step: FlowStep, fieldIds: StepFieldId[]): void {
     const regimeFrozen = this.isRegimeEffectivelyFrozen();
     if (!regimeFrozen || step !== 'REGIME') return;
-    const attempted = fieldIds.find((id) => FlowController.REGIME_CRITICAL_FIELDS.has(id));
+    const attempted = fieldIds.find((id) => FlowController.isRegimeCriticalField(id));
     if (!attempted) return;
     this.appendHistory('REGIME_FREEZE_VIOLATION', 'REGIME', {
       attemptedField: attempted,
@@ -473,7 +478,7 @@ export class FlowController {
   }
 
   private extractPersistedStepFields(state: OperationalStateContract): Record<FlowStep, StepFieldState[]> {
-    const raw = (state as Record<string, unknown>)['_stepFieldsByStep'];
+    const raw = (state as unknown as Record<string, unknown>)['_stepFieldsByStep'];
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
       throw new Error('FLOW_SNAPSHOT_INVALID_STEP_FIELDS');
     }
@@ -481,7 +486,7 @@ export class FlowController {
   }
 
   private syncInternalStateFields(): void {
-    const stateAsRecord = this.state as Record<string, unknown>;
+    const stateAsRecord = this.state as unknown as Record<string, unknown>;
     stateAsRecord['_schemaVersion'] =
       typeof stateAsRecord['_schemaVersion'] === 'string' ? stateAsRecord['_schemaVersion'] : '1.0';
     stateAsRecord['_stepFieldsByStep'] = clone(this.stepFieldsByStep);

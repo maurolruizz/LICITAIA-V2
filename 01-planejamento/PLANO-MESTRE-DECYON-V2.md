@@ -1744,6 +1744,7 @@ Consolidações estruturais:
    - bloqueio de mutação crítica após consolidação;
    - auditoria de violação de freeze;
    - razão de invalidação por reabertura de contexto.
+5) prova E2E real adicionada no backend (`proof:etapa-c`) usando `FlowController` do runtime canônico, com cenário hostil de violação após retorno para `REGIME`.
 
 Regra de status:
 - este registro declara o fechamento da ETAPA C no escopo de freeze efetivo de regime no fluxo de condução;

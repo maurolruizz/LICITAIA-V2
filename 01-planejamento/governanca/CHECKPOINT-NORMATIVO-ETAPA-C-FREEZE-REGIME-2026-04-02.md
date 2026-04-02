@@ -47,12 +47,24 @@ Situacao anterior:
 
 Comando executado:
 
-- `npx vitest modules/orchestrator/flow-controller.test.ts`
+- `npm run proof:etapa-c` (prova E2E real com FlowController do runtime canônico)
+- `npx vitest modules/orchestrator/flow-controller.test.ts` (cobertura unitária complementar)
 
 Resultado:
 
-- 9/9 testes aprovados
-- cobertura da ETAPA C adicionada para:
+- prova E2E concluída com saída:
+  - `[ETAPA_C_FREEZE_OK]`
+  - `[ETAPA_C_FREEZE_EVIDENCE] process_id=...`
+  - `[ETAPA_C_FREEZE_EVIDENCE] event=REGIME_FREEZE_VIOLATION`
+- cenário hostil validado:
+  - fluxo avança até após `REGIME`;
+  - retorno para `REGIME`;
+  - tentativa de mutação de `REG_LEGAL_REGIME`;
+  - bloqueio explícito `FLOW_REGIME_FROZEN`;
+  - evento imutável `REGIME_FREEZE_VIOLATION`;
+  - preservação do valor crítico e do `stepStatusMap` (sem mutação estrutural indevida);
+- 9/9 testes unitários aprovados (complementares)
+- cobertura consolidada da ETAPA C para:
   - bloqueio de mutacao critica apos consolidacao mesmo com retorno para `REGIME`;
   - registro de violacao de freeze no historico imutavel;
   - invalidação downstream com razao `INVALIDATION_REGIME_OR_CONTEXT_REOPEN` em mutacao de contexto.

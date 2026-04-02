@@ -532,6 +532,6 @@ Registro factual em 2026-04-02:
 | **Risco crítico tratado** | mutação tardia de campos de regime após consolidação do passo `REGIME` |
 | **Consolidação técnica** | freeze efetivo de `REG_LEGAL_REGIME` e `REG_PROCUREMENT_STRATEGY` mesmo após retorno ao passo `REGIME`; bloqueio explícito via `FLOW_REGIME_FROZEN`; registro imutável de `REGIME_FREEZE_VIOLATION` |
 | **Invalidação downstream** | classificação determinística: `INVALIDATION_REGIME_OR_CONTEXT_REOPEN` para mutações de `CONTEXT`/`REGIME`; `INVALIDATION_EXPLICIT_SEGMENT_RESET` para demais passos |
-| **Prova executável real** | `02-frontend/licitaia-v2-web/modules/orchestrator/flow-controller.test.ts` (9/9 em verde via `npx vitest modules/orchestrator/flow-controller.test.ts`) |
+| **Prova executável real** | `03-backend-api/licitaia-v2-api/src/proof/etapa-c-freeze-regime-validation.ts` via `npm run proof:etapa-c` com saída obrigatória `[ETAPA_C_FREEZE_OK]` + evidência de `process_id` e `REGIME_FREEZE_VIOLATION`; cobertura unitária complementar em `flow-controller.test.ts` |
 | **Sem fallback silencioso** | tentativa inválida gera violação explícita, blocking hard e erro `FLOW_REGIME_FROZEN` |
 | **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-C-FREEZE-REGIME-2026-04-02.md` |
