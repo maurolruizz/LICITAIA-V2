@@ -7,3 +7,5 @@ build/
 **/.git-backup-subrepo/
 backend-err.txt
 backend-log.txt
+.tmp-pg/
+LICITAIA-V2-HEAD.zip
