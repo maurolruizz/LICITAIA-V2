@@ -1,10 +1,21 @@
 import { randomUUID } from 'crypto';
 import { Pool } from 'pg';
-import { config } from '../config/env';
 import { withTenantContext } from '../lib/db';
 
 function fail(message: string): never {
   throw new Error(`[ETAPA_B_FORCE_RLS_FAIL] ${message}`);
+}
+
+/**
+ * Superusuário PostgreSQL ignora RLS — a prova de isolamento exige role não-superuser
+ * sem BYPASSRLS (alinhado à governança: ex. `licitaia_app`).
+ */
+function resolveEtapaBDatabaseUrl(): string {
+  const explicit = process.env['ETAPA_B_DATABASE_URL']?.trim();
+  if (explicit) {
+    return explicit;
+  }
+  return 'postgresql://licitaia_app:licitaia_app@127.0.0.1:5432/licitaia_dev';
 }
 
 type CatalogRow = {
@@ -37,22 +48,23 @@ async function assertForceRlsCatalog(pool: Pool): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  const tenantA = process.env['ETAPA_B_TENANT_A'] ?? '';
-  const tenantB = process.env['ETAPA_B_TENANT_B'] ?? '';
+  const tenantA =
+    process.env['ETAPA_B_TENANT_A']?.trim() || '00000000-0000-0000-0000-000000000001';
+  const tenantB =
+    process.env['ETAPA_B_TENANT_B']?.trim() || '00000000-0000-0000-0000-000000000002';
   const processId = process.env['ETAPA_B_PROCESS_ID'] ?? `etapa-b-force-rls-${Date.now()}`;
 
-  if (!tenantA || !tenantB) {
-    fail('Defina ETAPA_B_TENANT_A e ETAPA_B_TENANT_B com UUIDs válidos e distintos.');
-  }
   if (tenantA === tenantB) {
     fail('ETAPA_B_TENANT_A e ETAPA_B_TENANT_B devem ser diferentes.');
   }
 
-  const pool = new Pool({ connectionString: config.databaseUrl });
+  const proofPool = new Pool({ connectionString: resolveEtapaBDatabaseUrl() });
   try {
-    await assertForceRlsCatalog(pool);
+    await assertForceRlsCatalog(proofPool);
 
-    await withTenantContext(tenantA, async (client) => {
+    await withTenantContext(
+      tenantA,
+      async (client) => {
       await client.query(
         `INSERT INTO processes (id, tenant_id, created_by)
          VALUES ($1, $2::uuid, NULL)
@@ -91,9 +103,13 @@ async function main(): Promise<void> {
          ON CONFLICT DO NOTHING`,
         [randomUUID(), tenantA, sessionId, processId],
       );
-    });
+      },
+      proofPool,
+    );
 
-    const visibleToA = await withTenantContext(tenantA, async (client) => {
+    const visibleToA = await withTenantContext(
+      tenantA,
+      async (client) => {
       const r = await client.query<{ c: string }>(
         `SELECT COUNT(*)::text AS c
          FROM flow_sessions
@@ -101,12 +117,16 @@ async function main(): Promise<void> {
         [processId],
       );
       return Number(r.rows[0]?.c ?? '0');
-    });
+      },
+      proofPool,
+    );
     if (visibleToA < 1) {
       fail('Tenant A não enxerga os próprios dados.');
     }
 
-    const visibleToB = await withTenantContext(tenantB, async (client) => {
+    const visibleToB = await withTenantContext(
+      tenantB,
+      async (client) => {
       const r = await client.query<{ c: string }>(
         `SELECT COUNT(*)::text AS c
          FROM flow_sessions
@@ -114,12 +134,16 @@ async function main(): Promise<void> {
         [processId],
       );
       return Number(r.rows[0]?.c ?? '0');
-    });
+      },
+      proofPool,
+    );
     if (visibleToB !== 0) {
       fail('Tenant B enxergou dados do tenant A.');
     }
 
-    const crossUpdate = await withTenantContext(tenantB, async (client) => {
+    const crossUpdate = await withTenantContext(
+      tenantB,
+      async (client) => {
       const r = await client.query(
         `UPDATE flow_sessions
          SET updated_at = NOW()
@@ -127,25 +151,31 @@ async function main(): Promise<void> {
         [processId],
       );
       return r.rowCount ?? 0;
-    });
+      },
+      proofPool,
+    );
     if (crossUpdate !== 0) {
       fail('Tenant B conseguiu atualizar dado do tenant A.');
     }
 
-    const crossDelete = await withTenantContext(tenantB, async (client) => {
+    const crossDelete = await withTenantContext(
+      tenantB,
+      async (client) => {
       const r = await client.query(
         `DELETE FROM flow_sessions
          WHERE process_id = $1`,
         [processId],
       );
       return r.rowCount ?? 0;
-    });
+      },
+      proofPool,
+    );
     if (crossDelete !== 0) {
       fail('Tenant B conseguiu excluir dado do tenant A.');
     }
 
     // Sem contexto de tenant, o filtro de policy deve negar acesso amplo.
-    const noContextRead = await pool.query<{ c: string }>(
+    const noContextRead = await proofPool.query<{ c: string }>(
       `SELECT COUNT(*)::text AS c
        FROM flow_sessions
        WHERE process_id = $1`,
@@ -158,7 +188,7 @@ async function main(): Promise<void> {
     console.log('[ETAPA_B_FORCE_RLS_OK] FORCE RLS ativo e isolamento multi-tenant comprovado.');
     console.log(`[ETAPA_B_FORCE_RLS_EVIDENCE] process_id=${processId}`);
   } finally {
-    await pool.end();
+    await proofPool.end();
   }
 }
 

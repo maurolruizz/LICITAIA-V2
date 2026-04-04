@@ -35,8 +35,9 @@ pool.on('error', (err) => {
 export async function withTenantContext<T>(
   tenantId: string,
   fn: (client: PoolClient) => Promise<T>,
+  poolInstance: Pool = pool,
 ): Promise<T> {
-  const client = await pool.connect();
+  const client = await poolInstance.connect();
   try {
     await client.query('BEGIN');
     // Postgres não permite placeholder ($1) em SET. Usamos set_config(), que é

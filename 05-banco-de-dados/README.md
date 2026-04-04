@@ -51,6 +51,9 @@ DATABASE_URL=postgresql://usuario:senha@host:5432/db npm run migrate
 # 4. (Opcional) Carregar seed de desenvolvimento
 DATABASE_URL=postgresql://... NODE_ENV=development npm run seed
 
+# 4.1 Role de prova RLS (`licitaia_app`, não-superuser) — necessária para `proof:etapa-b` / `proof:etapa-f`
+# psql -U postgres -d licitaia_dev -f scripts/ensure-licitaia-app-role.sql
+
 # 5. Validar schema
 DATABASE_URL=postgresql://... npm run validate
 ```

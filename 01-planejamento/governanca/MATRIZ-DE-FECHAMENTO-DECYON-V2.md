@@ -575,7 +575,7 @@ Registro factual em 2026-04-04:
 | Campo | Conteúdo |
 |---|---|
 | **Etapa** | ETAPA F (consolidação de robustez — prova transversal A–E) |
-| **Status** | **Artefatos e consolidação encerrados — 10/10**; execução de `proof:etapa-f` com saída `[ETAPA_F_TESTS_OK]` exige PostgreSQL acessível para `proof:etapa-b` (ver checkpoint §7–9 e riscos residuais) |
+| **Status** | **CONCLUÍDA — 10/10** (`proof:etapa-f` verde com PostgreSQL, migrations, seed e role `licitaia_app`; ver checkpoint ETAPA F) |
 | **Risco tratado** | regressão silenciosa entre motor, fluxo, HTTP, persistência e validadores após homologação das etapas anteriores |
 | **Consolidação técnica** | script único `src/proof/etapa-f-system-integrity-validation.ts` orquestrando `test:etapa-a-review` e `proof:etapa-b` … `proof:etapa-e` sem mascarar falhas |
 | **Prova executável** | `npm run proof:etapa-f` no pacote `03-backend-api/licitaia-v2-api` |

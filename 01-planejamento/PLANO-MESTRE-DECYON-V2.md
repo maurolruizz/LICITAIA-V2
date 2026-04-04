@@ -1827,7 +1827,7 @@ Objetivo do registro:
 
 Escopo técnico:
 1) `test:etapa-a-review` — unitários dos adaptadores + integração `TRIGGER_REVIEW` (ETAPA A);
-2) `proof:etapa-b` — catálogo PostgreSQL (`FORCE RLS`) + isolamento tenant + `withTenantContext` + negação sem contexto (ETAPA B; exige `DATABASE_URL` e `ETAPA_B_TENANT_A` / `ETAPA_B_TENANT_B`);
+2) `proof:etapa-b` — catálogo PostgreSQL (`FORCE RLS`) + isolamento tenant + `withTenantContext` + negação sem contexto (ETAPA B; conexão com role não-superuser `licitaia_app` via `ETAPA_B_DATABASE_URL` ou padrão; tenants alinhados ao seed);
 3) `proof:etapa-c` — freeze de regime no FlowController runtime (ETAPA C);
 4) `proof:etapa-d` — anti-spoof, rate limit em `/api/users`, `Retry-After` em 429, `/health` íntegro (ETAPA D);
 5) `proof:etapa-e` — base legal estrutural, cross-module, regressão S1 (ETAPA E).
