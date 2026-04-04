@@ -1811,3 +1811,30 @@ Consolidações estruturais:
 Critérios de evidência desta etapa:
 - prova `proof:etapa-e` verde com tags `[ETAPA_E_VALIDATORS_OK]` e evidências declaradas;
 - runner Fase 35 (7/7) sem regressão.
+
+---
+
+11.41 REGISTRO NORMATIVO — ETAPA F (CONSOLIDAÇÃO DE TESTES CRÍTICOS E PROVA TRANSVERSAL)
+
+Registrado em: 2026-04-04  
+Artefato de referência:
+- `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-F-TESTES-2026-04-04.md`
+
+Objetivo do registro:
+- consolidar, num fluxo único reproduzível, a integridade transversal dos mecanismos homologados nas ETAPAS A a E (review real, FORCE RLS, freeze de regime, hardening HTTP, validadores e regressão canônica);
+- evitar provas duplicadas ou cosméticas: reutiliza testes e scripts já auditados;
+- exigir prova executável central no backend: `npm run proof:etapa-f` (`src/proof/etapa-f-system-integrity-validation.ts`).
+
+Escopo técnico:
+1) `test:etapa-a-review` — unitários dos adaptadores + integração `TRIGGER_REVIEW` (ETAPA A);
+2) `proof:etapa-b` — catálogo PostgreSQL (`FORCE RLS`) + isolamento tenant + `withTenantContext` + negação sem contexto (ETAPA B; exige `DATABASE_URL` e `ETAPA_B_TENANT_A` / `ETAPA_B_TENANT_B`);
+3) `proof:etapa-c` — freeze de regime no FlowController runtime (ETAPA C);
+4) `proof:etapa-d` — anti-spoof, rate limit em `/api/users`, `Retry-After` em 429, `/health` íntegro (ETAPA D);
+5) `proof:etapa-e` — base legal estrutural, cross-module, regressão S1 (ETAPA E).
+
+Saída obrigatória da prova consolidada (sucesso):
+- `[ETAPA_F_TESTS_OK]` e linhas `[ETAPA_F_EVIDENCE]` para cada bloco crítico (`review_real`, `force_rls`, `regime_freeze`, `http_hardening`, `validators`, `regression`).
+
+Nota de convivência com a Secção 11.17:
+- a reconciliação histórica de nomenclatura (Frente 7 / produto real absorvido na ETAPA G) permanece válida;
+- o presente registro **11.41** formaliza uma **ETAPA F de robustez e testes transversais**, ortogonal àquela ambiguidade, com foco em consolidação de provas A–E.

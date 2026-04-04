@@ -14,7 +14,9 @@
     "proof:etapa-b": "ts-node src/proof/etapa-b-force-rls-multitenant-validation.ts",
     "proof:etapa-c": "ts-node src/proof/etapa-c-freeze-regime-validation.ts",
     "proof:etapa-d": "ts-node src/proof/etapa-d-http-hardening-validation.ts",
-    "proof:etapa-e": "ts-node src/proof/etapa-e-validators-validation.ts"
+    "proof:etapa-e": "ts-node src/proof/etapa-e-validators-validation.ts",
+    "test:etapa-a-review": "node --test -r ts-node/register src/modules/flow/adapters/snapshot-to-motor-input.test.ts src/modules/flow/adapters/motor-result-to-review-result.test.ts src/modules/flow/flow-session.service.trigger-review.integration.test.ts",
+    "proof:etapa-f": "ts-node src/proof/etapa-f-system-integrity-validation.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

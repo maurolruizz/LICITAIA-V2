@@ -14,11 +14,17 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+type HttpResponse = {
+  status: number;
+  body: string;
+  headers: http.IncomingHttpHeaders;
+};
+
 function request(
   method: string,
   path: string,
   headers?: Record<string, string>,
-): Promise<{ status: number; body: string }> {
+): Promise<HttpResponse> {
   return new Promise((resolve, reject) => {
     const url = new URL(path, API_BASE);
     const req = http.request(
@@ -38,6 +44,7 @@ function request(
           resolve({
             status: res.statusCode ?? 0,
             body: data,
+            headers: res.headers,
           });
         });
       },
@@ -45,6 +52,27 @@ function request(
     req.on('error', reject);
     req.end();
   });
+}
+
+function headerFirst(headers: http.IncomingHttpHeaders, name: string): string | undefined {
+  const v = headers[name];
+  if (v === undefined) {
+    return undefined;
+  }
+  if (Array.isArray(v)) {
+    return v[0];
+  }
+  return v;
+}
+
+function assertRetryAfterOn429(res: HttpResponse, context: string): void {
+  if (res.status !== 429) {
+    return;
+  }
+  const ra = headerFirst(res.headers, 'retry-after');
+  if (ra === undefined || ra.length === 0) {
+    fail(`${context}: HTTP 429 sem header Retry-After.`);
+  }
 }
 
 async function waitUntilHealthy(timeoutMs: number): Promise<void> {
@@ -97,6 +125,7 @@ async function main(): Promise<void> {
         'X-Forwarded-For': spoofIp,
       });
       if (res.status === 429) {
+        assertRetryAfterOn429(res, 'CENARIO 1 (spoof)');
         spoofBlocked = true;
         break;
       }
@@ -112,6 +141,7 @@ async function main(): Promise<void> {
     for (let i = 0; i < MAX_USERS_REQUESTS + 1; i += 1) {
       const res = await request('GET', '/api/users');
       if (res.status === 429) {
+        assertRetryAfterOn429(res, 'CENARIO 2 (rate limit)');
         rateLimitHit = true;
         break;
       }
@@ -131,6 +161,7 @@ async function main(): Promise<void> {
     console.log('[ETAPA_D_HARDENING_OK]');
     console.log('[ETAPA_D_EVIDENCE] spoof_blocked=OK');
     console.log('[ETAPA_D_EVIDENCE] rate_limit=OK');
+    console.log('[ETAPA_D_EVIDENCE] retry_after=OK');
   } finally {
     server.kill('SIGTERM');
     await sleep(500);

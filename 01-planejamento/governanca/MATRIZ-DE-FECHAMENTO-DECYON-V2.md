@@ -550,7 +550,7 @@ Registro factual em 2026-04-02:
 | **Rate limit /api/users** | middleware dedicado com chave por IP seguro, bloqueio `HTTP 429` e sem bypass por header spoofado |
 | **Preparação para Redis** | `createRateLimitMiddleware` desacoplado via `RateLimitStore` (in-memory atual, substituível por backend distribuído sem refatoração estrutural) |
 | **Prova executável real** | `03-backend-api/licitaia-v2-api/src/proof/etapa-d-http-hardening-validation.ts` via `npm run proof:etapa-d` |
-| **Evidência obrigatória da prova** | saída com `[ETAPA_D_HARDENING_OK]`, `[ETAPA_D_EVIDENCE] spoof_blocked=OK`, `[ETAPA_D_EVIDENCE] rate_limit=OK` |
+| **Evidência obrigatória da prova** | saída com `[ETAPA_D_HARDENING_OK]`, `[ETAPA_D_EVIDENCE] spoof_blocked=OK`, `[ETAPA_D_EVIDENCE] rate_limit=OK`, `[ETAPA_D_EVIDENCE] retry_after=OK` |
 | **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-D-HARDENING-2026-04-02.md` |
 
 ## 30. Registro operacional — ETAPA E / Validadores (base legal estrutural + coerência cross-module)
@@ -567,3 +567,20 @@ Registro factual em 2026-04-02:
 | **Evidência obrigatória da prova** | `[ETAPA_E_VALIDATORS_OK]`, `[ETAPA_E_EVIDENCE] legal_basis_validation=OK`, `[ETAPA_E_EVIDENCE] cross_module_validation=OK` |
 | **Regressão canônica** | Fase 35 runner 7/7 após ajuste de cenários S2/S5 |
 | **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-E-VALIDADORES-2026-04-02.md` |
+
+## 31. Registro operacional — ETAPA F / Consolidação de testes críticos e prova transversal (A–E)
+
+Registro factual em 2026-04-04:
+
+| Campo | Conteúdo |
+|---|---|
+| **Etapa** | ETAPA F (consolidação de robustez — prova transversal A–E) |
+| **Status** | **Artefatos e consolidação encerrados — 10/10**; execução de `proof:etapa-f` com saída `[ETAPA_F_TESTS_OK]` exige PostgreSQL acessível para `proof:etapa-b` (ver checkpoint §7–9 e riscos residuais) |
+| **Risco tratado** | regressão silenciosa entre motor, fluxo, HTTP, persistência e validadores após homologação das etapas anteriores |
+| **Consolidação técnica** | script único `src/proof/etapa-f-system-integrity-validation.ts` orquestrando `test:etapa-a-review` e `proof:etapa-b` … `proof:etapa-e` sem mascarar falhas |
+| **Prova executável** | `npm run proof:etapa-f` no pacote `03-backend-api/licitaia-v2-api` |
+| **Evidência obrigatória** | `[ETAPA_F_TESTS_OK]` e linhas `[ETAPA_F_EVIDENCE]` (review_real, force_rls, regime_freeze, http_hardening, validators, regression) |
+| **Reutilização** | provas e testes já existentes das ETAPAS A–E; ajuste mínimo em `etapa-d` para assertar `Retry-After` em 429 |
+| **Checkpoint correspondente** | `01-planejamento/governanca/CHECKPOINT-NORMATIVO-ETAPA-F-TESTES-2026-04-04.md` |
+
+Nota: permanece válida a reconciliação da Secção 2 / Plano Mestre 11.17 sobre a Frente 7; esta linha registra a **ETAPA F de testes transversais** como camada de governança de robustez.
