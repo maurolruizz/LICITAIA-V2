@@ -17,17 +17,54 @@
 
 -- Limpa dados de teste anteriores (idempotente)
 -- NOTA: audit_logs é append-only (DELETE/UPDATE bloqueados por trigger).
--- DELETE em users dispara FK ON DELETE SET NULL em audit_logs (UPDATE implícito) — falha.
--- TRUNCATE não dispara os triggers BEFORE DELETE desta tabela; executar como superusuário no seed.
+-- TRUNCATE em audit_logs deve funcionar no seed administrativo.
 TRUNCATE TABLE audit_logs;
 
-DELETE FROM organ_configs      WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
-DELETE FROM process_executions WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
-DELETE FROM user_sessions      WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
-DELETE FROM users              WHERE tenant_id IN (SELECT id FROM tenants WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b'));
-DELETE FROM tenants            WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b');
+-- =========================
+-- LIMPEZA TENANT A
+-- =========================
+SELECT set_config('app.current_tenant_id', '00000000-0000-0000-0000-000000000001', false);
 
--- Tenant de teste
+DELETE FROM organ_configs
+WHERE tenant_id = '00000000-0000-0000-0000-000000000001';
+
+DELETE FROM process_executions
+WHERE tenant_id = '00000000-0000-0000-0000-000000000001';
+
+DELETE FROM user_sessions
+WHERE tenant_id = '00000000-0000-0000-0000-000000000001';
+
+DELETE FROM users
+WHERE tenant_id = '00000000-0000-0000-0000-000000000001';
+
+-- =========================
+-- LIMPEZA TENANT B
+-- =========================
+SELECT set_config('app.current_tenant_id', '00000000-0000-0000-0000-000000000002', false);
+
+DELETE FROM organ_configs
+WHERE tenant_id = '00000000-0000-0000-0000-000000000002';
+
+DELETE FROM process_executions
+WHERE tenant_id = '00000000-0000-0000-0000-000000000002';
+
+DELETE FROM user_sessions
+WHERE tenant_id = '00000000-0000-0000-0000-000000000002';
+
+DELETE FROM users
+WHERE tenant_id = '00000000-0000-0000-0000-000000000002';
+
+-- =========================
+-- LIMPEZA TENANTS
+-- =========================
+SELECT set_config('app.current_tenant_id', '', false);
+
+DELETE FROM tenants
+WHERE slug IN ('prefeitura-exemplo', 'orgao-isolamento-b');
+
+-- =========================
+-- CRIA TENANTS
+-- =========================
 INSERT INTO tenants (id, slug, name, cnpj, status, plan_type)
 VALUES (
     '00000000-0000-0000-0000-000000000001',
@@ -37,6 +74,21 @@ VALUES (
     'trial',
     'trial'
 );
+
+INSERT INTO tenants (id, slug, name, cnpj, status, plan_type)
+VALUES (
+    '00000000-0000-0000-0000-000000000002',
+    'orgao-isolamento-b',
+    'Órgão B — isolamento',
+    '11.111.111/0001-11',
+    'trial',
+    'trial'
+);
+
+-- =========================
+-- DADOS TENANT A
+-- =========================
+SELECT set_config('app.current_tenant_id', '00000000-0000-0000-0000-000000000001', false);
 
 -- TENANT_ADMIN
 INSERT INTO users (id, tenant_id, email, name, role, status, password_hash)
@@ -76,29 +128,7 @@ VALUES (
     '00000000-0000-0000-0001-000000000001'
 );
 
--- Segundo tenant (isolamento multi-tenant nas provas)
-INSERT INTO tenants (id, slug, name, cnpj, status, plan_type)
-VALUES (
-    '00000000-0000-0000-0000-000000000002',
-    'orgao-isolamento-b',
-    'Órgão B — isolamento',
-    '11.111.111/0001-11',
-    'trial',
-    'trial'
-);
-
-INSERT INTO users (id, tenant_id, email, name, role, status, password_hash)
-VALUES (
-    '00000000-0000-0000-0002-000000000001',
-    '00000000-0000-0000-0000-000000000002',
-    'admin-b@exemplo.gov.br',
-    'Administrador Órgão B',
-    'TENANT_ADMIN',
-    'active',
-    '$2b$12$wjFnUGF01iQCPlAcWd.aT.BDDjjj.6jVKCFh/ovbp5U53rm0aRb2.'
-);
-
--- Configuração institucional do tenant de teste
+-- Configuração institucional do tenant A
 INSERT INTO organ_configs (
     tenant_id,
     orgao_nome_oficial,
@@ -121,3 +151,22 @@ VALUES (
     false,
     5
 );
+
+-- =========================
+-- DADOS TENANT B
+-- =========================
+SELECT set_config('app.current_tenant_id', '00000000-0000-0000-0000-000000000002', false);
+
+INSERT INTO users (id, tenant_id, email, name, role, status, password_hash)
+VALUES (
+    '00000000-0000-0000-0002-000000000001',
+    '00000000-0000-0000-0000-000000000002',
+    'admin-b@exemplo.gov.br',
+    'Administrador Órgão B',
+    'TENANT_ADMIN',
+    'active',
+    '$2b$12$wjFnUGF01iQCPlAcWd.aT.BDDjjj.6jVKCFh/ovbp5U53rm0aRb2.'
+);
+
+-- Limpa contexto ao final
+SELECT set_config('app.current_tenant_id', '', false);
