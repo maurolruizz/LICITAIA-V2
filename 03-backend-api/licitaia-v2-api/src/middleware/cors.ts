@@ -16,10 +16,14 @@ const ALLOWED_HEADERS = 'Content-Type, Authorization, x-request-id';
 
 export function corsMiddleware(req: Request, res: Response, next: NextFunction): void {
   const origin = req.headers['origin'];
+  const allowedOrigins = config.corsOrigins;
+  const isAllowedOrigin =
+    typeof origin === 'string' && allowedOrigins.includes(origin);
 
-  if (origin === config.corsOrigin) {
+  if (isAllowedOrigin && typeof origin === 'string') {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
   // Requests sem Origin (curl, Postman, runners locais) passam em desenvolvimento sem bloqueio.
 

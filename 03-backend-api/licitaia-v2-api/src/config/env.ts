@@ -69,13 +69,26 @@ function normalizeCorsOrigin(raw: string): string {
   return url.origin;
 }
 
-function resolveCorsOrigin(environment: AppEnvironment): string {
+function resolveCorsOrigins(environment: AppEnvironment): string[] {
   const raw = process.env['CORS_ORIGIN'];
   const empty = raw === undefined || raw.trim() === '';
+  const parseList = (value: string): string[] => {
+    const origins = value
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => item !== '')
+      .map(normalizeCorsOrigin);
+    if (origins.length === 0) {
+      throw new Error(
+        `${BOOT_FAIL} CORS_ORIGIN inválido: informe ao menos uma origem http(s) explícita.`,
+      );
+    }
+    return Array.from(new Set(origins));
+  };
 
   if (environment === 'development') {
-    if (empty) return DEFAULT_DEV_CORS_ORIGIN;
-    return normalizeCorsOrigin(raw);
+    if (empty) return [DEFAULT_DEV_CORS_ORIGIN];
+    return parseList(raw);
   }
 
   if (empty) {
@@ -83,7 +96,7 @@ function resolveCorsOrigin(environment: AppEnvironment): string {
       `${BOOT_FAIL} CORS_ORIGIN é obrigatório quando NODE_ENV é "${environment}".`,
     );
   }
-  return normalizeCorsOrigin(raw);
+  return parseList(raw);
 }
 
 const DEFAULT_DEV_DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/licitaia_dev';
@@ -158,6 +171,7 @@ function resolveTrustProxyHops(raw: string | undefined): number {
 function buildValidatedConfig(): {
   port: number;
   environment: AppEnvironment;
+  corsOrigins: string[];
   corsOrigin: string;
   aiAssistiveEnabled: boolean;
   service: string;
@@ -170,7 +184,7 @@ function buildValidatedConfig(): {
 } {
   const environment = parseEnvironment(process.env['NODE_ENV']);
   const port = parsePort(process.env['PORT']);
-  const corsOrigin = resolveCorsOrigin(environment);
+  const corsOrigins = resolveCorsOrigins(environment);
   const databaseUrl = resolveDatabaseUrl(environment);
   const jwtSecret = resolveJwtSecret(environment);
   const jwtAccessExpiresSecs = parsePositiveInt(
@@ -188,7 +202,8 @@ function buildValidatedConfig(): {
   return {
     port,
     environment,
-    corsOrigin,
+    corsOrigins,
+    corsOrigin: corsOrigins[0],
     aiAssistiveEnabled: process.env['AI_ASSISTIVE_ENABLED'] !== 'false',
     service: 'licitaia-v2-api',
     version: '2.0.0',

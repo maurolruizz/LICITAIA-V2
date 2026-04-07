@@ -10,6 +10,7 @@ import { ProcessOperationalStatus } from "@/components/process/process-operation
 import { ProcessStepOverview } from "@/components/process/process-step-overview";
 import { ProcessBlockings } from "@/components/process/process-blockings";
 import { ProcessTechnicalDetails } from "@/components/process/process-technical-details";
+import { ProcessFlowActions } from "@/components/process/process-flow-actions";
 
 export default function ProcessPage() {
   const params = useParams();
@@ -25,14 +26,20 @@ export default function ProcessPage() {
   const current = useProcessStore((s) => s.current);
   const detailLoading = useProcessStore((s) => s.detailLoading);
   const detailError = useProcessStore((s) => s.detailError);
+  const executeProcessAction = useProcessStore((s) => s.executeProcessAction);
+  const executeLoading = useProcessStore((s) => s.executeLoading);
+  const executeError = useProcessStore((s) => s.executeError);
+  const executeSuccess = useProcessStore((s) => s.executeSuccess);
+  const clearExecuteFeedback = useProcessStore((s) => s.clearExecuteFeedback);
 
   useEffect(() => {
     if (!processId) return;
     void loadProcess(processId);
+    clearExecuteFeedback();
     return () => {
       clearDetail();
     };
-  }, [processId, loadProcess, clearDetail]);
+  }, [processId, loadProcess, clearDetail, clearExecuteFeedback]);
 
   if (detailLoading) {
     return (
@@ -96,6 +103,13 @@ export default function ProcessPage() {
         </section>
 
         <ProcessOperationalStatus state={state} />
+        <ProcessFlowActions
+          state={state}
+          executeLoading={executeLoading}
+          executeError={executeError}
+          executeSuccess={executeSuccess}
+          onExecuteAction={executeProcessAction}
+        />
         <ProcessStepOverview state={state} />
         <ProcessBlockings state={state} />
         <ProcessTechnicalDetails state={state} />

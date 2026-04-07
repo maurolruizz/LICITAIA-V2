@@ -30,6 +30,20 @@ export type CreateProcessResult = {
 };
 
 export type GetProcessResult = CreateProcessResult;
+export type ExecuteProcessActionPayload = {
+  processId: string;
+  action: string;
+  guard: {
+    expectedRevision: number;
+    expectedRenderToken: string;
+  };
+  updates?: unknown[];
+};
+
+export type ExecuteProcessActionResult = {
+  processId: string;
+  state: Record<string, unknown>;
+};
 
 function isProcessRecord(value: unknown): value is ProcessRecord {
   if (!value || typeof value !== "object") return false;
@@ -71,6 +85,26 @@ function parseCreateOrGetEnvelope(body: unknown): CreateProcessResult | null {
     return null;
   }
   return { process: rec, state: state as Record<string, unknown> };
+}
+
+function parseExecuteEnvelope(body: unknown): ExecuteProcessActionResult | null {
+  if (!isApiSuccessEnvelope(body)) return null;
+  const data = body.data;
+  if (!data || typeof data !== "object" || Array.isArray(data)) return null;
+  const processId = (data as Record<string, unknown>).processId;
+  const state = (data as Record<string, unknown>).state;
+  if (
+    typeof processId !== "string" ||
+    !state ||
+    typeof state !== "object" ||
+    Array.isArray(state)
+  ) {
+    return null;
+  }
+  return {
+    processId,
+    state: state as Record<string, unknown>,
+  };
 }
 
 /**
@@ -126,6 +160,21 @@ export async function getAdministrativeProcess(
   const parsed = parseCreateOrGetEnvelope(body);
   if (!parsed) {
     throw new Error("Resposta de detalhe do processo em formato inesperado.");
+  }
+  return parsed;
+}
+
+/**
+ * Executa ação operacional do processo no motor persistido.
+ * Backend: POST /api/process/execute
+ */
+export async function executeAdministrativeProcessAction(
+  payload: ExecuteProcessActionPayload,
+): Promise<ExecuteProcessActionResult> {
+  const { data: body } = await api.post<unknown>("/api/process/execute", payload);
+  const parsed = parseExecuteEnvelope(body);
+  if (!parsed) {
+    throw new Error("Resposta de execução de ação em formato inesperado.");
   }
   return parsed;
 }

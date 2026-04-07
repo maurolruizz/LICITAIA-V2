@@ -180,7 +180,7 @@ process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 server = app.listen(config.port, () => {
   logger.info(`${config.service} v${config.version} iniciado`);
   logger.info(`ambiente: ${config.environment} | porta: ${config.port}`);
-  logger.info(`CORS permitido para: ${config.corsOrigin}`);
+  logger.info(`CORS permitido para: ${config.corsOrigins.join(', ')}`);
 });
 
 /**
